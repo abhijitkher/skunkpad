@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Job Feed</title>
+<style>
+  :root { --bg:#fafaf8; --card:#fff; --ink:#1c1c1a; --sub:#6b6b66; --line:#e6e5e0; --accent:#1f5eff; --good:#0a7a4b; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#141413; --card:#1d1d1b; --ink:#ecebe6; --sub:#9a9a93; --line:#2c2c29; --accent:#6c97ff; --good:#4fd08f; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
+  main { max-width:860px; margin:0 auto; padding:32px 16px 64px; }
+  h1 { font-size:24px; margin:0 0 4px; }
+  .meta { color:var(--sub); font-size:13px; margin-bottom:20px; }
+  .controls { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
+  input, select { background:var(--card); color:var(--ink); border:1px solid var(--line); border-radius:8px; padding:8px 10px; font:inherit; }
+  input { flex:1; min-width:180px; }
+  .job { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin-bottom:10px; display:grid; grid-template-columns:56px 1fr; gap:14px; }
+  .score { font-size:22px; font-weight:700; text-align:center; line-height:1; padding-top:2px; }
+  .score small { display:block; font-size:11px; font-weight:500; color:var(--sub); margin-top:4px; }
+  .title a { color:var(--ink); text-decoration:none; font-weight:600; }
+  .title a:hover { color:var(--accent); }
+  .sub { color:var(--sub); font-size:13px; margin-top:2px; }
+  .tag { display:inline-block; font-size:11px; padding:1px 7px; border-radius:99px; border:1px solid var(--line); margin-right:6px; color:var(--sub); }
+  .tag.new { color:var(--good); border-color:var(--good); }
+  .empty { color:var(--sub); padding:40px 0; text-align:center; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Job feed</h1>
+  <div class="meta" id="meta">Loading...</div>
+  <div class="controls">
+    <input id="q" type="search" placeholder="Filter by company, title, location">
+    <select id="sort"><option value="score">Best match</option><option value="new">Newest first</option></select>
+    <select id="onlyNew"><option value="">All roles</option><option value="1">New today only</option></select>
+  </div>
+  <div id="list"></div>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+let feed = { jobs: [] };
+
+async function load() {
+  for (const url of ["/api/feed", "feed.json"]) {
+    try {
+      const r = await fetch(url);
+      if (r.ok) { feed = await r.json(); break; }
+    } catch (e) {}
+  }
+  render();
+}
+
+function render() {
+  const q = $("q").value.toLowerCase();
+  let jobs = feed.jobs.filter((j) =>
+    `${j.company} ${j.title} ${j.location}`.toLowerCase().includes(q) && (!$("onlyNew").value || j.isNew));
+  if ($("sort").value === "new") jobs = [...jobs].sort((a, b) => (b.firstSeen || "").localeCompare(a.firstSeen || ""));
+
+  const when = feed.generatedAt ? new Date(feed.generatedAt).toLocaleString() : "never";
+  $("meta").textContent = `${jobs.length} roles shown, updated ${when}. Match score is a keyword heuristic against my resume, so use it as a sort order.`;
+
+  $("list").replaceChildren(...(jobs.length ? jobs.map(card) : [Object.assign(document.createElement("div"), { className: "empty", textContent: "No roles yet. The feed refreshes each weekday morning." })]));
+}
+
+function card(j) {
+  const el = document.createElement("div");
+  el.className = "job";
+  const score = document.createElement("div");
+  score.className = "score";
+  score.textContent = j.score;
+  const s = document.createElement("small");
+  s.textContent = "match";
+  score.append(s);
+
+  const body = document.createElement("div");
+  const title = document.createElement("div");
+  title.className = "title";
+  const a = document.createElement("a");
+  a.href = j.url; a.target = "_blank"; a.rel = "noopener";
+  a.textContent = `${j.title}, ${j.company}`;
+  title.append(a);
+
+  const sub = document.createElement("div");
+  sub.className = "sub";
+  if (j.isNew) { const t = document.createElement("span"); t.className = "tag new"; t.textContent = "new"; sub.append(t); }
+  sub.append([j.location, j.comp].filter(Boolean).join("  |  "));
+
+  body.append(title, sub);
+  el.append(score, body);
+  return el;
+}
+
+["q", "sort", "onlyNew"].forEach((id) => $(id).addEventListener("input", render));
+load();
+</script>
+</body>
+</html>

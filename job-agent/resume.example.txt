@@ -1,0 +1,5 @@
+Paste your resume text here for local runs, save it as resume.txt (gitignored).
+On Netlify, set the RESUME_TEXT environment variable instead.
+
+Example terms the scorer will pick up: trust and safety, identity verification, fraud,
+platform, privacy, marketplace, 0 to 1, roadmap, experimentation, payments.

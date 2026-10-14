@@ -1,0 +1,17 @@
+{
+  "_comment": "Target companies. Each entry: { source: greenhouse|lever|ashby, slug: <board token> }. The slug is the identifier in the company's hiring URL. These are starter guesses across trust/identity specialists and growth-stage tech; VERIFY each slug against the company's real job board before trusting results (see scripts/check-slugs.js).",
+  "companies": [
+    { "source": "greenhouse", "slug": "stripe",        "name": "Stripe" },
+    { "source": "lever",      "slug": "plaid",         "name": "Plaid" },
+    { "source": "greenhouse", "slug": "databricks",    "name": "Databricks" },
+    { "source": "greenhouse", "slug": "airbnb",        "name": "Airbnb" },
+    { "source": "greenhouse", "slug": "coinbase",      "name": "Coinbase" },
+    { "source": "ashby",      "slug": "persona",       "name": "Persona" },
+    { "source": "greenhouse", "slug": "socure",        "name": "Socure" },
+    { "source": "lever",      "slug": "alloy",         "name": "Alloy" },
+    { "source": "ashby",      "slug": "stytch",        "name": "Stytch" },
+    { "source": "greenhouse", "slug": "gusto",         "name": "Gusto" },
+    { "source": "greenhouse", "slug": "figma",         "name": "Figma" },
+    { "source": "greenhouse", "slug": "notion",        "name": "Notion" }
+  ]
+}

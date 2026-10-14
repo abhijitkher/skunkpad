@@ -1,0 +1,5 @@
+node_modules/
+.netlify/
+.env
+resume.txt
+public/feed.json

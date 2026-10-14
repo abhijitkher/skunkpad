@@ -1,0 +1,50 @@
+{
+  "_comment": "Your targeting. The scorer and filters read this. Edit freely.",
+  "titles_wanted": [
+    "principal product manager",
+    "staff product manager",
+    "head of product",
+    "director of product",
+    "senior director product",
+    "group product manager",
+    "vp product",
+    "principal pm",
+    "lead product manager"
+  ],
+  "titles_excluded": [
+    "associate product manager",
+    "product marketing",
+    "technical program manager",
+    "project manager",
+    "product designer",
+    "data",
+    "engineer"
+  ],
+  "locations_wanted": [
+    "san francisco",
+    "bay area",
+    "sf",
+    "remote",
+    "united states",
+    "us",
+    "california",
+    "ca"
+  ],
+  "keywords_boost": [
+    "trust",
+    "safety",
+    "identity",
+    "verification",
+    "fraud",
+    "platform",
+    "0 to 1",
+    "0-1",
+    "marketplace",
+    "privacy",
+    "security",
+    "ai",
+    "payments",
+    "growth"
+  ],
+  "min_score_to_show": 25
+}
