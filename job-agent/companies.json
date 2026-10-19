@@ -6,6 +6,7 @@
     { "source": "greenhouse", "slug": "airbnb",         "name": "Airbnb" },
     { "source": "greenhouse", "slug": "coinbase",       "name": "Coinbase" },
     { "source": "ashby",      "slug": "persona",        "name": "Persona" },
+    { "source": "lever",      "slug": "persona",        "name": "Persona" },
     { "source": "lever",      "slug": "alloy",          "name": "Alloy" },
     { "source": "ashby",      "slug": "stytch",         "name": "Stytch" },
     { "source": "greenhouse", "slug": "gusto",          "name": "Gusto" },
