@@ -1,5 +1,5 @@
 {
-  "_comment": "Target companies. Each entry: { source: greenhouse|lever|ashby, slug: <board token>, name }. Slugs below were verified against the live feed on 2026-10-19: every one returns jobs. Removed after the first live run because their slug/source 404'd: Plaid, Socure, Notion, NerdWallet, Box, DoorDash. To re-add one, find its real board token and source and confirm it returns jobs. Coverage is ATS-only (Greenhouse, Lever, Ashby public APIs) by design; ranking is by resume/skills match, not by which company.",
+  "_comment": "Target companies. { source: greenhouse|lever|ashby, slug: <board token>, name }. The first block (through Robinhood) was verified against the live feed on 2026-10-19: every slug returns jobs. The AI block at the end was added 2026-10-19 as CANDIDATE slugs, not yet verified from this environment: a wrong source/slug 404s into the feed's `errors` array and shows nothing, it does not break the run. Prune any AI entry that appears in `errors` after the next run. Removed earlier as dead: Plaid, Socure, Notion, NerdWallet, Box, DoorDash. Coverage is ATS-only (Greenhouse, Lever, Ashby public APIs); ranking is by resume/skills match, not by which company.",
   "companies": [
     { "source": "greenhouse", "slug": "stripe",        "name": "Stripe" },
     { "source": "greenhouse", "slug": "databricks",     "name": "Databricks" },
@@ -36,6 +36,16 @@
     { "source": "greenhouse", "slug": "roblox",         "name": "Roblox" },
     { "source": "greenhouse", "slug": "discord",        "name": "Discord" },
     { "source": "greenhouse", "slug": "flexport",       "name": "Flexport" },
-    { "source": "greenhouse", "slug": "robinhood",      "name": "Robinhood" }
+    { "source": "greenhouse", "slug": "robinhood",      "name": "Robinhood" },
+
+    { "source": "greenhouse", "slug": "anthropic",      "name": "Anthropic" },
+    { "source": "ashby",      "slug": "openai",         "name": "OpenAI" },
+    { "source": "greenhouse", "slug": "scaleai",        "name": "Scale AI" },
+    { "source": "ashby",      "slug": "cohere",         "name": "Cohere" },
+    { "source": "ashby",      "slug": "perplexityai",   "name": "Perplexity" },
+    { "source": "greenhouse", "slug": "glean",          "name": "Glean" },
+    { "source": "ashby",      "slug": "sierra",         "name": "Sierra" },
+    { "source": "ashby",      "slug": "harvey",         "name": "Harvey" },
+    { "source": "ashby",      "slug": "mistral",        "name": "Mistral AI" }
   ]
 }
