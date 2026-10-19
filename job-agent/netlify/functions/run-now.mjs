@@ -1,17 +1,24 @@
 import { getStore } from "@netlify/blobs";
 import { runPipeline } from "../../src/pipeline.js";
 
-// On-demand refresh at /api/refresh?token=RUN_TOKEN. Same work as the scheduled
-// refresh-feed, but HTTP-triggered so a run does not depend on the dashboard.
-// Token-gated so it is not wide open. Returns the run summary (counts + the
-// board errors) as JSON so you can see immediately what happened.
+// On-demand refresh at /api/refresh. Runs the same work as the scheduled
+// refresh-feed but HTTP-triggered, so a run never depends on the dashboard.
+// Returns the run summary (counts + board errors) as JSON so you see what
+// happened immediately.
+//
+// Optional lock: set a RUN_TOKEN env var in Netlify and this endpoint will
+// then require ?token=<that value>. With no RUN_TOKEN set, it is open, which
+// is fine for a personal feed since a run only recomputes the list.
 export default async (req) => {
-  const token = new URL(req.url).searchParams.get("token");
-  if (!process.env.RUN_TOKEN || token !== process.env.RUN_TOKEN) {
-    return new Response(JSON.stringify({ error: "unauthorized" }), {
-      status: 401,
-      headers: { "content-type": "application/json" },
-    });
+  const required = process.env.RUN_TOKEN;
+  if (required) {
+    const token = new URL(req.url).searchParams.get("token");
+    if (token !== required) {
+      return new Response(JSON.stringify({ error: "unauthorized" }), {
+        status: 401,
+        headers: { "content-type": "application/json" },
+      });
+    }
   }
   const store = getStore("job-agent");
   const previousSeen = (await store.get("seen", { type: "json" })) || {};
