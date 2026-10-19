@@ -25,6 +25,8 @@
   .sub { color:var(--sub); font-size:13px; margin-top:2px; }
   .tag { display:inline-block; font-size:11px; padding:1px 7px; border-radius:99px; border:1px solid var(--line); margin-right:6px; color:var(--sub); }
   .tag.new { color:var(--good); border-color:var(--good); }
+  .tag.remote { color:var(--good); border-color:var(--good); }
+  .tag.hybrid { color:var(--accent); border-color:var(--accent); }
   .empty { color:var(--sub); padding:40px 0; text-align:center; }
 </style>
 </head>
@@ -36,6 +38,22 @@
     <input id="q" type="search" placeholder="Filter by company, title, location">
     <select id="sort"><option value="score">Best match</option><option value="new">Newest first</option></select>
     <select id="onlyNew"><option value="">All roles</option><option value="1">New today only</option></select>
+    <select id="mode">
+      <option value="">Any location type</option>
+      <option value="remote">Remote</option>
+      <option value="hybrid">Hybrid</option>
+      <option value="onsite">Onsite</option>
+      <option value="unknown">Unspecified</option>
+    </select>
+    <select id="days" hidden>
+      <option value="">Hybrid: any cadence</option>
+      <option value="1">1 day / week</option>
+      <option value="2">2 days / week</option>
+      <option value="3">3 days / week</option>
+      <option value="4">4 days / week</option>
+      <option value="5">5 days / week</option>
+      <option value="none">Days not stated</option>
+    </select>
   </div>
   <div id="list"></div>
 </main>
@@ -53,16 +71,33 @@ async function load() {
   render();
 }
 
+const MODE_LABEL = { remote: "Remote", hybrid: "Hybrid", onsite: "Onsite", unknown: "Location unspecified" };
+
 function render() {
   const q = $("q").value.toLowerCase();
-  let jobs = feed.jobs.filter((j) =>
-    `${j.company} ${j.title} ${j.location}`.toLowerCase().includes(q) && (!$("onlyNew").value || j.isNew));
+  const mode = $("mode").value;
+  const days = $("days").value;
+  // The hybrid-cadence filter only makes sense once Hybrid is chosen.
+  $("days").hidden = mode !== "hybrid";
+
+  let jobs = feed.jobs.filter((j) => {
+    const wm = j.workMode || "unknown";
+    if (!`${j.company} ${j.title} ${j.location}`.toLowerCase().includes(q)) return false;
+    if ($("onlyNew").value && !j.isNew) return false;
+    if (mode && wm !== mode) return false;
+    if (mode === "hybrid" && days) {
+      const d = j.hybridDays == null ? null : Number(j.hybridDays);
+      if (days === "none") return d === null;
+      return d === Number(days);
+    }
+    return true;
+  });
   if ($("sort").value === "new") jobs = [...jobs].sort((a, b) => (b.firstSeen || "").localeCompare(a.firstSeen || ""));
 
   const when = feed.generatedAt ? new Date(feed.generatedAt).toLocaleString() : "never";
-  $("meta").textContent = `${jobs.length} roles shown, updated ${when}. Match score is a keyword heuristic against my resume, so use it as a sort order.`;
+  $("meta").textContent = `${jobs.length} roles shown, updated ${when}. Match score is a keyword heuristic against my resume. Location type is read from each posting; "unspecified" means the posting did not say.`;
 
-  $("list").replaceChildren(...(jobs.length ? jobs.map(card) : [Object.assign(document.createElement("div"), { className: "empty", textContent: "No roles yet. The feed refreshes each weekday morning." })]));
+  $("list").replaceChildren(...(jobs.length ? jobs.map(card) : [Object.assign(document.createElement("div"), { className: "empty", textContent: "No roles match these filters." })]));
 }
 
 function card(j) {
@@ -86,14 +121,21 @@ function card(j) {
   const sub = document.createElement("div");
   sub.className = "sub";
   if (j.isNew) { const t = document.createElement("span"); t.className = "tag new"; t.textContent = "new"; sub.append(t); }
-  sub.append([j.location, j.comp].filter(Boolean).join("  |  "));
+
+  const wm = j.workMode || "unknown";
+  const modeTag = document.createElement("span");
+  modeTag.className = `tag ${wm}`;
+  modeTag.textContent = wm === "hybrid" && j.hybridDays ? `Hybrid · ${j.hybridDays}d/wk` : MODE_LABEL[wm];
+  sub.append(modeTag);
+
+  sub.append(" " + [j.location, j.comp].filter(Boolean).join("  |  "));
 
   body.append(title, sub);
   el.append(score, body);
   return el;
 }
 
-["q", "sort", "onlyNew"].forEach((id) => $(id).addEventListener("input", render));
+["q", "sort", "onlyNew", "mode", "days"].forEach((id) => $(id).addEventListener("input", render));
 load();
 </script>
 </body>

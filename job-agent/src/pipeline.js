@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import profile from "../profile.json" with { type: "json" };
 import companiesData from "../companies.json" with { type: "json" };
 import { fetchAll } from "./sources.js";
-import { buildResumeTerms, passesFilters, scoreJob } from "./score.js";
+import { buildResumeTerms, passesFilters, scoreJob, classifyWorkMode } from "./score.js";
 
 // profile.json and companies.json are imported at build time so esbuild inlines
 // them into the bundled function. Reading them from disk at runtime broke after
@@ -34,6 +34,7 @@ export async function runPipeline(previousSeen = {}) {
     .filter((j) => passesFilters(j, profile))
     .map((j) => {
       const { score, why } = scoreJob(j, profile, resumeTerms);
+      const { workMode, hybridDays } = classifyWorkMode(j);
       if (!seen[j.id]) seen[j.id] = now;
       return {
         id: j.id,
@@ -45,6 +46,8 @@ export async function runPipeline(previousSeen = {}) {
         postedAt: j.postedAt,
         firstSeen: seen[j.id],
         isNew: seen[j.id] === now,
+        workMode,
+        hybridDays,
         score,
         why,
       };

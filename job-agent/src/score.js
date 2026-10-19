@@ -54,3 +54,48 @@ export function scoreJob(job, profile, resumeTerms) {
     why: { title: titleScore, keywords: boostScore, resume: overlapScore, location: locScore },
   };
 }
+
+// Best-effort work-arrangement classifier from the posting's location + text.
+// Conservative by design: returns remote/hybrid/onsite only when the text says
+// so, else "unknown". hybridDays is set only when an in-office cadence is
+// explicitly stated near an office/hybrid cue; it is never guessed.
+const WORD_NUM = { one: 1, two: 2, three: 3, four: 4, five: 5 };
+
+function extractHybridDays(text) {
+  const num = "(\\d+|one|two|three|four|five)";
+  const office = "(?:office|in[\\s-]*person|on[\\s-]*site|onsite|hybrid)";
+  const res = [
+    new RegExp(`${num}\\s*\\+?\\s*days?\\s*(?:per|a|/)\\s*week[^.]{0,40}?${office}`, "i"),
+    new RegExp(`${office}[^.]{0,40}?${num}\\s*\\+?\\s*days?\\s*(?:per|a|/)?\\s*week`, "i"),
+    new RegExp(`hybrid[^.]{0,40}?${num}\\s*\\+?\\s*days?`, "i"),
+  ];
+  for (const re of res) {
+    const m = text.match(re);
+    if (m) {
+      const n = WORD_NUM[m[1].toLowerCase()] || parseInt(m[1], 10);
+      if (n >= 1 && n <= 6) return n;
+    }
+  }
+  return null;
+}
+
+export function classifyWorkMode(job) {
+  const loc = (job.location || "").toLowerCase();
+  const desc = (job.description || "").toLowerCase();
+  const all = `${loc}\n${desc}`;
+
+  const hybrid = /\bhybrid\b/.test(all);
+  const remote =
+    /\bremote\b/.test(loc) ||
+    /(fully remote|remote[- ]first|100% remote|work from anywhere|remote[- ]eligible|open to remote|remote,?\s*(?:us|usa|united states))/.test(desc);
+  const onsite = /\b(on[\s-]?site|onsite|in[\s-]?person|in[\s-]?office|in the office)\b/.test(all);
+
+  const days = extractHybridDays(all);
+
+  let workMode = "unknown";
+  if (hybrid || days) workMode = "hybrid";
+  else if (remote) workMode = "remote";
+  else if (onsite) workMode = "onsite";
+
+  return { workMode, hybridDays: workMode === "hybrid" ? days || null : null };
+}
