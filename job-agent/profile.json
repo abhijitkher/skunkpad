@@ -1,15 +1,23 @@
 {
   "_comment": "Your targeting. The scorer and filters read this. Edit freely.",
+  "_titles_note": "Principal PM and above only. Lead/Senior PM intentionally removed. Staff PM kept because it sits at the Principal tier at most companies; delete it if you want strictly Principal-and-up.",
   "titles_wanted": [
     "principal product manager",
+    "principal pm",
     "staff product manager",
+    "group product manager",
     "head of product",
     "director of product",
+    "director, product",
+    "director of product management",
     "senior director product",
-    "group product manager",
+    "senior director, product",
     "vp product",
-    "principal pm",
-    "lead product manager"
+    "vp, product",
+    "vp of product",
+    "vice president product",
+    "vice president, product",
+    "chief product officer"
   ],
   "titles_excluded": [
     "associate product manager",
