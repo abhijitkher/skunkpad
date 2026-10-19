@@ -1,5 +1,5 @@
 {
-  "_comment": "Target companies. { source: greenhouse|lever|ashby, slug: <board token>, name }. Blocks: (1) core, verified against the live feed 2026-10-19; (2) AI block, candidate slugs added 2026-10-19; (3) pets/animals block added 2026-10-19 (thefarmersdog, rover, modernanimal, p3vetpartners verified against their live boards; spotandtango and ollie are candidates). A wrong source/slug 404s into the feed's `errors` array and shows nothing, it does not break the run; prune anything that appears there. Note: big pet names on unsupported ATS (Chewy/Trupanion on Workday, Embark on JazzHR, Dutch/Spot&Tango custom sites) cannot be pulled here. Coverage is ATS-only; ranking is by resume/skills match, not by which company.",
+  "_comment": "Target companies. { source: greenhouse|lever|ashby, slug: <board token>, name }. Verified against live boards on 2026-10-19. A wrong source/slug 404s into the feed's `errors` array and shows nothing; prune anything that lands there. Removed as unreachable: Plaid, Socure, Notion, NerdWallet, Box, DoorDash, Ollie (no board found), and big names on unsupported ATS (Chewy/Trupanion on Workday, Embark on JazzHR, Dutch custom). Coverage is ATS-only (Greenhouse, Lever, Ashby); ranking is by resume/skills match, not by which company.",
   "companies": [
     { "source": "greenhouse", "slug": "stripe",        "name": "Stripe" },
     { "source": "greenhouse", "slug": "databricks",     "name": "Databricks" },
@@ -42,17 +42,16 @@
     { "source": "ashby",      "slug": "openai",         "name": "OpenAI" },
     { "source": "greenhouse", "slug": "scaleai",        "name": "Scale AI" },
     { "source": "ashby",      "slug": "cohere",         "name": "Cohere" },
-    { "source": "ashby",      "slug": "perplexityai",   "name": "Perplexity" },
-    { "source": "greenhouse", "slug": "glean",          "name": "Glean" },
+    { "source": "ashby",      "slug": "perplexity",     "name": "Perplexity" },
+    { "source": "greenhouse", "slug": "gleanwork",      "name": "Glean" },
     { "source": "ashby",      "slug": "sierra",         "name": "Sierra" },
     { "source": "ashby",      "slug": "harvey",         "name": "Harvey" },
-    { "source": "ashby",      "slug": "mistral",        "name": "Mistral AI" },
+    { "source": "lever",      "slug": "mistral",        "name": "Mistral AI" },
 
     { "source": "greenhouse", "slug": "thefarmersdog",  "name": "The Farmer's Dog" },
     { "source": "lever",      "slug": "rover",          "name": "Rover" },
     { "source": "greenhouse", "slug": "modernanimal",   "name": "Modern Animal" },
     { "source": "lever",      "slug": "p3vetpartners",  "name": "P3 Veterinary Partners" },
-    { "source": "greenhouse", "slug": "spotandtango",   "name": "Spot & Tango" },
-    { "source": "greenhouse", "slug": "ollie",          "name": "Ollie" }
+    { "source": "greenhouse", "slug": "spotandtango",   "name": "Spot & Tango" }
   ]
 }
