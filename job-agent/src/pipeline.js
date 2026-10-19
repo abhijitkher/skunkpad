@@ -1,8 +1,13 @@
 import { readFile } from "node:fs/promises";
+import profile from "../profile.json" with { type: "json" };
+import companiesData from "../companies.json" with { type: "json" };
 import { fetchAll } from "./sources.js";
 import { buildResumeTerms, passesFilters, scoreJob } from "./score.js";
 
-const readJson = async (path) => JSON.parse(await readFile(new URL(path, import.meta.url), "utf8"));
+// profile.json and companies.json are imported at build time so esbuild inlines
+// them into the bundled function. Reading them from disk at runtime broke after
+// bundling, because the function's location (not src/) became import.meta.url.
+const { companies } = companiesData;
 
 // Resume text comes from the RESUME_TEXT env var (use this on Netlify, the file
 // is gitignored so it is never deployed), then resume.txt, then the example.
@@ -18,11 +23,7 @@ async function loadResume() {
 
 // previousSeen: { [jobId]: firstSeenISO } so each run can flag what is new.
 export async function runPipeline(previousSeen = {}) {
-  const [profile, { companies }, resume] = await Promise.all([
-    readJson("../profile.json"),
-    readJson("../companies.json"),
-    loadResume(),
-  ]);
+  const resume = await loadResume();
 
   const resumeTerms = buildResumeTerms(resume);
   const { jobs, errors } = await fetchAll(companies);
