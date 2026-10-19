@@ -1,18 +1,15 @@
 {
-  "_comment": "Target companies, broadened well beyond the original 12. Each entry: { source: greenhouse|lever|ashby, slug: <board token>, name }. The slug is the identifier in the company's hiring URL. These are CANDIDATE slugs, not verified from this environment. Verification happens at runtime: a wrong source/slug fails gracefully into the feed's `errors` array and shows no jobs, it does not break the run. After the first live deploy, prune any entry that appears in `errors`. Coverage is ATS-only (Greenhouse, Lever, Ashby public APIs) by design; this is not an all-companies aggregator. Ranking is by resume/skills match, not by which company, so a large universe is the point.",
+  "_comment": "Target companies. Each entry: { source: greenhouse|lever|ashby, slug: <board token>, name }. Slugs below were verified against the live feed on 2026-10-19: every one returns jobs. Removed after the first live run because their slug/source 404'd: Plaid, Socure, Notion, NerdWallet, Box, DoorDash. To re-add one, find its real board token and source and confirm it returns jobs. Coverage is ATS-only (Greenhouse, Lever, Ashby public APIs) by design; ranking is by resume/skills match, not by which company.",
   "companies": [
     { "source": "greenhouse", "slug": "stripe",        "name": "Stripe" },
-    { "source": "lever",      "slug": "plaid",          "name": "Plaid" },
     { "source": "greenhouse", "slug": "databricks",     "name": "Databricks" },
     { "source": "greenhouse", "slug": "airbnb",         "name": "Airbnb" },
     { "source": "greenhouse", "slug": "coinbase",       "name": "Coinbase" },
     { "source": "ashby",      "slug": "persona",        "name": "Persona" },
-    { "source": "greenhouse", "slug": "socure",         "name": "Socure" },
     { "source": "lever",      "slug": "alloy",          "name": "Alloy" },
     { "source": "ashby",      "slug": "stytch",         "name": "Stytch" },
     { "source": "greenhouse", "slug": "gusto",          "name": "Gusto" },
     { "source": "greenhouse", "slug": "figma",          "name": "Figma" },
-    { "source": "greenhouse", "slug": "notion",         "name": "Notion" },
 
     { "source": "ashby",      "slug": "ramp",           "name": "Ramp" },
     { "source": "ashby",      "slug": "mercury",        "name": "Mercury" },
@@ -25,16 +22,13 @@
     { "source": "greenhouse", "slug": "chime",          "name": "Chime" },
     { "source": "greenhouse", "slug": "sofi",           "name": "SoFi" },
     { "source": "greenhouse", "slug": "carta",          "name": "Carta" },
-    { "source": "greenhouse", "slug": "nerdwallet",     "name": "NerdWallet" },
 
     { "source": "greenhouse", "slug": "dropbox",        "name": "Dropbox" },
     { "source": "greenhouse", "slug": "cloudflare",     "name": "Cloudflare" },
     { "source": "greenhouse", "slug": "twilio",         "name": "Twilio" },
     { "source": "greenhouse", "slug": "samsara",        "name": "Samsara" },
     { "source": "greenhouse", "slug": "asana",          "name": "Asana" },
-    { "source": "greenhouse", "slug": "box",            "name": "Box" },
 
-    { "source": "greenhouse", "slug": "doordash",       "name": "DoorDash" },
     { "source": "greenhouse", "slug": "instacart",      "name": "Instacart" },
     { "source": "greenhouse", "slug": "lyft",           "name": "Lyft" },
     { "source": "greenhouse", "slug": "pinterest",      "name": "Pinterest" },
