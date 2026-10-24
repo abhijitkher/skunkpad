@@ -10,9 +10,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Rye&family=Special+Elite&display=swap" rel="stylesheet">
 <style>
 :root{
-  --kraft:#b18c65;
-  --kraft-hi:#c2a07b;
-  --kraft-lo:#9a764f;
+  --kraft:#d4a879;
+  --kraft-hi:#e3b78a;
+  --kraft-lo:#ba9268;
   --ink:#28201a;
   --ink-80:rgba(40,32,26,.80);
   --ink-55:rgba(40,32,26,.55);
@@ -350,16 +350,9 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
       <div class="who"><b>Kids</b><span>appetite scales with age</span></div>
       <div class="stepper"><button type="button" data-step="-1" aria-label="fewer kids">–</button><span class="count" data-count>0</span><button type="button" data-step="1" aria-label="more kids">+</button></div>
       <div class="appetite">
-        <div class="lab" style="margin-bottom:2px"><span style="letter-spacing:.06em">age range of the young ones</span></div>
-        <div class="age-wrap">
-          <select data-age aria-label="kids age range">
-            <option value="0.4">Toddlers (2 to 4)</option>
-            <option value="0.7">Little kids (5 to 7)</option>
-            <option value="1.0" selected>Big kids (8 to 10)</option>
-            <option value="1.4">Tweens (11 to 13)</option>
-            <option value="1.8">Teens (14 to 17)</option>
-          </select>
-        </div>
+        <div class="lab"><span>younger</span><b data-agelabel>average age 8</b><span>older</span></div>
+        <input type="range" min="2" max="17" value="8" step="1" data-age aria-label="kids average age">
+        <div class="avg-note">average age across the kids, so a 4 and a 14 sit around 9</div>
       </div>
     </div>
   </section>
@@ -411,7 +404,7 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
         <p>These are grill-day rules of thumb, not laboratory facts. Tune with the sliders if your crowd runs hungrier.</p>
         <p>Each eater gets a target of <b>cooked</b> meat: a regular man about half a pound, a regular woman a bit less, a kid scaled by age. The appetite slider swings that from roughly 60% to 160%.</p>
         <p>That cooked target is split evenly across the meats you pick, then grossed up to <b>raw</b> buying weight, because meat loses weight on the fire and bone and shell don't feed anyone. Shellfish needs the most raw weight for that reason; sausage the least.</p>
-        <p>A smoker adds about 10% for the long, slow shrink. Sides checked trims the whole thing by a quarter. Each meat is rounded to the nearest quarter pound so you can actually order it.</p>
+        <p>A smoker adds about 10% for the long, slow shrink. Sides checked trims the whole thing by a quarter. The balance sliders set each protein's share of the meal in 5% steps, and each weight is rounded to a tenth of a pound.</p>
       </div>
     </details>
   </section>
@@ -429,6 +422,9 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
 
   // ---- model constants (cooked lbs per eater at "regular" appetite) ----
   var COOKED = { men:0.50, women:0.375, kidBase:0.30 };
+  // kid portion scales smoothly with average age: ~0.3x at age 2 up to adult-ish by the teens
+  function kidFactor(age){ return Math.max(0.3, Math.min(1.85, 0.3 + (age-2)*0.11)); }
+
   // appetite only nudges the total (~15% each way), it doesn't swing it
   var APPETITE = {1:0.85, 2:0.93, 3:1.0, 4:1.08, 5:1.15};
   var APPETITE_LABEL = {1:"light on average", 2:"a touch light", 3:"regular on average", 4:"a touch hearty", 5:"hearty on average"};
@@ -492,7 +488,7 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     men:{count:2, appetite:3},
     women:{count:2, appetite:3},
     kids:{count:0, appetite:3},
-    kidFactor:1.0,
+    kidFactor:kidFactor(8),
     meats:{beef:true, chicken:true, pork:false, sausage:false, fish:false, shell:false, paneer:false, tofu:false},
     weights:{},
     grill:"charcoal",
@@ -508,7 +504,7 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     b.innerHTML='<span class="tick">✕</span>'+m.icon()+'<span>'+m.name+'</span>';
     b.addEventListener("click",function(){
       state.meats[m.id]=!state.meats[m.id];
-      if(state.meats[m.id] && !state.weights[m.id]) state.weights[m.id]=5; // new pick starts even
+      if(state.meats[m.id] && !state.weights[m.id]) state.weights[m.id]=10; // new pick starts even
       b.setAttribute("aria-pressed", state.meats[m.id]?"true":"false");
       renderBalance();
       compute();
@@ -524,10 +520,10 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     if(chosen.length<2){ balanceSec.style.display="none"; balanceEl.innerHTML=""; return; }
     balanceSec.style.display="";
     balanceEl.innerHTML=chosen.map(function(m){
-      var w=state.weights[m.id]||5;
+      var w=state.weights[m.id]||10;
       return '<div class="wrow">'+
         '<div class="wtop"><span class="wname">'+m.name+'</span><span class="wpct" data-wpct="'+m.id+'">–</span></div>'+
-        '<input type="range" min="1" max="10" value="'+w+'" data-weight="'+m.id+'" aria-label="'+m.name+' share">'+
+        '<input type="range" min="1" max="19" value="'+w+'" data-weight="'+m.id+'" aria-label="'+m.name+' share">'+
         '</div>';
     }).join("");
     balanceEl.querySelectorAll("[data-weight]").forEach(function(inp){
@@ -572,7 +568,15 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
       });
     }
     var age=row.querySelector("[data-age]");
-    if(age){ age.addEventListener("change",function(){ state.kidFactor=parseFloat(age.value); compute(); }); }
+    if(age){
+      var ageLab=row.querySelector("[data-agelabel]");
+      age.addEventListener("input",function(){
+        var a=parseInt(age.value,10);
+        state.kidFactor=kidFactor(a);
+        if(ageLab) ageLab.textContent="average age "+a;
+        compute();
+      });
+    }
   });
 
   // ---------- sides toggle ----------
@@ -582,7 +586,32 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
   sidesEl.addEventListener("keydown",function(e){ if(e.key===" "||e.key==="Enter"){ e.preventDefault(); toggleSides(); }});
 
   // ---------- compute ----------
-  function roundQuarter(x){ return Math.round(x*4)/4; }
+  function round1(x){ return Math.round(x*10)/10; }
+
+  // snap the chosen proteins' shares to a 5% grid that sums to 100 (largest-remainder)
+  function snapShares(ids){
+    var sum=0, w={};
+    ids.forEach(function(id){ var v=state.weights[id]||10; w[id]=v; sum+=v; });
+    var out={}, used=0, rem=[];
+    ids.forEach(function(id){
+      var ideal=(w[id]/sum)*100;
+      var f=Math.floor(ideal/5)*5;
+      out[id]=f; used+=f; rem.push({id:id, frac:ideal-f});
+    });
+    var left=Math.round((100-used)/5);
+    rem.sort(function(a,b){ return b.frac-a.frac; });
+    for(var i=0;i<left && i<rem.length;i++){ out[rem[i].id]+=5; }
+    var tot=0; ids.forEach(function(id){ tot+=out[id]; });
+    if(tot!==100 && ids.length){ out[ids[0]]+=(100-tot); }
+    // no chosen protein should sit at 0%
+    ids.forEach(function(id){
+      if(out[id]===0){
+        var mx=ids[0]; ids.forEach(function(k){ if(out[k]>out[mx]) mx=k; });
+        if(out[mx]>=10){ out[mx]-=5; out[id]+=5; }
+      }
+    });
+    return out;
+  }
 
   function compute(){
     // cooked target
@@ -604,24 +633,24 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     rawNote.style.visibility="visible";
 
     var smokerBump = state.grill==="smoker" ? 1.10 : 1.0;
-    var sumW=0; chosen.forEach(function(m){ sumW += (state.weights[m.id]||5); });
+    var shares = snapShares(chosen.map(function(m){return m.id;}));
 
     var rows=[], total=0;
     chosen.forEach(function(m){
-      var share = (state.weights[m.id]||5)/sumW;
+      var share = shares[m.id]/100;
       var cookedPortion = cooked*share;
-      var raw = roundQuarter((cookedPortion/m.yield)*smokerBump);
-      if(raw<0.25 && cookedPortion>0) raw=0.25;
+      var raw = round1((cookedPortion/m.yield)*smokerBump);
+      if(raw<0.1 && cookedPortion>0) raw=0.1;
       total += raw;
       rows.push({name:m.name, amt:raw});
       var pct=document.querySelector('[data-wpct="'+m.id+'"]');
-      if(pct) pct.textContent=Math.round(share*100)+"%";
+      if(pct) pct.textContent=shares[m.id]+"%";
     });
 
-    totalEl.textContent = (Math.round(total*4)/4).toString();
+    totalEl.textContent = (Math.round(total*10)/10).toFixed(1);
 
     breakdownEl.innerHTML='<div class="bhead">What to buy</div>'+rows.map(function(r){
-      return '<div class="brow"><span class="nm">'+r.name+'</span><span class="dots"></span><span class="amt">'+r.amt.toFixed(2).replace(/\.00$/,"").replace(/0$/,"")+' lb</span></div>';
+      return '<div class="brow"><span class="nm">'+r.name+'</span><span class="dots"></span><span class="amt">'+r.amt.toFixed(1)+' lb</span></div>';
     }).join("");
 
     // recipes
