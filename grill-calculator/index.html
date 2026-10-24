@@ -120,6 +120,13 @@ body::after{
 .appetite{grid-column:1 / -1;display:flex;flex-direction:column;gap:5px;padding-top:4px}
 .appetite .lab{display:flex;justify-content:space-between;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-55)}
 .appetite .lab b{font-family:inherit;color:var(--ink);font-weight:400;letter-spacing:.04em}
+.avg-note{font-size:11px;color:var(--ink-55);line-height:1.35;margin-top:2px}
+/* balance rows */
+.wrow{padding:12px 2px;border-bottom:1.5px dotted var(--ink-35)}
+.wrow:last-child{border-bottom:0}
+.wtop{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.wname{font-family:"Rye",serif;font-size:17px;letter-spacing:.02em}
+.wpct{font-family:"Rye",serif;font-size:17px}
 input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:26px;background:transparent;cursor:pointer;margin:0}
 input[type=range]::-webkit-slider-runnable-track{height:4px;background:var(--ink-35);border:1px solid var(--ink-55)}
 input[type=range]::-moz-range-track{height:4px;background:var(--ink-35);border:1px solid var(--ink-55)}
@@ -317,14 +324,15 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
   <section class="panel" aria-labelledby="g-h">
     <svg class="panel-bd" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><rect x="1.2" y="1.2" width="97.6" height="97.6" fill="none" stroke="currentColor" stroke-width=".5" filter="url(#lino-fine)" vector-effect="non-scaling-stroke"/></svg>
     <h2 id="g-h">The Gathering</h2>
-    <p class="sub">Who's coming, and how hungry. Drag each toward the carnivore end.</p>
+    <p class="sub">Who's coming, and roughly how hungry. Each slider is the group's average, so a mixed crowd just lands in the middle.</p>
 
     <div class="row" data-group="men">
       <div class="who"><b>Men</b><span>grown appetites</span></div>
       <div class="stepper"><button type="button" data-step="-1" aria-label="fewer men">–</button><span class="count" data-count>2</span><button type="button" data-step="1" aria-label="more men">+</button></div>
       <div class="appetite">
-        <div class="lab"><span>a nibble</span><b data-aplabel>regular eater</b><span>carnivore</span></div>
-        <input type="range" min="1" max="5" value="3" step="1" data-appetite aria-label="men appetite">
+        <div class="lab"><span>lighter</span><b data-aplabel>regular on average</b><span>heartier</span></div>
+        <input type="range" min="1" max="5" value="3" step="1" data-appetite aria-label="men average appetite">
+        <div class="avg-note">average across the group, e.g. 2 big eaters + 1 regular sits just right of center</div>
       </div>
     </div>
 
@@ -332,8 +340,9 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
       <div class="who"><b>Women</b><span>grown appetites</span></div>
       <div class="stepper"><button type="button" data-step="-1" aria-label="fewer women">–</button><span class="count" data-count>2</span><button type="button" data-step="1" aria-label="more women">+</button></div>
       <div class="appetite">
-        <div class="lab"><span>a nibble</span><b data-aplabel>regular eater</b><span>carnivore</span></div>
-        <input type="range" min="1" max="5" value="3" step="1" data-appetite aria-label="women appetite">
+        <div class="lab"><span>lighter</span><b data-aplabel>regular on average</b><span>heartier</span></div>
+        <input type="range" min="1" max="5" value="3" step="1" data-appetite aria-label="women average appetite">
+        <div class="avg-note">average across the group</div>
       </div>
     </div>
 
@@ -359,8 +368,16 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
   <section class="panel" aria-labelledby="o-h">
     <svg class="panel-bd" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><rect x="1.2" y="1.2" width="97.6" height="97.6" fill="none" stroke="currentColor" stroke-width=".5" filter="url(#lino-fine)" vector-effect="non-scaling-stroke"/></svg>
     <h2 id="o-h">The Offerings</h2>
-    <p class="sub">Choose your proteins, meat or not. The total splits evenly across them.</p>
+    <p class="sub">Choose your proteins, meat or not. Balance them below.</p>
     <div class="stamps" id="meats"></div>
+  </section>
+
+  <!-- ===== THE BALANCE ===== -->
+  <section class="panel" id="balance-sec" aria-labelledby="b-h">
+    <svg class="panel-bd" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><rect x="1.2" y="1.2" width="97.6" height="97.6" fill="none" stroke="currentColor" stroke-width=".5" filter="url(#lino-fine)" vector-effect="non-scaling-stroke"/></svg>
+    <h2 id="b-h">The Balance</h2>
+    <p class="sub">How the pounds split across your proteins. Even by default. Drag to favor one.</p>
+    <div id="balance"></div>
   </section>
 
   <!-- ===== THE FLAME ===== -->
@@ -412,8 +429,9 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
 
   // ---- model constants (cooked lbs per eater at "regular" appetite) ----
   var COOKED = { men:0.50, women:0.375, kidBase:0.30 };
-  var APPETITE = {1:0.6, 2:0.8, 3:1.0, 4:1.25, 5:1.6};
-  var APPETITE_LABEL = {1:"just a nibble", 2:"light eater", 3:"regular eater", 4:"hearty eater", 5:"full carnivore"};
+  // appetite only nudges the total (~15% each way), it doesn't swing it
+  var APPETITE = {1:0.85, 2:0.93, 3:1.0, 4:1.08, 5:1.15};
+  var APPETITE_LABEL = {1:"light on average", 2:"a touch light", 3:"regular on average", 4:"a touch hearty", 5:"hearty on average"};
 
   // yield = cooked edible / raw purchased
   var MEATS = [
@@ -476,6 +494,7 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     kids:{count:0, appetite:3},
     kidFactor:1.0,
     meats:{beef:true, chicken:true, pork:false, sausage:false, fish:false, shell:false, paneer:false, tofu:false},
+    weights:{},
     grill:"charcoal",
     sides:false
   };
@@ -489,11 +508,32 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     b.innerHTML='<span class="tick">✕</span>'+m.icon()+'<span>'+m.name+'</span>';
     b.addEventListener("click",function(){
       state.meats[m.id]=!state.meats[m.id];
+      if(state.meats[m.id] && !state.weights[m.id]) state.weights[m.id]=5; // new pick starts even
       b.setAttribute("aria-pressed", state.meats[m.id]?"true":"false");
+      renderBalance();
       compute();
     });
     meatsEl.appendChild(b);
   });
+
+  // ---------- balance panel: a share slider per chosen protein ----------
+  var balanceEl=document.getElementById("balance");
+  var balanceSec=document.getElementById("balance-sec");
+  function renderBalance(){
+    var chosen=MEATS.filter(function(m){return state.meats[m.id];});
+    if(chosen.length<2){ balanceSec.style.display="none"; balanceEl.innerHTML=""; return; }
+    balanceSec.style.display="";
+    balanceEl.innerHTML=chosen.map(function(m){
+      var w=state.weights[m.id]||5;
+      return '<div class="wrow">'+
+        '<div class="wtop"><span class="wname">'+m.name+'</span><span class="wpct" data-wpct="'+m.id+'">–</span></div>'+
+        '<input type="range" min="1" max="10" value="'+w+'" data-weight="'+m.id+'" aria-label="'+m.name+' share">'+
+        '</div>';
+    }).join("");
+    balanceEl.querySelectorAll("[data-weight]").forEach(function(inp){
+      inp.addEventListener("input",function(){ state.weights[this.dataset.weight]=parseInt(this.value,10); compute(); });
+    });
+  }
 
   var grillsEl=document.getElementById("grills");
   GRILLS.forEach(function(g){
@@ -563,15 +603,19 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     if(chosen.length===0){ totalEl.textContent="0"; breakdownEl.innerHTML=""; recipesEl.innerHTML='<p class="empty">Pick at least one meat and the eye will reckon.</p>'; rawNote.style.visibility="hidden"; return; }
     rawNote.style.visibility="visible";
 
-    var cookedEach = cooked/chosen.length;
     var smokerBump = state.grill==="smoker" ? 1.10 : 1.0;
+    var sumW=0; chosen.forEach(function(m){ sumW += (state.weights[m.id]||5); });
 
     var rows=[], total=0;
     chosen.forEach(function(m){
-      var raw = roundQuarter((cookedEach/m.yield)*smokerBump);
-      if(raw<0.25 && cookedEach>0) raw=0.25;
+      var share = (state.weights[m.id]||5)/sumW;
+      var cookedPortion = cooked*share;
+      var raw = roundQuarter((cookedPortion/m.yield)*smokerBump);
+      if(raw<0.25 && cookedPortion>0) raw=0.25;
       total += raw;
       rows.push({name:m.name, amt:raw});
+      var pct=document.querySelector('[data-wpct="'+m.id+'"]');
+      if(pct) pct.textContent=Math.round(share*100)+"%";
     });
 
     totalEl.textContent = (Math.round(total*4)/4).toString();
@@ -620,6 +664,7 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     g.innerHTML=paths;
   })();
 
+  renderBalance();
   compute();
 
   // ---------- hand-drawn linocut meat icons ----------

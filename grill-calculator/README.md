@@ -8,8 +8,9 @@ No build step, no dependencies. One self-contained `index.html`: markup, styles,
 
 You tell it who's coming and the rest follows:
 
-- **The Gathering** — counts of men, women, and kids, each with an appetite slider (a nibble to full carnivore). Kids scale by age band, since a teen eats like an adult and a toddler doesn't.
-- **The Offerings** — pick your meats (beef, pork, chicken, sausage, fish, shellfish). The total splits evenly across them.
+- **The Gathering** — counts of men, women, and kids, each with an average appetite slider. Appetite only nudges the total (~15% each way), so a crowd of carnivores buys a bit more, not double. The slider is the group average, so a mixed group (say two big eaters and one regular) just lands near the middle. Kids scale by age band, since a teen eats like an adult and a toddler doesn't.
+- **The Offerings** — pick your proteins (beef, pork, chicken, sausage, fish, shellfish, paneer, tofu).
+- **The Balance** — a share slider per chosen protein, even by default. Drag to favor one. Shares are portions of the meal; raw buy-weights still differ because bonier or shell proteins need more weight to hit the same cooked amount.
 - **The Flame** — charcoal, gas, smoker, or electric. This doesn't change how much people eat; it shapes the cooking tips and nudges the smoker number up for the long low-and-slow shrink.
 - **Sides toggle** — trims the meat by a quarter when there's a real spread of sides.
 
@@ -17,7 +18,7 @@ Output is total **raw** pounds to buy, a per-meat breakdown rounded to the quart
 
 ## How the math works
 
-Each eater gets a target of **cooked** edible meat (a regular man ~0.5 lb, a regular woman a bit less, a kid scaled by age), swung 60%–160% by the appetite slider. That cooked target is split across the chosen meats, then grossed up to raw buying weight using a per-meat yield factor that accounts for cooking shrink plus bone and shell waste. Shellfish needs the most raw weight (mostly shell); sausage the least. These are grill-day rules of thumb, not lab figures.
+Each eater gets a target of **cooked** edible meat (a regular man ~0.5 lb, a regular woman a bit less, a kid scaled by age), nudged about 15% each way by the average appetite slider. That cooked target is split across the chosen proteins by the balance sliders (even by default), then grossed up to raw buying weight using a per-protein yield factor that accounts for cooking shrink plus bone and shell waste. Shellfish needs the most raw weight (mostly shell); sausage, paneer, and tofu the least. These are grill-day rules of thumb, not lab figures.
 
 ## Design
 
