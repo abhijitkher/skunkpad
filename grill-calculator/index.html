@@ -49,28 +49,29 @@ body::before{
 }
 .wrap{position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:28px 20px 72px}
 
-/* ---------- HERO ---------- */
-.hero{text-align:center;padding:8px 0 4px}
-.eye-stage{width:100%;max-width:420px;margin:0 auto;display:block}
+/* ---------- HERO (compact corner mark + title) ---------- */
+.hero{display:flex;align-items:center;gap:15px;text-align:left;padding:4px 0 2px}
+.eye-mark{flex:0 0 auto;width:68px;height:68px;display:block}
+.brand{min-width:0}
 .title{
   font-family:"Rye",serif;
   font-weight:400;
-  line-height:.92;
-  letter-spacing:.02em;
-  margin:2px 0 0;
-  font-size:clamp(44px,13vw,78px);
+  line-height:.9;
+  letter-spacing:.015em;
+  margin:0;
+  font-size:clamp(30px,8.4vw,46px);
   text-shadow:0 1px 0 var(--kraft-hi);
 }
-.title .small{display:block;font-size:.42em;letter-spacing:.34em;margin-bottom:.15em;padding-left:.34em}
+.title .small{display:block;font-size:.34em;letter-spacing:.3em;margin-bottom:.1em}
 .creed{
-  font-size:clamp(12px,3.4vw,15px);
-  letter-spacing:.14em;
+  font-size:clamp(11px,3vw,13px);
+  letter-spacing:.1em;
   text-transform:uppercase;
   color:var(--ink-80);
-  margin:14px 0 2px;
+  margin:7px 0 0;
 }
-.creed .peace{font-family:"Rye",serif;letter-spacing:.06em}
-.rule{display:block;width:100%;height:26px;margin:16px auto 6px;color:var(--ink-55)}
+.creed .peace{font-family:"Rye",serif;letter-spacing:.05em}
+.rule{display:block;width:100%;height:20px;margin:16px auto 2px;color:var(--ink-55)}
 
 /* ---------- PANELS ---------- */
 .panel{position:relative;margin:30px 0 0;padding:26px 20px 22px}
@@ -148,7 +149,7 @@ select{
 /* ---------- VERDICT ---------- */
 .verdict{text-align:center;margin:40px 0 0}
 .spoke{font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-80)}
-.total{font-family:"Rye",serif;line-height:.86;margin:6px 0 0;font-size:clamp(84px,30vw,168px);position:relative}
+.total{font-family:"Rye",serif;line-height:.86;margin:6px 0 0;font-size:clamp(66px,22vw,116px);position:relative}
 .total .unit{display:block;font-size:.2em;letter-spacing:.42em;padding-left:.42em;margin-top:.1em}
 .raw-note{font-size:12px;color:var(--ink-55);margin:4px 0 0;letter-spacing:.04em}
 
@@ -212,51 +213,35 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
 
 <div class="wrap">
 
-  <!-- ===== HERO ===== -->
+  <!-- ===== HERO: small corner eye + title ===== -->
   <header class="hero">
-    <svg class="eye-stage" viewBox="0 0 420 300" role="img" aria-label="An all-seeing eye radiating sunbeams">
-      <g filter="url(#lino)" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-        <!-- sunbeam rays -->
-        <g class="rays" stroke-width="3">
-          <g id="rayset"></g>
-        </g>
-        <!-- outer radiant ring -->
-        <circle cx="210" cy="150" r="78" stroke-width="4"/>
-        <circle cx="210" cy="150" r="88" stroke-width="2" stroke-dasharray="3 7"/>
+    <svg class="eye-mark" viewBox="0 0 120 120" role="img" aria-label="The all-seeing eye">
+      <g filter="url(#lino-fine)" fill="none" stroke="var(--ink)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+        <!-- short rays -->
+        <g class="rays" stroke-width="2.6"><g id="rayset"></g></g>
+        <circle cx="60" cy="60" r="30" stroke-width="3.4"/>
         <!-- eye almond -->
-        <path d="M132 150 Q210 92 288 150 Q210 208 132 150 Z" stroke-width="4"/>
-        <!-- hatching in the corners of the eye -->
-        <path d="M150 150 q12 -14 26 -20 M146 158 q16 -12 32 -16 M250 139 q14 6 26 18 M246 131 q16 6 30 20"/>
-        <!-- iris -->
+        <path d="M34 60 Q60 40 86 60 Q60 80 34 60 Z" stroke-width="3.2"/>
         <g class="iris">
-          <circle cx="210" cy="150" r="34" stroke-width="4"/>
-          <circle cx="210" cy="150" r="15" fill="var(--ink)" stroke="none"/>
-          <!-- iris rays -->
-          <g stroke-width="2">
-            <path d="M210 118 v8 M210 174 v8 M178 150 h8 M234 150 h8 M188 128 l5 5 M232 128 l-5 5 M188 172 l5 -5 M232 172 l-5 -5"/>
-          </g>
-          <!-- carved glint -->
-          <circle cx="202" cy="143" r="3.5" fill="var(--kraft)" stroke="none"/>
+          <circle cx="60" cy="60" r="12" stroke-width="3"/>
+          <circle cx="60" cy="60" r="5.2" fill="var(--ink)" stroke="none"/>
+          <circle cx="57" cy="57" r="1.5" fill="var(--kraft)" stroke="none"/>
         </g>
-        <!-- brow flourishes -->
-        <path d="M120 128 q30 -26 66 -30 M300 128 q-30 -26 -66 -30" stroke-width="2.5"/>
-        <!-- little stars -->
-        <path d="M96 96 l3 7 l7 1 l-5 5 l1 7 l-6 -4 l-6 4 l1 -7 l-5 -5 l7 -1 Z" stroke-width="2"/>
-        <path d="M318 98 l3 7 l7 1 l-5 5 l1 7 l-6 -4 l-6 4 l1 -7 l-5 -5 l7 -1 Z" stroke-width="2"/>
       </g>
     </svg>
-
-    <h1 class="title"><span class="small">THE</span>MEAT ORACLE</h1>
-    <p class="creed">It knows how much thou shalt grill &nbsp;·&nbsp; <span class="peace">We come in peace</span></p>
-
-    <svg class="rule" viewBox="0 0 320 20" preserveAspectRatio="none" aria-hidden="true">
-      <g filter="url(#lino-fine)" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round">
-        <path d="M6 10 H140 M180 10 H314"/>
-        <path d="M160 3 l6 7 l-6 7 l-6 -7 Z" fill="currentColor"/>
-        <circle cx="148" cy="10" r="2.4" fill="currentColor"/><circle cx="172" cy="10" r="2.4" fill="currentColor"/>
-      </g>
-    </svg>
+    <div class="brand">
+      <h1 class="title"><span class="small">THE</span>MEAT ORACLE</h1>
+      <p class="creed">How much thou shalt grill &nbsp;·&nbsp; <span class="peace">We come in peace</span></p>
+    </div>
   </header>
+
+  <svg class="rule" viewBox="0 0 320 20" preserveAspectRatio="none" aria-hidden="true">
+    <g filter="url(#lino-fine)" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round">
+      <path d="M6 10 H140 M180 10 H314"/>
+      <path d="M160 3 l6 7 l-6 7 l-6 -7 Z" fill="currentColor"/>
+      <circle cx="148" cy="10" r="2.4" fill="currentColor"/><circle cx="172" cy="10" r="2.4" fill="currentColor"/>
+    </g>
+  </svg>
 
   <!-- ===== THE GATHERING ===== -->
   <section class="panel" aria-labelledby="g-h">
@@ -539,17 +524,17 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     document.getElementById("verdict").scrollIntoView({behavior:"smooth", block:"start"});
   });
 
-  // ---------- build sunbeam rays ----------
+  // ---------- build sunbeam rays around the small eye mark ----------
   (function rays(){
     var g=document.getElementById("rayset"); if(!g) return;
-    var cx=210, cy=150, n=24;
+    var cx=60, cy=60, n=16;
     var paths="";
     for(var i=0;i<n;i++){
       var a=(i/n)*Math.PI*2;
-      var r1=94, r2=(i%2===0)?136:120;
+      var r1=34, r2=(i%2===0)?48:42;
       var x1=cx+Math.cos(a)*r1, y1=cy+Math.sin(a)*r1;
       var x2=cx+Math.cos(a)*r2, y2=cy+Math.sin(a)*r2;
-      paths+='<line x1="'+x1.toFixed(1)+'" y1="'+y1.toFixed(1)+'" x2="'+x2.toFixed(1)+'" y2="'+y2.toFixed(1)+'" stroke-width="'+((i%2===0)?3:2)+'"/>';
+      paths+='<line x1="'+x1.toFixed(1)+'" y1="'+y1.toFixed(1)+'" x2="'+x2.toFixed(1)+'" y2="'+y2.toFixed(1)+'" stroke-width="'+((i%2===0)?2.6:1.8)+'"/>';
     }
     g.innerHTML=paths;
   })();
