@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Meat Oracle</title>
+<meta name="description" content="A grilling calculator that divines how much meat to buy, and what to cook with it.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rye&family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+:root{
+  --kraft:#c2a878;
+  --kraft-hi:#cdb488;
+  --kraft-lo:#b39a68;
+  --ink:#28201a;
+  --ink-80:rgba(40,32,26,.80);
+  --ink-55:rgba(40,32,26,.55);
+  --ink-35:rgba(40,32,26,.32);
+  --ink-18:rgba(40,32,26,.16);
+  --maxw:640px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--kraft);
+  color:var(--ink);
+  font-family:"Special Elite",Courier,monospace;
+  font-size:16px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  position:relative;
+  overflow-x:hidden;
+}
+/* kraft grain + fiber, layered. the big noise field lives in an ::before so it never blocks taps */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  background:
+    radial-gradient(130% 90% at 50% -10%, var(--kraft-hi), rgba(205,180,136,0) 60%),
+    radial-gradient(120% 80% at 50% 115%, var(--kraft-lo), rgba(179,154,104,0) 55%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.16 0 0 0 0 0.125 0 0 0 0 0.10 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-blend-mode:multiply,multiply,normal;
+  opacity:.9;
+  mix-blend-mode:multiply;
+}
+.wrap{position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:28px 20px 72px}
+
+/* ---------- HERO ---------- */
+.hero{text-align:center;padding:8px 0 4px}
+.eye-stage{width:100%;max-width:420px;margin:0 auto;display:block}
+.title{
+  font-family:"Rye",serif;
+  font-weight:400;
+  line-height:.92;
+  letter-spacing:.02em;
+  margin:2px 0 0;
+  font-size:clamp(44px,13vw,78px);
+  text-shadow:0 1px 0 var(--kraft-hi);
+}
+.title .small{display:block;font-size:.42em;letter-spacing:.34em;margin-bottom:.15em;padding-left:.34em}
+.creed{
+  font-size:clamp(12px,3.4vw,15px);
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--ink-80);
+  margin:14px 0 2px;
+}
+.creed .peace{font-family:"Rye",serif;letter-spacing:.06em}
+.rule{display:block;width:100%;height:26px;margin:16px auto 6px;color:var(--ink-55)}
+
+/* ---------- PANELS ---------- */
+.panel{position:relative;margin:30px 0 0;padding:26px 20px 22px}
+.panel-bd{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;color:var(--ink-55)}
+.panel h2{
+  font-family:"Rye",serif;font-weight:400;
+  font-size:clamp(19px,5.4vw,24px);
+  letter-spacing:.015em;
+  margin:0 0 3px;text-align:center;
+}
+.panel .sub{text-align:center;color:var(--ink-55);font-size:13px;margin:0 auto 18px;max-width:34ch}
+
+/* people rows */
+.row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px 12px;padding:13px 2px;border-bottom:1.5px dotted var(--ink-35)}
+.row:last-of-type{border-bottom:0}
+.row .who{display:flex;flex-direction:column;gap:2px}
+.row .who b{font-family:"Rye",serif;font-weight:400;font-size:18px;letter-spacing:.02em}
+.row .who span{font-size:12px;color:var(--ink-55);line-height:1.3}
+.stepper{display:flex;align-items:center;gap:0;border:2px solid var(--ink);border-radius:2px;background:rgba(40,32,26,.04)}
+.stepper button{
+  font-family:"Rye",serif;font-size:20px;line-height:1;
+  width:38px;height:38px;border:0;background:transparent;color:var(--ink);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+.stepper button:active{background:var(--ink);color:var(--kraft)}
+.stepper .count{min-width:34px;text-align:center;font-family:"Rye",serif;font-size:19px}
+.appetite{grid-column:1 / -1;display:flex;flex-direction:column;gap:5px;padding-top:4px}
+.appetite .lab{display:flex;justify-content:space-between;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-55)}
+.appetite .lab b{font-family:inherit;color:var(--ink);font-weight:400;letter-spacing:.04em}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:26px;background:transparent;cursor:pointer;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:4px;background:var(--ink-35);border:1px solid var(--ink-55)}
+input[type=range]::-moz-range-track{height:4px;background:var(--ink-35);border:1px solid var(--ink-55)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;margin-top:-10px;border-radius:50%;background:var(--kraft-hi);border:3px solid var(--ink);box-shadow:0 0 0 2px var(--kraft)}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--kraft-hi);border:3px solid var(--ink)}
+.age-wrap{display:flex;align-items:center;gap:8px}
+select{
+  font-family:"Special Elite",monospace;font-size:14px;color:var(--ink);
+  background:rgba(40,32,26,.05);border:2px solid var(--ink);border-radius:2px;
+  padding:7px 26px 7px 10px;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2328201a' stroke-width='2'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 9px center;-webkit-appearance:none;appearance:none;
+}
+
+/* stamp grid for meats + flame */
+.stamps{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
+.stamp{
+  position:relative;border:2px solid var(--ink);border-radius:3px;background:transparent;color:var(--ink);
+  cursor:pointer;padding:13px 6px 9px;display:flex;flex-direction:column;align-items:center;gap:6px;
+  font-family:"Special Elite",monospace;font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;
+  transition:transform .06s ease;
+}
+.stamp svg{width:40px;height:40px;display:block}
+.stamp:active{transform:scale(.97)}
+.stamp[aria-pressed=true]{background:var(--ink);color:var(--kraft)}
+.stamp[aria-pressed=true] svg{color:var(--kraft)}
+.stamp .tick{position:absolute;top:5px;right:6px;font-family:"Rye",serif;font-size:13px;opacity:0;line-height:1}
+.stamp[aria-pressed=true] .tick{opacity:1}
+.flame .stamps{grid-template-columns:repeat(2,1fr)}
+@media(min-width:520px){.flame .stamps{grid-template-columns:repeat(4,1fr)}}
+
+.sides{display:flex;align-items:flex-start;gap:12px;margin-top:20px;padding:14px;border:1.5px dashed var(--ink-55);border-radius:3px;cursor:pointer}
+.sides .box{flex:0 0 auto;width:26px;height:26px;border:2px solid var(--ink);border-radius:2px;position:relative;margin-top:1px}
+.sides[aria-pressed=true] .box::after{content:"✕";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:"Rye",serif;font-size:18px}
+.sides .cap b{font-family:"Rye",serif;font-weight:400;font-size:16px;display:block}
+.sides .cap span{font-size:12.5px;color:var(--ink-55)}
+
+/* consult button */
+.consult{display:block;width:100%;margin:34px 0 0;padding:18px;cursor:pointer;
+  background:var(--ink);color:var(--kraft-hi);border:0;border-radius:3px;
+  font-family:"Rye",serif;font-size:clamp(20px,6vw,27px);letter-spacing:.05em;
+  position:relative;box-shadow:0 3px 0 var(--ink);transition:transform .07s ease;
+}
+.consult:active{transform:translateY(3px);box-shadow:0 0 0 var(--ink)}
+
+/* ---------- VERDICT ---------- */
+.verdict{text-align:center;margin:40px 0 0}
+.spoke{font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-80)}
+.total{font-family:"Rye",serif;line-height:.86;margin:6px 0 0;font-size:clamp(84px,30vw,168px);position:relative}
+.total .unit{display:block;font-size:.2em;letter-spacing:.42em;padding-left:.42em;margin-top:.1em}
+.raw-note{font-size:12px;color:var(--ink-55);margin:4px 0 0;letter-spacing:.04em}
+
+.breakdown{margin:26px auto 0;max-width:360px;text-align:left}
+.breakdown .bhead{font-family:"Rye",serif;font-size:16px;text-align:center;margin:0 0 10px;letter-spacing:.02em}
+.brow{display:flex;align-items:baseline;gap:8px;padding:7px 0;font-size:15px}
+.brow .nm{white-space:nowrap}
+.brow .dots{flex:1;border-bottom:2px dotted var(--ink-35);transform:translateY(-4px)}
+.brow .amt{font-family:"Rye",serif;font-size:17px;white-space:nowrap}
+
+/* recipes */
+.recipes{margin:34px 0 0}
+.recipes .bhead{font-family:"Rye",serif;font-size:clamp(18px,5vw,22px);text-align:center;margin:0 0 4px}
+.recipes .rsub{text-align:center;font-size:12.5px;color:var(--ink-55);margin:0 0 18px}
+.rec{border-top:1.5px solid var(--ink-55);padding:15px 2px 14px;display:grid;grid-template-columns:36px 1fr;gap:12px;align-items:start}
+.rec svg{width:36px;height:36px;margin-top:2px}
+.rec .meat{font-family:"Rye",serif;font-size:16px;letter-spacing:.02em;margin:0 0 2px}
+.rec .dish{font-size:15px;margin:0}
+.rec .how{font-size:13px;color:var(--ink-55);margin:3px 0 8px;line-height:1.45}
+.rec a.find{display:inline-block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);
+  border:1.5px solid var(--ink);border-radius:2px;padding:5px 11px;text-decoration:none;background:rgba(40,32,26,.04)}
+.rec a.find:active{background:var(--ink);color:var(--kraft)}
+
+.empty{text-align:center;color:var(--ink-55);font-size:14px;padding:16px 0}
+
+/* reckoning */
+details.reck{margin:30px auto 0;max-width:460px;font-size:13.5px}
+details.reck summary{cursor:pointer;text-align:center;font-family:"Rye",serif;font-size:15px;letter-spacing:.02em;list-style:none}
+details.reck summary::-webkit-details-marker{display:none}
+details.reck summary::after{content:" ▾";color:var(--ink-55)}
+details.reck[open] summary::after{content:" ▴"}
+details.reck .body{color:var(--ink-80);line-height:1.6;padding:12px 4px 0}
+details.reck .body p{margin:0 0 9px}
+details.reck .body b{font-weight:400;border-bottom:1.5px solid var(--ink-35)}
+
+footer{text-align:center;margin:46px 0 0;color:var(--ink-55);font-size:12px;letter-spacing:.08em}
+footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
+
+/* the eye pulse: one orchestrated moment */
+@keyframes rayPulse{0%{transform:scale(1);opacity:.85}45%{transform:scale(1.06);opacity:1}100%{transform:scale(1);opacity:.85}}
+@keyframes irisPulse{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
+.rays.pulse{animation:rayPulse 1.1s ease-in-out;transform-origin:center}
+.iris.pulse{animation:irisPulse 1.1s ease-in-out;transform-origin:center}
+@media(prefers-reduced-motion:reduce){.rays.pulse,.iris.pulse{animation:none}}
+
+:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+</style>
+</head>
+<body>
+<!-- shared linocut displacement filter: breaks edges like carved ink -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="lino" x="-15%" y="-15%" width="130%" height="130%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.028 0.04" numOctaves="2" seed="7" result="t"/>
+    <feDisplacementMap in="SourceGraphic" in2="t" scale="4.5" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <filter id="lino-fine" x="-15%" y="-15%" width="130%" height="130%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.09 0.1" numOctaves="2" seed="3" result="t"/>
+    <feDisplacementMap in="SourceGraphic" in2="t" scale="2" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+
+<div class="wrap">
+
+  <!-- ===== HERO ===== -->
+  <header class="hero">
+    <svg class="eye-stage" viewBox="0 0 420 300" role="img" aria-label="An all-seeing eye radiating sunbeams">
+      <g filter="url(#lino)" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <!-- sunbeam rays -->
+        <g class="rays" stroke-width="3">
+          <g id="rayset"></g>
+        </g>
+        <!-- outer radiant ring -->
+        <circle cx="210" cy="150" r="78" stroke-width="4"/>
+        <circle cx="210" cy="150" r="88" stroke-width="2" stroke-dasharray="3 7"/>
+        <!-- eye almond -->
+        <path d="M132 150 Q210 92 288 150 Q210 208 132 150 Z" stroke-width="4"/>
+        <!-- hatching in the corners of the eye -->
+        <path d="M150 150 q12 -14 26 -20 M146 158 q16 -12 32 -16 M250 139 q14 6 26 18 M246 131 q16 6 30 20"/>
+        <!-- iris -->
+        <g class="iris">
+          <circle cx="210" cy="150" r="34" stroke-width="4"/>
+          <circle cx="210" cy="150" r="15" fill="var(--ink)" stroke="none"/>
+          <!-- iris rays -->
+          <g stroke-width="2">
+            <path d="M210 118 v8 M210 174 v8 M178 150 h8 M234 150 h8 M188 128 l5 5 M232 128 l-5 5 M188 172 l5 -5 M232 172 l-5 -5"/>
+          </g>
+          <!-- carved glint -->
+          <circle cx="202" cy="143" r="3.5" fill="var(--kraft)" stroke="none"/>
+        </g>
+        <!-- brow flourishes -->
+        <path d="M120 128 q30 -26 66 -30 M300 128 q-30 -26 -66 -30" stroke-width="2.5"/>
+        <!-- little stars -->
+        <path d="M96 96 l3 7 l7 1 l-5 5 l1 7 l-6 -4 l-6 4 l1 -7 l-5 -5 l7 -1 Z" stroke-width="2"/>
+        <path d="M318 98 l3 7 l7 1 l-5 5 l1 7 l-6 -4 l-6 4 l1 -7 l-5 -5 l7 -1 Z" stroke-width="2"/>
+      </g>
+    </svg>
+
+    <h1 class="title"><span class="small">THE</span>MEAT ORACLE</h1>
+    <p class="creed">It knows how much thou shalt grill &nbsp;·&nbsp; <span class="peace">We come in peace</span></p>
+
+    <svg class="rule" viewBox="0 0 320 20" preserveAspectRatio="none" aria-hidden="true">
+      <g filter="url(#lino-fine)" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round">
+        <path d="M6 10 H140 M180 10 H314"/>
+        <path d="M160 3 l6 7 l-6 7 l-6 -7 Z" fill="currentColor"/>
+        <circle cx="148" cy="10" r="2.4" fill="currentColor"/><circle cx="172" cy="10" r="2.4" fill="currentColor"/>
+      </g>
+    </svg>
+  </header>
+
+  <!-- ===== THE GATHERING ===== -->
+  <section class="panel" aria-labelledby="g-h">
+    <svg class="panel-bd" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><rect x="1.2" y="1.2" width="97.6" height="97.6" fill="none" stroke="currentColor" stroke-width=".5" filter="url(#lino-fine)" vector-effect="non-scaling-stroke"/></svg>
+    <h2 id="g-h">The Gathering</h2>
+    <p class="sub">Who's coming, and how hungry. Drag each toward the carnivore end.</p>
+
+    <div class="row" data-group="men">
+      <div class="who"><b>Men</b><span>grown appetites</span></div>
+      <div class="stepper"><button type="button" data-step="-1" aria-label="fewer men">–</button><span class="count" data-count>2</span><button type="button" data-step="1" aria-label="more men">+</button></div>
+      <div class="appetite">
+        <div class="lab"><span>a nibble</span><b data-aplabel>regular eater</b><span>carnivore</span></div>
+        <input type="range" min="1" max="5" value="3" step="1" data-appetite aria-label="men appetite">
+      </div>
+    </div>
+
+    <div class="row" data-group="women">
+      <div class="who"><b>Women</b><span>grown appetites</span></div>
+      <div class="stepper"><button type="button" data-step="-1" aria-label="fewer women">–</button><span class="count" data-count>2</span><button type="button" data-step="1" aria-label="more women">+</button></div>
+      <div class="appetite">
+        <div class="lab"><span>a nibble</span><b data-aplabel>regular eater</b><span>carnivore</span></div>
+        <input type="range" min="1" max="5" value="3" step="1" data-appetite aria-label="women appetite">
+      </div>
+    </div>
+
+    <div class="row" data-group="kids">
+      <div class="who"><b>Kids</b><span>appetite scales with age</span></div>
+      <div class="stepper"><button type="button" data-step="-1" aria-label="fewer kids">–</button><span class="count" data-count>0</span><button type="button" data-step="1" aria-label="more kids">+</button></div>
+      <div class="appetite">
+        <div class="lab" style="margin-bottom:2px"><span style="letter-spacing:.06em">age range of the young ones</span></div>
+        <div class="age-wrap">
+          <select data-age aria-label="kids age range">
+            <option value="0.4">Toddlers (2 to 4)</option>
+            <option value="0.7">Little kids (5 to 7)</option>
+            <option value="1.0" selected>Big kids (8 to 10)</option>
+            <option value="1.4">Tweens (11 to 13)</option>
+            <option value="1.8">Teens (14 to 17)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== THE OFFERINGS ===== -->
+  <section class="panel" aria-labelledby="o-h">
+    <svg class="panel-bd" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><rect x="1.2" y="1.2" width="97.6" height="97.6" fill="none" stroke="currentColor" stroke-width=".5" filter="url(#lino-fine)" vector-effect="non-scaling-stroke"/></svg>
+    <h2 id="o-h">The Offerings</h2>
+    <p class="sub">Choose thy meats. The total splits evenly across them.</p>
+    <div class="stamps" id="meats"></div>
+  </section>
+
+  <!-- ===== THE FLAME ===== -->
+  <section class="panel flame" aria-labelledby="f-h">
+    <svg class="panel-bd" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><rect x="1.2" y="1.2" width="97.6" height="97.6" fill="none" stroke="currentColor" stroke-width=".5" filter="url(#lino-fine)" vector-effect="non-scaling-stroke"/></svg>
+    <h2 id="f-h">The Flame</h2>
+    <p class="sub">Doesn't change appetites. It shapes the cook, and nudges the smoker up for the long shrink.</p>
+    <div class="stamps" id="grills"></div>
+
+    <div class="sides" id="sides" role="button" tabindex="0" aria-pressed="false">
+      <div class="box" aria-hidden="true"></div>
+      <div class="cap"><b>A great spread of sides awaits</b><span>Check this and the eye trims the meat by a quarter.</span></div>
+    </div>
+  </section>
+
+  <button class="consult" id="consult" type="button">Consult the Eye</button>
+
+  <!-- ===== VERDICT ===== -->
+  <section class="verdict" id="verdict" aria-live="polite">
+    <div class="spoke">The eye hath spoken. Thou shalt buy</div>
+    <div class="total"><span data-total>0</span><span class="unit">POUNDS</span></div>
+    <div class="raw-note" data-rawnote>raw weight at the butcher, before it meets the fire</div>
+
+    <div class="breakdown" id="breakdown"></div>
+
+    <div class="recipes" id="recipes"></div>
+
+    <details class="reck">
+      <summary>How the eye reckons</summary>
+      <div class="body">
+        <p>These are grill-day rules of thumb, not laboratory facts. Tune with the sliders if your crowd runs hungrier.</p>
+        <p>Each eater gets a target of <b>cooked</b> meat: a regular man about half a pound, a regular woman a bit less, a kid scaled by age. The appetite slider swings that from roughly 60% to 160%.</p>
+        <p>That cooked target is split evenly across the meats you pick, then grossed up to <b>raw</b> buying weight, because meat loses weight on the fire and bone and shell don't feed anyone. Shellfish needs the most raw weight for that reason; sausage the least.</p>
+        <p>A smoker adds about 10% for the long, slow shrink. Sides checked trims the whole thing by a quarter. Each meat is rounded to the nearest quarter pound so you can actually order it.</p>
+      </div>
+    </details>
+  </section>
+
+  <footer>
+    <div class="peace">We come in peace</div>
+    <div style="margin-top:4px">Go forth and grill</div>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---- model constants (cooked lbs per eater at "regular" appetite) ----
+  var COOKED = { men:0.50, women:0.375, kidBase:0.30 };
+  var APPETITE = {1:0.6, 2:0.8, 3:1.0, 4:1.25, 5:1.6};
+  var APPETITE_LABEL = {1:"just a nibble", 2:"light eater", 3:"regular eater", 4:"hearty eater", 5:"full carnivore"};
+
+  // yield = cooked edible / raw purchased
+  var MEATS = [
+    {id:"beef",    name:"Beef",      yield:0.70, icon:iconBeef},
+    {id:"pork",    name:"Pork",      yield:0.70, icon:iconPork},
+    {id:"chicken", name:"Chicken",   yield:0.60, icon:iconChicken},
+    {id:"sausage", name:"Sausage",   yield:0.80, icon:iconSausage},
+    {id:"fish",    name:"Fish",      yield:0.75, icon:iconFish},
+    {id:"shell",   name:"Shellfish", yield:0.45, icon:iconShell}
+  ];
+
+  var GRILLS = [
+    {id:"charcoal", name:"Charcoal"},
+    {id:"gas",      name:"Gas"},
+    {id:"smoker",   name:"Smoker"},
+    {id:"electric", name:"Electric"}
+  ];
+
+  // recipe ideas keyed by meat, with a smoker-specific low-and-slow pick
+  var RECIPES = {
+    beef:{
+      def:{dish:"Santa Maria tri-tip", how:"Rub with salt, pepper and garlic. Sear hot, then finish over indirect heat to a rosy medium-rare. Slice against the grain."},
+      smoker:{dish:"Low-and-slow brisket", how:"Trim, season simply, smoke at 225°F to about 203°F internal. Wrap once the bark sets. Rest an hour before slicing."}
+    },
+    pork:{
+      def:{dish:"Baby back ribs", how:"Dry rub, cook low over indirect heat until the meat pulls back from the bone, then glaze and crisp the last few minutes."},
+      smoker:{dish:"Pulled pork shoulder", how:"Rub a bone-in shoulder, smoke at 225°F to about 200°F internal, rest, then pull. Plan for a long cook."}
+    },
+    chicken:{
+      def:{dish:"Spatchcock chicken", how:"Flatten by removing the backbone so it cooks evenly. Season under the skin, grill skin-side down first, then flip."},
+      smoker:{dish:"Smoked chicken thighs", how:"Thighs stay juicy. Smoke at 275°F, then blast the skin over direct heat at the end so it isn't rubbery."}
+    },
+    sausage:{
+      def:{dish:"Beer-braised brats", how:"Simmer in beer and onions, then finish on the grates for color and snap. Keep a cooler zone so they don't split."},
+      smoker:{dish:"Smoked sausage links", how:"Smoke whole links at 250°F until they hit 160°F internal, then kiss them over direct heat for a crackling skin."}
+    },
+    fish:{
+      def:{dish:"Cedar-plank salmon", how:"Soak the plank, lay the fillet skin-side down, grill covered over medium. The plank keeps it moist and adds smoke."},
+      smoker:{dish:"Smoked salmon fillet", how:"Brine first, then smoke low at around 180°F until just flaky. Low and slow keeps it from drying out."}
+    },
+    shell:{
+      def:{dish:"Garlic-butter shrimp skewers", how:"Thread shell-on or peeled shrimp, grill hot and fast, two to three minutes a side, basting with garlic butter."},
+      smoker:{dish:"Smoked garlic shrimp", how:"Toss in oil and spice, smoke at 225°F in a single layer for about 30 minutes until pink and just firm."}
+    }
+  };
+
+  var state = {
+    men:{count:2, appetite:3},
+    women:{count:2, appetite:3},
+    kids:{count:0, appetite:3},
+    kidFactor:1.0,
+    meats:{beef:true, chicken:true, pork:false, sausage:false, fish:false, shell:false},
+    grill:"charcoal",
+    sides:false
+  };
+
+  // ---------- build meat + grill stamps ----------
+  var meatsEl = document.getElementById("meats");
+  MEATS.forEach(function(m){
+    var b=document.createElement("button");
+    b.type="button"; b.className="stamp"; b.dataset.meat=m.id;
+    b.setAttribute("aria-pressed", state.meats[m.id] ? "true":"false");
+    b.innerHTML='<span class="tick">✕</span>'+m.icon()+'<span>'+m.name+'</span>';
+    b.addEventListener("click",function(){
+      state.meats[m.id]=!state.meats[m.id];
+      b.setAttribute("aria-pressed", state.meats[m.id]?"true":"false");
+      compute();
+    });
+    meatsEl.appendChild(b);
+  });
+
+  var grillsEl=document.getElementById("grills");
+  GRILLS.forEach(function(g){
+    var b=document.createElement("button");
+    b.type="button"; b.className="stamp"; b.dataset.grill=g.id;
+    b.setAttribute("aria-pressed", state.grill===g.id?"true":"false");
+    b.innerHTML='<span class="tick">✕</span>'+iconFlame()+'<span>'+g.name+'</span>';
+    b.addEventListener("click",function(){
+      state.grill=g.id;
+      grillsEl.querySelectorAll(".stamp").forEach(function(s){s.setAttribute("aria-pressed", s.dataset.grill===g.id?"true":"false");});
+      compute();
+    });
+    grillsEl.appendChild(b);
+  });
+
+  // ---------- people rows ----------
+  document.querySelectorAll(".row").forEach(function(row){
+    var grp=row.dataset.group;
+    var countEl=row.querySelector("[data-count]");
+    countEl.textContent=state[grp].count;
+    row.querySelectorAll("[data-step]").forEach(function(btn){
+      btn.addEventListener("click",function(){
+        var n=state[grp].count + parseInt(btn.dataset.step,10);
+        state[grp].count=Math.max(0,Math.min(40,n));
+        countEl.textContent=state[grp].count;
+        compute();
+      });
+    });
+    var slider=row.querySelector("[data-appetite]");
+    if(slider){
+      var lab=row.querySelector("[data-aplabel]");
+      slider.addEventListener("input",function(){
+        state[grp].appetite=parseInt(slider.value,10);
+        if(lab) lab.textContent=APPETITE_LABEL[slider.value];
+        compute();
+      });
+    }
+    var age=row.querySelector("[data-age]");
+    if(age){ age.addEventListener("change",function(){ state.kidFactor=parseFloat(age.value); compute(); }); }
+  });
+
+  // ---------- sides toggle ----------
+  var sidesEl=document.getElementById("sides");
+  function toggleSides(){ state.sides=!state.sides; sidesEl.setAttribute("aria-pressed", state.sides?"true":"false"); compute(); }
+  sidesEl.addEventListener("click",toggleSides);
+  sidesEl.addEventListener("keydown",function(e){ if(e.key===" "||e.key==="Enter"){ e.preventDefault(); toggleSides(); }});
+
+  // ---------- compute ----------
+  function roundQuarter(x){ return Math.round(x*4)/4; }
+
+  function compute(){
+    // cooked target
+    var cooked = state.men.count*COOKED.men*APPETITE[state.men.appetite]
+               + state.women.count*COOKED.women*APPETITE[state.women.appetite]
+               + state.kids.count*COOKED.kidBase*state.kidFactor*APPETITE[state.kids.appetite];
+    if(state.sides) cooked *= 0.75;
+
+    var chosen = MEATS.filter(function(m){ return state.meats[m.id]; });
+    var breakdownEl=document.getElementById("breakdown");
+    var recipesEl=document.getElementById("recipes");
+    var totalEl=document.querySelector("[data-total]");
+    var rawNote=document.querySelector("[data-rawnote]");
+
+    var people = state.men.count+state.women.count+state.kids.count;
+
+    if(people===0){ totalEl.textContent="0"; breakdownEl.innerHTML=""; recipesEl.innerHTML='<p class="empty">No eaters yet. Add some souls to the gathering.</p>'; rawNote.style.visibility="hidden"; return; }
+    if(chosen.length===0){ totalEl.textContent="0"; breakdownEl.innerHTML=""; recipesEl.innerHTML='<p class="empty">Pick at least one meat and the eye will reckon.</p>'; rawNote.style.visibility="hidden"; return; }
+    rawNote.style.visibility="visible";
+
+    var cookedEach = cooked/chosen.length;
+    var smokerBump = state.grill==="smoker" ? 1.10 : 1.0;
+
+    var rows=[], total=0;
+    chosen.forEach(function(m){
+      var raw = roundQuarter((cookedEach/m.yield)*smokerBump);
+      if(raw<0.25 && cookedEach>0) raw=0.25;
+      total += raw;
+      rows.push({name:m.name, amt:raw});
+    });
+
+    totalEl.textContent = (Math.round(total*4)/4).toString();
+
+    breakdownEl.innerHTML='<div class="bhead">What to buy</div>'+rows.map(function(r){
+      return '<div class="brow"><span class="nm">'+r.name+'</span><span class="dots"></span><span class="amt">'+r.amt.toFixed(2).replace(/\.00$/,"").replace(/0$/,"")+' lb</span></div>';
+    }).join("");
+
+    // recipes
+    var grillLabel=GRILLS.filter(function(g){return g.id===state.grill;})[0].name;
+    var recHTML='<div class="bhead">The oracle suggests</div><div class="rsub">tuned for your '+grillLabel.toLowerCase()+'</div>';
+    chosen.forEach(function(m){
+      var r=RECIPES[m.id];
+      var pick=(state.grill==="smoker" && r.smoker) ? r.smoker : r.def;
+      var q=encodeURIComponent(pick.dish+" recipe");
+      recHTML+='<div class="rec">'+m.icon()+'<div>'+
+        '<p class="meat">'+m.name+'</p>'+
+        '<p class="dish">'+pick.dish+'</p>'+
+        '<p class="how">'+pick.how+'</p>'+
+        '<a class="find" href="https://www.google.com/search?q='+q+'" target="_blank" rel="noopener">Find recipes</a>'+
+        '</div></div>';
+    });
+    recipesEl.innerHTML=recHTML;
+  }
+
+  // ---------- consult: one ceremonial pulse ----------
+  document.getElementById("consult").addEventListener("click",function(){
+    compute();
+    var rays=document.querySelector(".rays"), iris=document.querySelector(".iris");
+    [rays,iris].forEach(function(el){ if(!el) return; el.classList.remove("pulse"); void el.offsetWidth; el.classList.add("pulse"); });
+    document.getElementById("verdict").scrollIntoView({behavior:"smooth", block:"start"});
+  });
+
+  // ---------- build sunbeam rays ----------
+  (function rays(){
+    var g=document.getElementById("rayset"); if(!g) return;
+    var cx=210, cy=150, n=24;
+    var paths="";
+    for(var i=0;i<n;i++){
+      var a=(i/n)*Math.PI*2;
+      var r1=94, r2=(i%2===0)?136:120;
+      var x1=cx+Math.cos(a)*r1, y1=cy+Math.sin(a)*r1;
+      var x2=cx+Math.cos(a)*r2, y2=cy+Math.sin(a)*r2;
+      paths+='<line x1="'+x1.toFixed(1)+'" y1="'+y1.toFixed(1)+'" x2="'+x2.toFixed(1)+'" y2="'+y2.toFixed(1)+'" stroke-width="'+((i%2===0)?3:2)+'"/>';
+    }
+    g.innerHTML=paths;
+  })();
+
+  compute();
+
+  // ---------- hand-drawn linocut meat icons ----------
+  function wrap(inner){ return '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><g filter="url(#lino-fine)">'+inner+'</g></svg>'; }
+  function iconBeef(){ return wrap('<path d="M10 20 Q24 6 38 20 Q42 30 32 38 Q24 44 16 38 Q6 30 10 20 Z"/><path d="M19 24 q5 -4 10 0 q3 6 -2 10 q-6 3 -9 -2 q-2 -5 1 -8 Z"/><path d="M13 22 l-4 -3 M35 22 l4 -3"/>'); }
+  function iconPork(){ return wrap('<path d="M14 16 Q24 10 34 16 L38 30 Q34 40 24 40 Q14 40 10 30 Z"/><circle cx="24" cy="27" r="6"/><path d="M14 16 l-3 -5 M34 16 l3 -5"/>'); }
+  function iconChicken(){ return wrap('<path d="M18 10 l5 10 M28 10 l-3 10"/><path d="M14 20 h20 l-3 16 q-7 5 -14 0 Z"/><path d="M20 24 v10 M27 24 v10"/>'); }
+  function iconSausage(){ return wrap('<path d="M12 14 Q8 10 12 8 Q16 6 18 12 Q30 20 36 32 Q40 38 36 40 Q32 42 30 36 Q20 28 12 18 Q10 16 12 14 Z"/><path d="M18 18 l-2 2 M24 24 l-2 2 M30 30 l-2 2"/>'); }
+  function iconFish(){ return wrap('<path d="M8 24 Q20 12 34 20 Q42 24 34 28 Q20 36 8 24 Z"/><path d="M34 20 l8 -5 l-2 9 l4 6 l-10 -2"/><circle cx="16" cy="23" r="1.6" fill="currentColor"/><path d="M22 20 q3 4 0 8"/>'); }
+  function iconShell(){ return wrap('<path d="M24 12 Q40 16 36 36 Q24 44 12 36 Q8 16 24 12 Z"/><path d="M24 14 V40 M17 16 Q14 28 18 38 M31 16 Q34 28 30 38"/>'); }
+  function iconFlame(){ return wrap('<path d="M24 8 Q30 18 26 24 Q33 22 32 32 Q31 42 24 42 Q16 42 15 32 Q14 24 20 26 Q16 16 24 8 Z"/>'); }
+})();
+</script>
+</body>
+</html>
