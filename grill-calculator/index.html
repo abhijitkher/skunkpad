@@ -10,9 +10,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Rye&family=Special+Elite&display=swap" rel="stylesheet">
 <style>
 :root{
-  --kraft:#c2a878;
-  --kraft-hi:#cdb488;
-  --kraft-lo:#b39a68;
+  --kraft:#b18c65;
+  --kraft-hi:#c2a07b;
+  --kraft-lo:#9a764f;
   --ink:#28201a;
   --ink-80:rgba(40,32,26,.80);
   --ink-55:rgba(40,32,26,.55);
@@ -47,6 +47,21 @@ body::before{
   opacity:.9;
   mix-blend-mode:multiply;
 }
+/* crumpled-paper emboss: turbulence lit from upper-left reads as creases */
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cfilter id='c'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.011' numOctaves='3' seed='4' result='n'/%3E%3CfeDiffuseLighting in='n' lighting-color='%23ffffff' surfaceScale='2.2' diffuseConstant='1.1'%3E%3CfeDistantLight azimuth='235' elevation='62'/%3E%3C/feDiffuseLighting%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23c)'/%3E%3C/svg%3E");
+  background-size:620px 620px;
+  mix-blend-mode:soft-light;
+  opacity:.55;
+}
+/* ghostly farm-animal watermark, barely there until you look */
+.watermark{position:fixed;inset:0;z-index:0;pointer-events:none;mix-blend-mode:multiply;opacity:.07}
+.watermark svg{width:100%;height:100%}
 .wrap{position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:28px 20px 72px}
 
 /* ---------- HERO (compact corner mark + title) ---------- */
@@ -71,6 +86,10 @@ body::before{
   margin:7px 0 0;
 }
 .creed .peace{font-family:"Rye",serif;letter-spacing:.05em}
+.byline{display:inline-block;margin-top:9px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-80);text-decoration:none;border:1.5px solid var(--ink-55);border-radius:999px;
+  padding:3px 11px;background:rgba(40,32,26,.05);line-height:1.4}
+.byline:active{background:var(--ink);color:var(--kraft)}
 .rule{display:block;width:100%;height:20px;margin:16px auto 2px;color:var(--ink-55)}
 
 /* ---------- PANELS ---------- */
@@ -211,6 +230,56 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
   </filter>
 </svg>
 
+<!-- ghosted farm-animal watermark, fixed behind everything -->
+<div class="watermark" aria-hidden="true">
+  <svg viewBox="0 0 420 900" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <g id="wm-hen">
+        <polygon points="6,22 -1,6 13,17"/>
+        <ellipse cx="28" cy="28" rx="20" ry="14"/>
+        <circle cx="44" cy="16" r="8"/>
+        <circle cx="41" cy="7" r="2.2"/><circle cx="45" cy="5.5" r="2.4"/><circle cx="49" cy="7.5" r="2.2"/>
+        <polygon points="52,15 61,17 52,20"/>
+        <circle cx="45" cy="24" r="2"/>
+        <rect x="23" y="40" width="2.6" height="9"/><rect x="33" y="40" width="2.6" height="9"/>
+      </g>
+      <g id="wm-pig">
+        <ellipse cx="30" cy="28" rx="24" ry="15"/>
+        <circle cx="52" cy="27" r="11"/>
+        <ellipse cx="62" cy="28" rx="4.5" ry="6"/>
+        <polygon points="45,15 52,9 55,20"/>
+        <rect x="14" y="40" width="3" height="9"/><rect x="24" y="41" width="3" height="9"/>
+        <rect x="38" y="41" width="3" height="9"/><rect x="47" y="40" width="3" height="9"/>
+      </g>
+      <g id="wm-cow">
+        <rect x="8" y="17" width="46" height="22" rx="7"/>
+        <ellipse cx="61" cy="23" rx="9" ry="8"/>
+        <polygon points="55,15 52,6 59,14"/><polygon points="67,14 73,6 69,16"/>
+        <rect x="14" y="39" width="3.4" height="11"/><rect x="24" y="39" width="3.4" height="11"/>
+        <rect x="40" y="39" width="3.4" height="11"/><rect x="48" y="39" width="3.4" height="11"/>
+        <rect x="6" y="20" width="2.4" height="16"/><circle cx="7" cy="37" r="2.4"/>
+      </g>
+      <g id="wm-sheep">
+        <circle cx="20" cy="27" r="12"/><circle cx="31" cy="22" r="13"/><circle cx="42" cy="27" r="12"/>
+        <circle cx="26" cy="33" r="11"/><circle cx="37" cy="33" r="11"/>
+        <ellipse cx="52" cy="29" rx="7" ry="9"/><polygon points="49,21 54,16 56,23"/>
+        <rect x="22" y="42" width="3" height="9"/><rect x="31" y="42" width="3" height="9"/><rect x="40" y="42" width="3" height="9"/>
+      </g>
+    </defs>
+    <g class="herd" filter="url(#lino)">
+      <use href="#wm-cow"   transform="translate(28,70) scale(1.5) rotate(-4)"/>
+      <use href="#wm-hen"   transform="translate(300,150) scale(1.1) rotate(6)"/>
+      <use href="#wm-sheep" transform="translate(230,300) scale(1.3) rotate(-3)"/>
+      <use href="#wm-pig"   transform="translate(40,330) scale(1.25) rotate(3)"/>
+      <use href="#wm-hen"   transform="translate(130,470) scale(0.9) rotate(-8)"/>
+      <use href="#wm-cow"   transform="translate(250,540) scale(1.15) rotate(5)"/>
+      <use href="#wm-sheep" transform="translate(30,620) scale(1.0) rotate(4)"/>
+      <use href="#wm-pig"   transform="translate(280,720) scale(1.45) rotate(-5)"/>
+      <use href="#wm-hen"   transform="translate(60,820) scale(1.15) rotate(7)"/>
+    </g>
+  </svg>
+</div>
+
 <div class="wrap">
 
   <!-- ===== HERO: small corner eye + title ===== -->
@@ -232,6 +301,7 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     <div class="brand">
       <h1 class="title"><span class="small">THE</span>MEAT ORACLE</h1>
       <p class="creed">How much thou shalt grill &nbsp;·&nbsp; <span class="peace">We come in peace</span></p>
+      <a class="byline" href="https://github.com/abhijitkher" target="_blank" rel="noopener">@Abhi K</a>
     </div>
   </header>
 
@@ -289,7 +359,7 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
   <section class="panel" aria-labelledby="o-h">
     <svg class="panel-bd" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><rect x="1.2" y="1.2" width="97.6" height="97.6" fill="none" stroke="currentColor" stroke-width=".5" filter="url(#lino-fine)" vector-effect="non-scaling-stroke"/></svg>
     <h2 id="o-h">The Offerings</h2>
-    <p class="sub">Choose thy meats. The total splits evenly across them.</p>
+    <p class="sub">Choose your proteins, meat or not. The total splits evenly across them.</p>
     <div class="stamps" id="meats"></div>
   </section>
 
@@ -332,6 +402,7 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
   <footer>
     <div class="peace">We come in peace</div>
     <div style="margin-top:4px">Go forth and grill</div>
+    <div style="margin-top:12px;opacity:.85">© 2026 Abhi K &nbsp;·&nbsp; @Abhi K</div>
   </footer>
 </div>
 
@@ -351,7 +422,9 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     {id:"chicken", name:"Chicken",   yield:0.60, icon:iconChicken},
     {id:"sausage", name:"Sausage",   yield:0.80, icon:iconSausage},
     {id:"fish",    name:"Fish",      yield:0.75, icon:iconFish},
-    {id:"shell",   name:"Shellfish", yield:0.45, icon:iconShell}
+    {id:"shell",   name:"Shellfish", yield:0.45, icon:iconShell},
+    {id:"paneer",  name:"Paneer",    yield:0.90, icon:iconPaneer},
+    {id:"tofu",    name:"Tofu",      yield:0.80, icon:iconTofu}
   ];
 
   var GRILLS = [
@@ -386,6 +459,14 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     shell:{
       def:{dish:"Garlic-butter shrimp skewers", how:"Thread shell-on or peeled shrimp, grill hot and fast, two to three minutes a side, basting with garlic butter."},
       smoker:{dish:"Smoked garlic shrimp", how:"Toss in oil and spice, smoke at 225°F in a single layer for about 30 minutes until pink and just firm."}
+    },
+    paneer:{
+      def:{dish:"Paneer tikka skewers", how:"Marinate cubes in spiced yogurt, thread with onion and pepper, and grill hot until the edges char. Don't overcook or it dries out."},
+      smoker:{dish:"Smoked paneer tikka", how:"Marinate, smoke at 225°F for about 20 minutes, then finish over direct heat for char. Paneer takes smoke fast, so keep it short."}
+    },
+    tofu:{
+      def:{dish:"Grilled teriyaki tofu", how:"Press extra-firm tofu, slab it thick, marinate, then grill on well-oiled grates until crisp-edged. Glaze in the last minute."},
+      smoker:{dish:"Smoked tofu steaks", how:"Press firm tofu hard, marinate, then smoke at 225°F for about 45 minutes for a chewy, smoky slab. Firmer tofu holds up best."}
     }
   };
 
@@ -394,7 +475,7 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     women:{count:2, appetite:3},
     kids:{count:0, appetite:3},
     kidFactor:1.0,
-    meats:{beef:true, chicken:true, pork:false, sausage:false, fish:false, shell:false},
+    meats:{beef:true, chicken:true, pork:false, sausage:false, fish:false, shell:false, paneer:false, tofu:false},
     grill:"charcoal",
     sides:false
   };
@@ -550,6 +631,8 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
   function iconFish(){ return wrap('<path d="M8 24 Q20 12 34 20 Q42 24 34 28 Q20 36 8 24 Z"/><path d="M34 20 l8 -5 l-2 9 l4 6 l-10 -2"/><circle cx="16" cy="23" r="1.6" fill="currentColor"/><path d="M22 20 q3 4 0 8"/>'); }
   function iconShell(){ return wrap('<path d="M24 12 Q40 16 36 36 Q24 44 12 36 Q8 16 24 12 Z"/><path d="M24 14 V40 M17 16 Q14 28 18 38 M31 16 Q34 28 30 38"/>'); }
   function iconFlame(){ return wrap('<path d="M24 8 Q30 18 26 24 Q33 22 32 32 Q31 42 24 42 Q16 42 15 32 Q14 24 20 26 Q16 16 24 8 Z"/>'); }
+  function iconPaneer(){ return wrap('<path d="M7 41 L41 7"/><path d="M15 29 l6 -6 l6 6 l-6 6 Z"/><path d="M23 21 l6 -6 l6 6 l-6 6 Z"/><path d="M31 13 l6 -6"/><path d="M12 36 l-4 4"/>'); }
+  function iconTofu(){ return wrap('<path d="M10 21 h28 v18 h-28 Z"/><path d="M10 30 h28 M24 21 v18"/><path d="M16 15 q4 -4 0 -9 M28 15 q4 -4 0 -9"/>'); }
 })();
 </script>
 </body>
