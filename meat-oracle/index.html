@@ -155,13 +155,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
 input[type=range]::-moz-range-thumb{width:30px;height:30px;border-radius:50%;
   background-color:var(--kraft-hi);border:2px solid var(--ink);
   background-image:var(--thumb,none);background-size:22px 22px;background-position:center;background-repeat:no-repeat;cursor:grab}
-/* bare thumbs: the animal itself is the handle (no circle), 48px */
-input[type=range].bare{margin-left:-9px;margin-right:-9px;width:calc(100% + 18px);overflow:visible;
-  background:linear-gradient(var(--ink-35),var(--ink-35)) center/calc(100% - 18px) 4px no-repeat}
+/* bare thumbs: the animal itself is the handle (no circle), 43px */
+input[type=range].bare{margin-left:-6.5px;margin-right:-6.5px;width:calc(100% + 13px);overflow:visible;
+  background:linear-gradient(var(--ink-35),var(--ink-35)) center/calc(100% - 13px) 4px no-repeat}
 input[type=range].bare::-webkit-slider-runnable-track{background:transparent;border:0}
 input[type=range].bare::-moz-range-track{background:transparent;border:0}
-input[type=range].bare::-webkit-slider-thumb{width:48px;height:48px;margin-top:-22px;border:0;border-radius:0;background-color:transparent;background-size:48px 48px;box-shadow:none}
-input[type=range].bare::-moz-range-thumb{width:48px;height:48px;border:0;border-radius:0;background-color:transparent;background-size:48px 48px;box-shadow:none}
+input[type=range].bare::-webkit-slider-thumb{width:43px;height:43px;margin-top:-19.5px;border:0;border-radius:0;background-color:transparent;background-size:43px 43px;box-shadow:none}
+input[type=range].bare::-moz-range-thumb{width:43px;height:43px;border:0;border-radius:0;background-color:transparent;background-size:43px 43px;box-shadow:none}
 .row:has(input.bare) .scale{margin-top:14px}
 .row:has(input.bare) .stepper,.row:has(input.bare) .row-head{margin-bottom:6px}
 .prow:has(input.bare){position:relative;z-index:2}
@@ -637,7 +637,7 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     var svg="<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'><g fill='#28201a'>"+inner+"</g></svg>";
     return "url(\"data:image/svg+xml,"+encodeURIComponent(svg)+"\")";
   }
-  // full-size, single-ink, tan-filled handles (48px). The animal itself is the handle.
+  // full-size, single-ink, tan-filled handles (43px). The animal itself is the handle.
   function W(inner){ return "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60' width='60' height='60' fill='none' stroke='#28201a' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'>"+inner+"</svg>"; }
   var F="fill='#e3b78a'", DOT="fill='#28201a' stroke='none'";
   var THUMB_FULL = {
