@@ -62,19 +62,38 @@ body::after{
 /* ghostly farm-animal watermark, barely there until you look */
 .watermark{position:fixed;inset:0;z-index:0;pointer-events:none;mix-blend-mode:multiply;opacity:.07}
 .watermark svg{width:100%;height:100%}
-.wrap{position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:28px 20px 72px}
+.app{position:relative;z-index:1;max-width:1600px;margin:0;padding:16px 20px 20px}
+.panes{display:grid;grid-template-columns:1fr;gap:18px}
+.pane{position:relative;border:1.5px solid var(--ink-35);border-radius:4px;padding:16px 15px 18px;background:rgba(40,32,26,.02)}
+.pane-h{font-family:"Rye",serif;font-weight:400;font-size:clamp(20px,2vw,25px);letter-spacing:.015em;margin:0 0 3px;text-align:left}
+.sub-h{font-family:"Rye",serif;font-weight:400;font-size:18px;letter-spacing:.015em;margin:22px 0 2px;text-align:left;border-top:1.5px dotted var(--ink-35);padding-top:16px}
+.pane-sub{text-align:left;color:var(--ink-80);font-size:13px;margin:0 0 14px;line-height:1.45}
+.hint{text-align:left;color:var(--ink-55);font-size:12px;margin:12px 0 0;line-height:1.4}
 
-/* ---------- HERO (compact corner mark + title) ---------- */
-.hero{display:flex;align-items:center;gap:15px;text-align:left;padding:4px 0 2px}
-.eye-mark{flex:0 0 auto;width:68px;height:68px;display:block}
-.brand{min-width:0}
+/* desktop: three fixed-height panes, each scrolls on its own, page doesn't */
+@media(min-width:900px){
+  html,body{height:100%}
+  body{overflow:hidden}
+  .app{height:100vh;display:flex;flex-direction:column}
+  .panes{flex:1;min-height:0;grid-template-columns:1.05fr 1.05fr 1fr;gap:16px}
+  .pane{min-height:0;overflow-y:auto;overflow-x:hidden}
+  .pane::-webkit-scrollbar{width:9px}
+  .pane::-webkit-scrollbar-thumb{background:var(--ink-35);border-radius:9px}
+  .pane.p3{overflow:hidden;display:flex;flex-direction:column}
+}
+
+/* ---------- TOP BAR ---------- */
+.topbar{display:flex;align-items:center;gap:14px;text-align:left;padding:0 2px 14px;margin-bottom:2px;border-bottom:1.5px solid var(--ink-35);flex-wrap:wrap}
+.eye-mark{flex:0 0 auto;width:56px;height:56px;display:block}
+.brand{min-width:0;flex:1 1 auto}
+.topmeta{display:flex;align-items:center;gap:12px;flex:0 0 auto}
 .title{
   font-family:"Rye",serif;
   font-weight:400;
   line-height:.9;
   letter-spacing:.015em;
   margin:0;
-  font-size:clamp(30px,8.4vw,46px);
+  font-size:clamp(26px,3.6vw,40px);
   text-shadow:0 1px 0 var(--kraft-hi);
 }
 .title .small{display:block;font-size:.34em;letter-spacing:.3em;margin-bottom:.1em}
@@ -155,8 +174,8 @@ select{
 .stamp[aria-pressed=true] svg{color:var(--kraft)}
 .stamp .tick{position:absolute;top:5px;right:6px;font-family:"Rye",serif;font-size:13px;opacity:0;line-height:1}
 .stamp[aria-pressed=true] .tick{opacity:1}
-.flame .stamps{grid-template-columns:repeat(2,1fr)}
-@media(min-width:520px){.flame .stamps{grid-template-columns:repeat(4,1fr)}}
+.grills{grid-template-columns:repeat(2,1fr)}
+.stamp{min-width:0}
 
 .sides{display:flex;align-items:flex-start;gap:12px;margin-top:20px;padding:14px;border:1.5px dashed var(--ink-55);border-radius:3px;cursor:pointer}
 .sides .box{flex:0 0 auto;width:26px;height:26px;border:2px solid var(--ink);border-radius:2px;position:relative;margin-top:1px}
@@ -165,51 +184,60 @@ select{
 .sides .cap span{font-size:12.5px;color:var(--ink-55)}
 
 /* consult button */
-.consult{display:block;width:100%;margin:34px 0 0;padding:18px;cursor:pointer;
+/* compact consult button in the top bar */
+.consult{display:inline-block;padding:9px 16px;cursor:pointer;
   background:var(--ink);color:var(--kraft-hi);border:0;border-radius:3px;
-  font-family:"Rye",serif;font-size:clamp(20px,6vw,27px);letter-spacing:.05em;
-  position:relative;box-shadow:0 3px 0 var(--ink);transition:transform .07s ease;
-}
+  font-family:"Rye",serif;font-size:16px;letter-spacing:.04em;
+  box-shadow:0 3px 0 rgba(40,32,26,.35);transition:transform .07s ease;white-space:nowrap}
 .consult:active{transform:translateY(3px);box-shadow:0 0 0 var(--ink)}
 
-/* ---------- VERDICT ---------- */
-.verdict{text-align:center;margin:40px 0 0}
-.spoke{font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-80)}
-.total{font-family:"Rye",serif;line-height:.86;margin:6px 0 0;font-size:clamp(66px,22vw,116px);position:relative}
-.total .unit{display:block;font-size:.2em;letter-spacing:.42em;padding-left:.42em;margin-top:.1em}
-.raw-note{font-size:12px;color:var(--ink-55);margin:4px 0 0;letter-spacing:.04em}
-
-.breakdown{margin:26px auto 0;max-width:360px;text-align:left}
-.breakdown .bhead{font-family:"Rye",serif;font-size:16px;text-align:center;margin:0 0 10px;letter-spacing:.02em}
-.brow{display:flex;align-items:baseline;gap:8px;padding:7px 0;font-size:15px}
+/* ---------- VERDICT (top of pane 3) ---------- */
+.verdict{flex:0 0 auto;text-align:left}
+.total-line{display:flex;align-items:baseline;gap:10px;margin:6px 0 0;flex-wrap:wrap}
+.total{font-family:"Rye",serif;line-height:.86;font-size:clamp(52px,6.5vw,78px)}
+.unit{font-family:"Rye",serif;font-size:clamp(16px,1.6vw,20px);letter-spacing:.08em;color:var(--ink-80)}
+.raw-note{font-size:12px;color:var(--ink-55);margin:3px 0 0;letter-spacing:.03em}
+.breakdown{margin:16px 0 0;text-align:left}
+.breakdown .bhead{font-family:"Rye",serif;font-size:15px;text-align:left;margin:0 0 8px;letter-spacing:.02em}
+.brow{display:flex;align-items:baseline;gap:8px;padding:6px 0;font-size:15px}
 .brow .nm{white-space:nowrap}
 .brow .dots{flex:1;border-bottom:2px dotted var(--ink-35);transform:translateY(-4px)}
 .brow .amt{font-family:"Rye",serif;font-size:17px;white-space:nowrap}
 
-/* recipes */
-.recipes{margin:34px 0 0}
-.recipes .bhead{font-family:"Rye",serif;font-size:clamp(18px,5vw,22px);text-align:center;margin:0 0 4px}
-.recipes .rsub{text-align:center;font-size:12.5px;color:var(--ink-55);margin:0 0 18px}
-.rec{border-top:1.5px solid var(--ink-55);padding:15px 2px 14px;display:grid;grid-template-columns:36px 1fr;gap:12px;align-items:start}
-.rec svg{width:36px;height:36px;margin-top:2px}
+/* recipes (scrolling bottom of pane 3) */
+.recipes-wrap{flex:1;min-height:0;overflow-y:auto;margin-top:18px;border-top:1.5px solid var(--ink-35);padding-top:4px}
+.recipes-wrap::-webkit-scrollbar{width:9px}
+.recipes-wrap::-webkit-scrollbar-thumb{background:var(--ink-35);border-radius:9px}
+.recipes{margin:14px 0 0}
+.recipes .bhead{font-family:"Rye",serif;font-size:19px;text-align:left;margin:0 0 2px}
+.recipes .rsub{text-align:left;font-size:12.5px;color:var(--ink-55);margin:0 0 14px}
+.rec{border-top:1.5px dotted var(--ink-35);padding:13px 2px 12px;display:grid;grid-template-columns:34px 1fr;gap:11px;align-items:start}
+.rec:first-of-type{border-top:0}
+.rec svg{width:34px;height:34px;margin-top:2px}
 .rec .meat{font-family:"Rye",serif;font-size:16px;letter-spacing:.02em;margin:0 0 2px}
 .rec .dish{font-size:15px;margin:0}
-.rec .how{font-size:13px;color:var(--ink-55);margin:3px 0 8px;line-height:1.45}
+.rec .how{font-size:13px;color:var(--ink-80);margin:3px 0 8px;line-height:1.45}
 .rec a.find{display:inline-block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);
   border:1.5px solid var(--ink);border-radius:2px;padding:5px 11px;text-decoration:none;background:rgba(40,32,26,.04)}
 .rec a.find:active{background:var(--ink);color:var(--kraft)}
 
-.empty{text-align:center;color:var(--ink-55);font-size:14px;padding:16px 0}
+.empty{text-align:left;color:var(--ink-55);font-size:14px;padding:14px 0}
 
 /* reckoning */
-details.reck{margin:30px auto 0;max-width:460px;font-size:13.5px}
-details.reck summary{cursor:pointer;text-align:center;font-family:"Rye",serif;font-size:15px;letter-spacing:.02em;list-style:none}
+details.reck{margin:22px 0 0;font-size:13px}
+details.reck summary{cursor:pointer;text-align:left;font-family:"Rye",serif;font-size:15px;letter-spacing:.02em;list-style:none}
 details.reck summary::-webkit-details-marker{display:none}
 details.reck summary::after{content:" ▾";color:var(--ink-55)}
 details.reck[open] summary::after{content:" ▴"}
-details.reck .body{color:var(--ink-80);line-height:1.6;padding:12px 4px 0}
-details.reck .body p{margin:0 0 9px}
+details.reck .body{color:var(--ink-80);line-height:1.55;padding:10px 2px 0}
+details.reck .body p{margin:0 0 8px}
 details.reck .body b{font-weight:400;border-bottom:1.5px solid var(--ink-35)}
+.mini-foot{margin:22px 0 6px;font-size:11px;letter-spacing:.06em;color:var(--ink-55);text-align:left}
+
+/* clearer slider scale labels */
+.scale{display:flex;justify-content:space-between;align-items:baseline;margin-top:5px;font-size:12px;color:var(--ink-80)}
+.scale span{font-size:11px;letter-spacing:.04em;color:var(--ink-55)}
+.scale b{font-family:"Rye",serif;font-weight:400;font-size:15px;color:var(--ink);letter-spacing:.02em}
 
 footer{text-align:center;margin:46px 0 0;color:var(--ink-55);font-size:12px;letter-spacing:.08em}
 footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
@@ -287,16 +315,14 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
   </svg>
 </div>
 
-<div class="wrap">
+<div class="app">
 
-  <!-- ===== HERO: small corner eye + title ===== -->
-  <header class="hero">
+  <!-- ===== TOP BAR ===== -->
+  <header class="topbar">
     <svg class="eye-mark" viewBox="0 0 120 120" role="img" aria-label="The all-seeing eye">
       <g filter="url(#lino-fine)" fill="none" stroke="var(--ink)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
-        <!-- short rays -->
         <g class="rays" stroke-width="2.6"><g id="rayset"></g></g>
         <circle cx="60" cy="60" r="30" stroke-width="3.4"/>
-        <!-- eye almond -->
         <path d="M34 60 Q60 40 86 60 Q60 80 34 60 Z" stroke-width="3.2"/>
         <g class="iris">
           <circle cx="60" cy="60" r="12" stroke-width="3"/>
@@ -308,112 +334,94 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     <div class="brand">
       <h1 class="title"><span class="small">THE</span>MEAT ORACLE</h1>
       <p class="creed">How much thou shalt grill &nbsp;·&nbsp; <span class="peace">We come in peace</span></p>
+    </div>
+    <div class="topmeta">
       <a class="byline" href="https://github.com/abhijitkher" target="_blank" rel="noopener">@Abhi K</a>
+      <button class="consult" id="consult" type="button">Consult the Eye</button>
     </div>
   </header>
 
-  <svg class="rule" viewBox="0 0 320 20" preserveAspectRatio="none" aria-hidden="true">
-    <g filter="url(#lino-fine)" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round">
-      <path d="M6 10 H140 M180 10 H314"/>
-      <path d="M160 3 l6 7 l-6 7 l-6 -7 Z" fill="currentColor"/>
-      <circle cx="148" cy="10" r="2.4" fill="currentColor"/><circle cx="172" cy="10" r="2.4" fill="currentColor"/>
-    </g>
-  </svg>
+  <div class="panes">
 
-  <!-- ===== THE GATHERING ===== -->
-  <section class="panel" aria-labelledby="g-h">
-    <svg class="panel-bd" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><rect x="1.2" y="1.2" width="97.6" height="97.6" fill="none" stroke="currentColor" stroke-width=".5" filter="url(#lino-fine)" vector-effect="non-scaling-stroke"/></svg>
-    <h2 id="g-h">The Gathering</h2>
-    <p class="sub">Who's coming, and roughly how hungry. Each slider is the group's average, so a mixed crowd just lands in the middle.</p>
+    <!-- ===== PANE 1: FAMILY ===== -->
+    <section class="pane" aria-labelledby="g-h">
+      <h2 class="pane-h" id="g-h">The Gathering</h2>
+      <p class="pane-sub">How many are coming, and how hungry each group runs on average. A mixed group just sits toward the middle.</p>
 
-    <div class="row" data-group="men">
-      <div class="who"><b>Men</b><span>grown appetites</span></div>
-      <div class="stepper"><button type="button" data-step="-1" aria-label="fewer men">–</button><span class="count" data-count>2</span><button type="button" data-step="1" aria-label="more men">+</button></div>
-      <div class="appetite">
-        <div class="lab"><span>lighter</span><b data-aplabel>regular on average</b><span>heartier</span></div>
-        <input type="range" min="1" max="5" value="3" step="1" data-appetite aria-label="men average appetite">
-        <div class="avg-note">average across the group, e.g. 2 big eaters + 1 regular sits just right of center</div>
+      <div class="row" data-group="men">
+        <div class="who"><b>Men</b></div>
+        <div class="stepper"><button type="button" data-step="-1" aria-label="fewer men">–</button><span class="count" data-count>2</span><button type="button" data-step="1" aria-label="more men">+</button></div>
+        <div class="appetite">
+          <input type="range" min="1" max="5" value="3" step="1" data-appetite aria-label="men average appetite">
+          <div class="scale"><span>Lighter</span><b data-aplabel>Regular</b><span>Heartier</span></div>
+        </div>
       </div>
-    </div>
 
-    <div class="row" data-group="women">
-      <div class="who"><b>Women</b><span>grown appetites</span></div>
-      <div class="stepper"><button type="button" data-step="-1" aria-label="fewer women">–</button><span class="count" data-count>2</span><button type="button" data-step="1" aria-label="more women">+</button></div>
-      <div class="appetite">
-        <div class="lab"><span>lighter</span><b data-aplabel>regular on average</b><span>heartier</span></div>
-        <input type="range" min="1" max="5" value="3" step="1" data-appetite aria-label="women average appetite">
-        <div class="avg-note">average across the group</div>
+      <div class="row" data-group="women">
+        <div class="who"><b>Women</b></div>
+        <div class="stepper"><button type="button" data-step="-1" aria-label="fewer women">–</button><span class="count" data-count>2</span><button type="button" data-step="1" aria-label="more women">+</button></div>
+        <div class="appetite">
+          <input type="range" min="1" max="5" value="3" step="1" data-appetite aria-label="women average appetite">
+          <div class="scale"><span>Lighter</span><b data-aplabel>Regular</b><span>Heartier</span></div>
+        </div>
       </div>
-    </div>
 
-    <div class="row" data-group="kids">
-      <div class="who"><b>Kids</b><span>appetite scales with age</span></div>
-      <div class="stepper"><button type="button" data-step="-1" aria-label="fewer kids">–</button><span class="count" data-count>0</span><button type="button" data-step="1" aria-label="more kids">+</button></div>
-      <div class="appetite">
-        <div class="lab"><span>younger</span><b data-agelabel>average age 8</b><span>older</span></div>
-        <input type="range" min="2" max="17" value="8" step="1" data-age aria-label="kids average age">
-        <div class="avg-note">average age across the kids, so a 4 and a 14 sit around 9</div>
+      <div class="row" data-group="kids">
+        <div class="who"><b>Kids</b></div>
+        <div class="stepper"><button type="button" data-step="-1" aria-label="fewer kids">–</button><span class="count" data-count>0</span><button type="button" data-step="1" aria-label="more kids">+</button></div>
+        <div class="appetite">
+          <input type="range" min="2" max="17" value="8" step="1" data-age aria-label="kids average age">
+          <div class="scale"><span>Younger</span><b data-agelabel>Age 8</b><span>Older</span></div>
+        </div>
       </div>
-    </div>
-  </section>
+      <p class="hint">Kids use average age: a 4 and a 14 average to about 9.</p>
+    </section>
 
-  <!-- ===== THE OFFERINGS ===== -->
-  <section class="panel" aria-labelledby="o-h">
-    <svg class="panel-bd" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><rect x="1.2" y="1.2" width="97.6" height="97.6" fill="none" stroke="currentColor" stroke-width=".5" filter="url(#lino-fine)" vector-effect="non-scaling-stroke"/></svg>
-    <h2 id="o-h">The Offerings</h2>
-    <p class="sub">Choose your proteins, meat or not. Balance them below.</p>
-    <div class="stamps" id="meats"></div>
-  </section>
+    <!-- ===== PANE 2: PROTEINS + BALANCE + FLAME ===== -->
+    <section class="pane" aria-labelledby="o-h">
+      <h2 class="pane-h" id="o-h">The Offerings</h2>
+      <p class="pane-sub">Pick your proteins, meat or not.</p>
+      <div class="stamps" id="meats"></div>
 
-  <!-- ===== THE BALANCE ===== -->
-  <section class="panel" id="balance-sec" aria-labelledby="b-h">
-    <svg class="panel-bd" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><rect x="1.2" y="1.2" width="97.6" height="97.6" fill="none" stroke="currentColor" stroke-width=".5" filter="url(#lino-fine)" vector-effect="non-scaling-stroke"/></svg>
-    <h2 id="b-h">The Balance</h2>
-    <p class="sub">How the pounds split across your proteins. Even by default. Drag to favor one.</p>
-    <div id="balance"></div>
-  </section>
-
-  <!-- ===== THE FLAME ===== -->
-  <section class="panel flame" aria-labelledby="f-h">
-    <svg class="panel-bd" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><rect x="1.2" y="1.2" width="97.6" height="97.6" fill="none" stroke="currentColor" stroke-width=".5" filter="url(#lino-fine)" vector-effect="non-scaling-stroke"/></svg>
-    <h2 id="f-h">The Flame</h2>
-    <p class="sub">Doesn't change appetites. It shapes the cook, and nudges the smoker up for the long shrink.</p>
-    <div class="stamps" id="grills"></div>
-
-    <div class="sides" id="sides" role="button" tabindex="0" aria-pressed="false">
-      <div class="box" aria-hidden="true"></div>
-      <div class="cap"><b>A great spread of sides awaits</b><span>Check this and the eye trims the meat by a quarter.</span></div>
-    </div>
-  </section>
-
-  <button class="consult" id="consult" type="button">Consult the Eye</button>
-
-  <!-- ===== VERDICT ===== -->
-  <section class="verdict" id="verdict" aria-live="polite">
-    <div class="spoke">The eye hath spoken. Thou shalt buy</div>
-    <div class="total"><span data-total>0</span><span class="unit">POUNDS</span></div>
-    <div class="raw-note" data-rawnote>raw weight at the butcher, before it meets the fire</div>
-
-    <div class="breakdown" id="breakdown"></div>
-
-    <div class="recipes" id="recipes"></div>
-
-    <details class="reck">
-      <summary>How the eye reckons</summary>
-      <div class="body">
-        <p>These are grill-day rules of thumb, not laboratory facts. Tune with the sliders if your crowd runs hungrier.</p>
-        <p>Each eater gets a target of <b>cooked</b> meat: a regular man about half a pound, a regular woman a bit less, a kid scaled by age. The appetite slider swings that from roughly 60% to 160%.</p>
-        <p>That cooked target is split evenly across the meats you pick, then grossed up to <b>raw</b> buying weight, because meat loses weight on the fire and bone and shell don't feed anyone. Shellfish needs the most raw weight for that reason; sausage the least.</p>
-        <p>A smoker adds about 10% for the long, slow shrink. Sides checked trims the whole thing by a quarter. The balance sliders set each protein's share of the meal in 5% steps, and each weight is rounded to a tenth of a pound.</p>
+      <div id="balance-sec">
+        <h3 class="sub-h">The Balance</h3>
+        <p class="pane-sub">Even by default. Drag to favor one. Moves in 5% steps.</p>
+        <div id="balance"></div>
       </div>
-    </details>
-  </section>
 
-  <footer>
-    <div class="peace">We come in peace</div>
-    <div style="margin-top:4px">Go forth and grill</div>
-    <div style="margin-top:12px;opacity:.85">© 2026 Abhi K &nbsp;·&nbsp; @Abhi K</div>
-  </footer>
+      <h3 class="sub-h">The Flame</h3>
+      <p class="pane-sub">Shapes the cook, not the amount. The smoker buys a touch more for the long shrink.</p>
+      <div class="stamps grills" id="grills"></div>
+
+      <div class="sides" id="sides" role="button" tabindex="0" aria-pressed="false">
+        <div class="box" aria-hidden="true"></div>
+        <div class="cap"><b>A great spread of sides awaits</b><span>Trims the meat by a quarter.</span></div>
+      </div>
+    </section>
+
+    <!-- ===== PANE 3: VERDICT + RECIPES ===== -->
+    <section class="pane p3" aria-labelledby="v-h" aria-live="polite">
+      <div class="verdict" id="verdict">
+        <h2 class="pane-h" id="v-h">The Verdict</h2>
+        <div class="total-line"><span class="total" data-total>0</span><span class="unit">lbs raw</span></div>
+        <div class="raw-note" data-rawnote>total raw weight, before the fire</div>
+        <div class="breakdown" id="breakdown"></div>
+      </div>
+      <div class="recipes-wrap">
+        <div class="recipes" id="recipes"></div>
+        <details class="reck">
+          <summary>How the eye reckons</summary>
+          <div class="body">
+            <p>Grill-day rules of thumb, not lab facts. A regular man targets about half a pound of cooked meat, a woman a bit less, a kid by age. Appetite nudges that about 15% each way.</p>
+            <p>The cooked target splits across your proteins by the balance sliders, then grosses up to raw buying weight, because meat shrinks on the fire and bone and shell don't feed anyone. Shellfish needs the most raw weight; sausage, paneer and tofu the least.</p>
+            <p>Smoker adds ~10% for the long shrink. Sides trims a quarter. Weights round to a tenth of a pound.</p>
+          </div>
+        </details>
+        <div class="mini-foot">We come in peace &nbsp;·&nbsp; go forth and grill &nbsp;·&nbsp; © 2026 Abhi K</div>
+      </div>
+    </section>
+
+  </div>
 </div>
 
 <script>
@@ -427,7 +435,7 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
 
   // appetite only nudges the total (~15% each way), it doesn't swing it
   var APPETITE = {1:0.85, 2:0.93, 3:1.0, 4:1.08, 5:1.15};
-  var APPETITE_LABEL = {1:"light on average", 2:"a touch light", 3:"regular on average", 4:"a touch hearty", 5:"hearty on average"};
+  var APPETITE_LABEL = {1:"Light", 2:"Bit light", 3:"Regular", 4:"Bit hearty", 5:"Hearty"};
 
   // yield = cooked edible / raw purchased
   var MEATS = [
@@ -573,7 +581,7 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
       age.addEventListener("input",function(){
         var a=parseInt(age.value,10);
         state.kidFactor=kidFactor(a);
-        if(ageLab) ageLab.textContent="average age "+a;
+        if(ageLab) ageLab.textContent="Age "+a;
         compute();
       });
     }

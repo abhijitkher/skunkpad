@@ -24,6 +24,8 @@ Each eater gets a target of **cooked** edible meat (a regular man ~0.5 lb, a reg
 
 Styled as a mystic linocut broadside: a single dark ink tone printed on kraft paper, hand-drawn SVG artwork (an all-seeing eye radiating sunbeams) run through an SVG displacement filter so the edges break like carved block-print ink. Woodblock display type (Rye) over typewriter body (Special Elite).
 
+On desktop it's a three-pane dashboard that fills the width with no page scroll: Family (the gathering), Proteins and fire (offerings, balance, flame), and the Verdict (total plus breakdown up top, recipes scrolling below). Each pane scrolls on its own. On narrow screens the panes stack into a single column.
+
 ## Run it
 
 Open `index.html` in a browser. That's the whole thing.
