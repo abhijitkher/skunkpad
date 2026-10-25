@@ -641,17 +641,20 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
   function W(inner){ return "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60' width='60' height='60' fill='none' stroke='#28201a' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'>"+inner+"</svg>"; }
   var F="fill='#e3b78a'", DOT="fill='#28201a' stroke='none'";
   var THUMB_FULL = {
-    men: W("<path d='M7 57 Q7 42 30 40 Q53 42 53 57 Z' "+F+"/><ellipse cx='30' cy='25' rx='12' ry='14' "+F+"/>"+
-      "<path d='M17.5 23 Q16 7 30 7 Q44 7 42.5 23 Q38 15 30 16 Q22 15 17.5 23 Z' fill='#28201a'/>"+
-      "<circle cx='25' cy='27' r='1.6' "+DOT+"/><circle cx='35' cy='27' r='1.6' "+DOT+"/><path d='M26 33 Q30 36 34 33' stroke-width='2'/>"),
-    women: W("<path d='M14 25 Q13 5 30 5 Q47 5 46 25 L48 47 Q41 52 38 41 L22 41 Q19 52 12 47 Z' fill='#28201a'/>"+
-      "<path d='M9 58 Q9 44 30 42 Q51 44 51 58 Z' "+F+"/><ellipse cx='30' cy='26' rx='10.5' ry='13' "+F+"/>"+
-      "<path d='M19.5 22 Q30 7 40.5 22 Q35 16 28 18 Q23 19 19.5 22 Z' fill='#28201a'/>"+
-      "<circle cx='25.5' cy='28' r='1.6' "+DOT+"/><circle cx='34.5' cy='28' r='1.6' "+DOT+"/><path d='M26.5 34 Q30 37 33.5 34' stroke-width='2'/>"),
-    kids: W("<circle cx='11' cy='23' r='5.5' fill='#28201a'/><circle cx='49' cy='23' r='5.5' fill='#28201a'/>"+
-      "<path d='M14 58 Q14 47 30 45 Q46 47 46 58 Z' "+F+"/><ellipse cx='30' cy='29' rx='14' ry='14.5' "+F+"/>"+
-      "<path d='M17 24 Q22 10 32 12 Q40 12 43 24 Q36 17 29 19 Q22 19 17 24 Z' fill='#28201a'/>"+
-      "<circle cx='24.5' cy='30' r='2' "+DOT+"/><circle cx='35.5' cy='30' r='2' "+DOT+"/><path d='M26 36 Q30 39 34 36' stroke-width='2'/>"),
+    men: W("<path d='M6 59 Q8 51 24 51 Q30 55 36 51 Q52 51 54 59'/><path d='M24 45 V51 M36 45 V51'/>"+
+      "<path d='M15 28 Q9 27 9 33 Q9 39 15 38' "+F+"/><path d='M45 28 Q51 27 51 33 Q51 39 45 38' "+F+"/>"+
+      "<path d='M14 24 Q14 15 30 15 Q46 15 46 24 L46 34 Q46 46 30 48 Q14 46 14 34 Z' "+F+"/>"+
+      "<path d='M14 26 Q10 15 19 11 L19 4 L26 9 L31 2 L36 9 L43 5 L42 12 Q50 17 46 26 Q44 19 38 19 Q30 16 22 19 Q16 20 14 26 Z' "+F+"/>"+
+      "<path d='M20 38 Q24 32 30 36 Q36 32 40 38 Q36 41 30 39 Q24 41 20 38 Z' fill='#28201a'/>"),
+    women: W("<path d='M16 25 Q14 7 30 6 Q46 7 44 25 L48 42 Q40 46 37 41 L23 41 Q20 46 12 42 Z' "+F+"/>"+
+      "<path d='M5 59 Q7 49 23 49 Q30 53 37 49 Q53 49 55 59'/><path d='M24 43 V49 M36 43 V49'/>"+
+      "<path d='M19 25 Q19 19 30 19 Q41 19 41 25 L41 33 Q41 45 30 47 Q19 45 19 33 Z' "+F+"/>"+
+      "<path d='M19 26 Q28 24 32 13 Q37 22 41 26' stroke-width='2.6'/>"),
+    kids: W("<path d='M11 59 Q13 51 24 51 Q30 54 36 51 Q47 51 49 59'/><path d='M25 46 V51 M35 46 V51'/>"+
+      "<path d='M13 29 Q7 29 7 34 Q7 39 13 39' "+F+"/><path d='M47 29 Q53 29 53 34 Q53 39 47 39' "+F+"/>"+
+      "<path d='M12 28 Q12 9 30 9 Q48 9 48 28 Q48 46 30 47 Q12 46 12 28 Z' "+F+"/>"+
+      "<path d='M13 27 Q11 14 22 10 Q30 6 38 10 Q49 14 47 27 Q45 20 38 17 Q33 22 25 17 Q16 19 13 27 Z' "+F+"/>"+
+      "<circle cx='23.5' cy='32' r='2.3' "+DOT+"/><circle cx='36.5' cy='32' r='2.3' "+DOT+"/><path d='M23 39 Q30 45 37 39'/>"),
     beef: W("<path d='M20 17 Q11 15 7 5 Q17 5 25 13' "+F+"/><path d='M40 17 Q49 15 53 5 Q43 5 35 13' "+F+"/>"+
       "<path d='M16 24 Q4 21 3 28 Q4 35 15 33' "+F+"/><path d='M44 24 Q56 21 57 28 Q56 35 45 33' "+F+"/>"+
       "<path d='M20 15 Q30 11 40 15 Q46 21 45 31 Q44 38 41 42 L19 42 Q16 38 15 31 Q14 21 20 15 Z' "+F+"/>"+
