@@ -794,7 +794,7 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
         return '<div class="rec"><p class="dish"><a href="'+esc(p.url)+'" target="_blank" rel="noopener">'+esc(p.dish)+'</a></p>'+
           '<p class="src">'+esc(p.src)+'</p><p class="how">'+esc(p.how)+'</p>'+
           '<a class="find" href="'+esc(p.url)+'" target="_blank" rel="noopener">Full recipe</a>'+
-          '<a class="find alt" href="'+g+'" target="_blank" rel="noopener">Similar on Google</a></div>';
+          '<a class="find alt" href="'+g+'" target="_blank" rel="noopener">Similar recipes</a></div>';
       }).join("");
       var more="https://www.google.com/search?q="+encodeURIComponent("best "+m.name.toLowerCase()+" recipes for a "+grillLabel.toLowerCase()+" grill");
       return '<div class="rec-group">'+m.icon()+'<div><p class="meat">'+m.name+'</p>'+cards+
