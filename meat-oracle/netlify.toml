@@ -1,5 +1,0 @@
-# Static single-page site. Set this folder as the Netlify base directory;
-# publish = "." then serves meat-oracle/ as the site root.
-[build]
-  publish = "."
-  command = ""

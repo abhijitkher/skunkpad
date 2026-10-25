@@ -31,4 +31,4 @@ Open `index.html` in a browser. That's the whole thing.
 
 ## Deploy
 
-Netlify, base directory `meat-oracle`, publish `.` — static, no build command. See `netlify.toml`.
+Vercel, Root Directory `meat-oracle`, framework Other, no build command. Static site, no config file needed. Live at https://meat-oracle.vercel.app/
