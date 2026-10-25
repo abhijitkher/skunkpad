@@ -62,24 +62,22 @@ body::after{
 /* ghostly farm-animal watermark, barely there until you look */
 .watermark{position:fixed;inset:0;z-index:0;pointer-events:none;mix-blend-mode:multiply;opacity:.07}
 .watermark svg{width:100%;height:100%}
-.app{position:relative;z-index:1;max-width:1600px;margin:0;padding:16px 20px 20px}
-.panes{display:grid;grid-template-columns:1fr;gap:18px}
-.pane{position:relative;border:1.5px solid var(--ink-35);border-radius:4px;padding:16px 15px 18px;background:rgba(40,32,26,.02)}
-.pane-h{font-family:"Rye",serif;font-weight:400;font-size:clamp(20px,2vw,25px);letter-spacing:.015em;margin:0 0 3px;text-align:left}
-.sub-h{font-family:"Rye",serif;font-weight:400;font-size:18px;letter-spacing:.015em;margin:22px 0 2px;text-align:left;border-top:1.5px dotted var(--ink-35);padding-top:16px}
-.pane-sub{text-align:left;color:var(--ink-80);font-size:13px;margin:0 0 14px;line-height:1.45}
-.hint{text-align:left;color:var(--ink-55);font-size:12px;margin:12px 0 0;line-height:1.4}
+.app{position:relative;z-index:1;max-width:1600px;margin:0;padding:10px 16px 12px}
+.panes{display:grid;grid-template-columns:1fr;gap:14px}
+.pane{position:relative;border:1.5px solid var(--ink-35);border-radius:4px;padding:11px 12px 12px;background:rgba(40,32,26,.02)}
+.pane-h{font-family:"Rye",serif;font-weight:400;font-size:clamp(18px,1.8vw,22px);letter-spacing:.015em;margin:0 0 2px;text-align:left}
+.sub-h{font-family:"Rye",serif;font-weight:400;font-size:17px;letter-spacing:.015em;margin:13px 0 2px;text-align:left;border-top:1.5px dotted var(--ink-35);padding-top:10px}
+.pane-sub{text-align:left;color:var(--ink-80);font-size:12px;margin:0 0 8px;line-height:1.4}
+.hint{text-align:left;color:var(--ink-55);font-size:11.5px;margin:9px 0 0;line-height:1.35}
 
 /* desktop: three fixed-height panes, each scrolls on its own, page doesn't */
 @media(min-width:900px){
   html,body{height:100%}
   body{overflow:hidden}
   .app{height:100vh;display:flex;flex-direction:column}
-  .panes{flex:1;min-height:0;grid-template-columns:1.05fr 1.05fr 1fr;gap:16px}
-  .pane{min-height:0;overflow-y:auto;overflow-x:hidden}
-  .pane::-webkit-scrollbar{width:9px}
-  .pane::-webkit-scrollbar-thumb{background:var(--ink-35);border-radius:9px}
-  .pane.p3{overflow:hidden;display:flex;flex-direction:column}
+  .panes{flex:1;min-height:0;grid-template-columns:1.05fr 1.05fr 1fr;gap:14px}
+  .pane{min-height:0;overflow:hidden}
+  .pane.p3{display:flex;flex-direction:column}
 }
 
 /* ---------- TOP BAR ---------- */
@@ -123,34 +121,49 @@ body::after{
 .panel .sub{text-align:center;color:var(--ink-55);font-size:13px;margin:0 auto 18px;max-width:34ch}
 
 /* people rows */
-.row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px 12px;padding:13px 2px;border-bottom:1.5px dotted var(--ink-35)}
+.row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:6px 12px;padding:9px 2px;border-bottom:1.5px dotted var(--ink-35)}
 .row:last-of-type{border-bottom:0}
 .row .who{display:flex;flex-direction:column;gap:2px}
 .row .who b{font-family:"Rye",serif;font-weight:400;font-size:18px;letter-spacing:.02em}
 .row .who span{font-size:12px;color:var(--ink-55);line-height:1.3}
 .stepper{display:flex;align-items:center;gap:0;border:2px solid var(--ink);border-radius:2px;background:rgba(40,32,26,.04)}
 .stepper button{
-  font-family:"Rye",serif;font-size:20px;line-height:1;
-  width:38px;height:38px;border:0;background:transparent;color:var(--ink);cursor:pointer;
+  font-family:"Rye",serif;font-size:18px;line-height:1;
+  width:32px;height:32px;border:0;background:transparent;color:var(--ink);cursor:pointer;
   display:flex;align-items:center;justify-content:center;
 }
 .stepper button:active{background:var(--ink);color:var(--kraft)}
 .stepper .count{min-width:34px;text-align:center;font-family:"Rye",serif;font-size:19px}
-.appetite{grid-column:1 / -1;display:flex;flex-direction:column;gap:5px;padding-top:4px}
+.appetite{grid-column:1 / -1;display:flex;flex-direction:column;gap:3px;padding-top:2px}
 .appetite .lab{display:flex;justify-content:space-between;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-55)}
 .appetite .lab b{font-family:inherit;color:var(--ink);font-weight:400;letter-spacing:.04em}
 .avg-note{font-size:11px;color:var(--ink-55);line-height:1.35;margin-top:2px}
 /* balance rows */
-.wrow{padding:12px 2px;border-bottom:1.5px dotted var(--ink-35)}
+.wrow{padding:6px 2px;border-bottom:1.5px dotted var(--ink-35)}
 .wrow:last-child{border-bottom:0}
-.wtop{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.wtop{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px}
 .wname{font-family:"Rye",serif;font-size:17px;letter-spacing:.02em}
 .wpct{font-family:"Rye",serif;font-size:17px}
-input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:26px;background:transparent;cursor:pointer;margin:0}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:20px;background:transparent;cursor:pointer;margin:0}
 input[type=range]::-webkit-slider-runnable-track{height:4px;background:var(--ink-35);border:1px solid var(--ink-55)}
 input[type=range]::-moz-range-track{height:4px;background:var(--ink-35);border:1px solid var(--ink-55)}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;margin-top:-10px;border-radius:50%;background:var(--kraft-hi);border:3px solid var(--ink);box-shadow:0 0 0 2px var(--kraft)}
-input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--kraft-hi);border:3px solid var(--ink)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:30px;height:30px;margin-top:-13px;border-radius:50%;
+  background-color:var(--kraft-hi);border:2px solid var(--ink);
+  background-image:var(--thumb,none);background-size:22px 22px;background-position:center;background-repeat:no-repeat;
+  box-shadow:0 1px 2px rgba(40,32,26,.3);cursor:grab}
+input[type=range]::-moz-range-thumb{width:30px;height:30px;border-radius:50%;
+  background-color:var(--kraft-hi);border:2px solid var(--ink);
+  background-image:var(--thumb,none);background-size:22px 22px;background-position:center;background-repeat:no-repeat;cursor:grab}
+/* combined protein rows */
+#proteins{margin-top:2px}
+.prow{display:grid;grid-template-columns:26px minmax(54px,auto) 1fr 40px;align-items:center;gap:8px;padding:5px 2px;border-bottom:1.5px dotted var(--ink-35);opacity:.5;transition:opacity .15s ease}
+.prow:last-child{border-bottom:0}
+.prow.on{opacity:1}
+.picon{display:flex}
+.picon svg{width:24px;height:24px;display:block}
+.pname{font-family:"Rye",serif;font-size:15px;letter-spacing:.02em;white-space:nowrap}
+.ppct{font-family:"Rye",serif;font-size:14px;text-align:right;color:var(--ink-80)}
+.prow:not(.on) .ppct{font-family:"Special Elite",monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-55)}
 .age-wrap{display:flex;align-items:center;gap:8px}
 select{
   font-family:"Special Elite",monospace;font-size:14px;color:var(--ink);
@@ -161,14 +174,14 @@ select{
 }
 
 /* stamp grid for meats + flame */
-.stamps{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
+.stamps{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
 .stamp{
   position:relative;border:2px solid var(--ink);border-radius:3px;background:transparent;color:var(--ink);
-  cursor:pointer;padding:13px 6px 9px;display:flex;flex-direction:column;align-items:center;gap:6px;
-  font-family:"Special Elite",monospace;font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;
+  cursor:pointer;padding:7px 4px 6px;display:flex;flex-direction:column;align-items:center;gap:3px;
+  font-family:"Special Elite",monospace;font-size:11px;letter-spacing:.05em;text-transform:uppercase;
   transition:transform .06s ease;
 }
-.stamp svg{width:40px;height:40px;display:block}
+.stamp svg{width:28px;height:28px;display:block}
 .stamp:active{transform:scale(.97)}
 .stamp[aria-pressed=true]{background:var(--ink);color:var(--kraft)}
 .stamp[aria-pressed=true] svg{color:var(--kraft)}
@@ -177,43 +190,78 @@ select{
 .grills{grid-template-columns:repeat(2,1fr)}
 .stamp{min-width:0}
 
-.sides{display:flex;align-items:flex-start;gap:12px;margin-top:20px;padding:14px;border:1.5px dashed var(--ink-55);border-radius:3px;cursor:pointer}
-.sides .box{flex:0 0 auto;width:26px;height:26px;border:2px solid var(--ink);border-radius:2px;position:relative;margin-top:1px}
-.sides[aria-pressed=true] .box::after{content:"✕";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:"Rye",serif;font-size:18px}
-.sides .cap b{font-family:"Rye",serif;font-weight:400;font-size:16px;display:block}
-.sides .cap span{font-size:12.5px;color:var(--ink-55)}
+.sides{display:flex;align-items:center;gap:11px;margin-top:14px;padding:9px 11px;border:1.5px dashed var(--ink-55);border-radius:3px;cursor:pointer}
+.sides .box{flex:0 0 auto;width:22px;height:22px;border:2px solid var(--ink);border-radius:2px;position:relative}
+.sides[aria-pressed=true] .box::after{content:"✕";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:"Rye",serif;font-size:16px}
+.sides .cap b{font-family:"Rye",serif;font-weight:400;font-size:15px;display:block}
+.sides .cap span{font-size:12px;color:var(--ink-55)}
 
-/* ---------- VERDICT (top of pane 3) ---------- */
-.verdict{flex:0 0 auto;text-align:left}
-.total-line{display:flex;align-items:baseline;gap:10px;margin:6px 0 0;flex-wrap:wrap}
-.total{font-family:"Rye",serif;line-height:.86;font-size:clamp(52px,6.5vw,78px)}
-.unit{font-family:"Rye",serif;font-size:clamp(16px,1.6vw,20px);letter-spacing:.08em;color:var(--ink-80)}
+/* ---------- VERDICT (top of pane 3, two columns) ---------- */
+.verdict-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.vcol{min-width:0}
+.total-line{display:flex;align-items:baseline;gap:7px;margin:4px 0 0;flex-wrap:wrap}
+.total{font-family:"Rye",serif;line-height:.85;font-size:clamp(40px,4.4vw,58px)}
+.unit{font-family:"Rye",serif;font-size:clamp(14px,1.4vw,17px);letter-spacing:.06em;color:var(--ink-80)}
 .raw-note{font-size:12px;color:var(--ink-55);margin:3px 0 0;letter-spacing:.03em}
-.breakdown{margin:16px 0 0;text-align:left}
-.breakdown .bhead{font-family:"Rye",serif;font-size:15px;text-align:left;margin:0 0 8px;letter-spacing:.02em}
-.brow{display:flex;align-items:baseline;gap:8px;padding:6px 0;font-size:15px}
+.breakdown{margin:4px 0 0;text-align:left}
+.breakdown .bhead{display:none}
+.brow{display:flex;align-items:baseline;gap:7px;padding:4px 0;font-size:14px}
 .brow .nm{white-space:nowrap}
 .brow .dots{flex:1;border-bottom:2px dotted var(--ink-35);transform:translateY(-4px)}
-.brow .amt{font-family:"Rye",serif;font-size:17px;white-space:nowrap}
+.brow .amt{font-family:"Rye",serif;font-size:16px;white-space:nowrap}
 
-/* recipes (scrolling bottom of pane 3) */
-.recipes-wrap{flex:1;min-height:0;overflow-y:auto;margin-top:18px;border-top:1.5px solid var(--ink-35);padding-top:4px}
-.recipes-wrap::-webkit-scrollbar{width:9px}
-.recipes-wrap::-webkit-scrollbar-thumb{background:var(--ink-35);border-radius:9px}
-.recipes{margin:14px 0 0}
-.recipes .bhead{font-family:"Rye",serif;font-size:19px;text-align:left;margin:0 0 2px}
-.recipes .rsub{text-align:left;font-size:12.5px;color:var(--ink-55);margin:0 0 14px}
-.rec{border-top:1.5px dotted var(--ink-35);padding:13px 2px 12px;display:grid;grid-template-columns:34px 1fr;gap:11px;align-items:start}
-.rec:first-of-type{border-top:0}
-.rec svg{width:34px;height:34px;margin-top:2px}
-.rec .meat{font-family:"Rye",serif;font-size:16px;letter-spacing:.02em;margin:0 0 2px}
-.rec .dish{font-size:15px;margin:0}
-.rec .how{font-size:13px;color:var(--ink-80);margin:3px 0 8px;line-height:1.45}
-.rec a.find{display:inline-block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);
-  border:1.5px solid var(--ink);border-radius:2px;padding:5px 11px;text-decoration:none;background:rgba(40,32,26,.04)}
+/* view-recipes button + note */
+.view-recipes{display:inline-block;margin:16px 0 0;padding:12px 18px;cursor:pointer;
+  background:var(--ink);color:var(--kraft-hi);border:0;border-radius:3px;
+  font-family:"Rye",serif;font-size:18px;letter-spacing:.03em;
+  box-shadow:0 3px 0 rgba(40,32,26,.35);transition:transform .07s ease}
+.view-recipes:active{transform:translateY(3px);box-shadow:0 0 0 var(--ink)}
+.view-recipes[disabled]{opacity:.4;cursor:default;box-shadow:none}
+.recipe-note{font-size:12px;color:var(--ink-55);margin:7px 0 0}
+
+/* ---------- RECIPE MODAL ---------- */
+.rx-backdrop{position:fixed;inset:0;z-index:60;background:rgba(40,32,26,.45)}
+.rx-backdrop[hidden]{display:none}
+.rx-modal{position:fixed;z-index:61;background:var(--kraft);color:var(--ink);display:flex;flex-direction:column;
+  box-shadow:0 0 40px rgba(40,32,26,.4)}
+.rx-modal[hidden]{display:none}
+.rx-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:18px 20px 12px;border-bottom:1.5px solid var(--ink-35)}
+.rx-head h2{font-family:"Rye",serif;font-weight:400;font-size:23px;letter-spacing:.015em;margin:0}
+.rx-sub{font-size:12.5px;color:var(--ink-55);margin-top:3px}
+.rx-close{flex:0 0 auto;width:38px;height:38px;border:1.5px solid var(--ink);border-radius:50%;background:transparent;
+  color:var(--ink);font-size:16px;cursor:pointer;line-height:1}
+.rx-close:active{background:var(--ink);color:var(--kraft)}
+.rx-body{flex:1;min-height:0;overflow-y:auto;padding:4px 20px 22px}
+.recipes{margin:0}
+.rec-group{border-top:1.5px solid var(--ink-35);padding:14px 0 6px;display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:start}
+.rec-group:first-child{border-top:0}
+.rec-group svg{width:34px;height:34px;margin-top:3px}
+.rec-group .meat{font-family:"Rye",serif;font-size:17px;letter-spacing:.02em;margin:0 0 6px}
+.rec{padding:0 0 12px}
+.rec .dish{font-size:15px;margin:0;font-weight:400}
+.rec .how{font-size:13px;color:var(--ink-80);margin:3px 0 7px;line-height:1.45}
+.rec a.find{display:inline-block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);
+  border:1.5px solid var(--ink);border-radius:2px;padding:4px 10px;text-decoration:none;background:rgba(40,32,26,.04)}
 .rec a.find:active{background:var(--ink);color:var(--kraft)}
-
 .empty{text-align:left;color:var(--ink-55);font-size:14px;padding:14px 0}
+
+/* desktop: right side panel */
+@media(min-width:900px){
+  .rx-modal{top:0;right:0;bottom:0;width:min(460px,42vw);transform:translateX(100%);transition:transform .28s ease}
+  .rx-modal.open{transform:translateX(0)}
+  .rx-backdrop{opacity:0;transition:opacity .28s ease}
+  .rx-backdrop.open{opacity:1}
+}
+/* mobile: bottom sheet */
+@media(max-width:899px){
+  .rx-modal{left:0;right:0;bottom:0;max-height:86vh;border-radius:14px 14px 0 0;transform:translateY(100%);transition:transform .3s ease}
+  .rx-modal.open{transform:translateY(0)}
+  .rx-backdrop{opacity:0;transition:opacity .3s ease}
+  .rx-backdrop.open{opacity:1}
+}
+@media(prefers-reduced-motion:reduce){
+  .rx-modal,.rx-backdrop{transition:none}
+}
 
 /* reckoning */
 details.reck{margin:22px 0 0;font-size:13px}
@@ -371,49 +419,62 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     <!-- ===== PANE 2: PROTEINS + BALANCE + FLAME ===== -->
     <section class="pane" aria-labelledby="o-h">
       <h2 class="pane-h" id="o-h">The Offerings</h2>
-      <p class="pane-sub">Pick your proteins, meat or not.</p>
-      <div class="stamps" id="meats"></div>
-
-      <div id="balance-sec">
-        <h3 class="sub-h">The Balance</h3>
-        <p class="pane-sub">Even by default. Drag to favor one. Moves in 5% steps.</p>
-        <div id="balance"></div>
-      </div>
-
-      <h3 class="sub-h">The Flame</h3>
-      <p class="pane-sub">Shapes the cook, not the amount. The smoker buys a touch more for the long shrink.</p>
-      <div class="stamps grills" id="grills"></div>
+      <p class="pane-sub">Drag a protein up to add it. The further you push, the bigger its share. Shares snap to 5%.</p>
+      <div id="proteins"></div>
 
       <div class="sides" id="sides" role="button" tabindex="0" aria-pressed="false">
         <div class="box" aria-hidden="true"></div>
         <div class="cap"><b>A great spread of sides awaits</b><span>Trims the meat by a quarter.</span></div>
       </div>
+
+      <h3 class="sub-h">The Flame</h3>
+      <p class="pane-sub">Shapes the cook, not the amount. The smoker buys a touch more for the long shrink.</p>
+      <div class="stamps grills" id="grills"></div>
     </section>
 
     <!-- ===== PANE 3: VERDICT + RECIPES ===== -->
-    <section class="pane p3" aria-labelledby="v-h" aria-live="polite">
-      <div class="verdict" id="verdict">
-        <h2 class="pane-h" id="v-h">The Verdict</h2>
-        <div class="total-line"><span class="total" data-total>0</span><span class="unit">lbs raw</span></div>
-        <div class="raw-note" data-rawnote>total raw weight, before the fire</div>
-        <div class="breakdown" id="breakdown"></div>
+    <section class="pane p3" aria-labelledby="v-h">
+      <div class="verdict-grid" aria-live="polite">
+        <div class="vcol">
+          <h2 class="pane-h" id="v-h">The Verdict</h2>
+          <div class="total-line"><span class="total" data-total>0</span><span class="unit">lbs raw</span></div>
+          <div class="raw-note" data-rawnote>before the fire</div>
+        </div>
+        <div class="vcol">
+          <h2 class="pane-h">What to buy</h2>
+          <div class="breakdown" id="breakdown"></div>
+        </div>
       </div>
-      <div class="recipes-wrap">
-        <div class="recipes" id="recipes"></div>
-        <details class="reck">
-          <summary>How the eye reckons</summary>
-          <div class="body">
-            <p>Grill-day rules of thumb, not lab facts. A regular man targets about half a pound of cooked meat, a woman a bit less, a kid by age. Appetite nudges that about 15% each way.</p>
-            <p>The cooked target splits across your proteins by the balance sliders, then grosses up to raw buying weight, because meat shrinks on the fire and bone and shell don't feed anyone. Shellfish needs the most raw weight; sausage, paneer and tofu the least.</p>
-            <p>Smoker adds ~10% for the long shrink. Sides trims a quarter. Weights round to a tenth of a pound.</p>
-          </div>
-        </details>
-        <div class="mini-foot">We come in peace &nbsp;·&nbsp; go forth and grill &nbsp;·&nbsp; © 2026 Abhi K</div>
-      </div>
+
+      <button class="view-recipes" id="view-recipes" type="button">View the recipes &nbsp;→</button>
+      <p class="recipe-note">Two ideas for each protein, tuned to your grill.</p>
+
+      <details class="reck">
+        <summary>How the eye reckons</summary>
+        <div class="body">
+          <p>Grill-day rules of thumb, not lab facts. A regular man targets about half a pound of cooked meat, a woman a bit less, a kid by age. Appetite nudges that about 15% each way.</p>
+          <p>The cooked target splits across your proteins by the balance sliders, then grosses up to raw buying weight, because meat shrinks on the fire and bone and shell don't feed anyone. Shellfish needs the most raw weight; sausage, paneer and tofu the least.</p>
+          <p>Smoker adds ~10% for the long shrink. Sides trims a quarter. Weights round to a tenth of a pound.</p>
+        </div>
+      </details>
+      <div class="mini-foot">We come in peace &nbsp;·&nbsp; go forth and grill &nbsp;·&nbsp; © 2026 Abhi K</div>
     </section>
 
   </div>
 </div>
+
+<!-- ===== RECIPE MODAL (side panel on desktop, bottom sheet on mobile) ===== -->
+<div class="rx-backdrop" id="rx-backdrop" hidden></div>
+<aside class="rx-modal" id="rx-modal" role="dialog" aria-modal="true" aria-label="Recipe suggestions" hidden>
+  <div class="rx-head">
+    <div>
+      <h2>The oracle suggests</h2>
+      <div class="rx-sub" id="rx-sub">two ideas for each protein</div>
+    </div>
+    <button class="rx-close" id="rx-close" type="button" aria-label="Close recipes">✕</button>
+  </div>
+  <div class="rx-body"><div class="recipes" id="recipes"></div></div>
+</aside>
 
 <script>
 (function(){
@@ -447,39 +508,55 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     {id:"electric", name:"Electric"}
   ];
 
-  // recipe ideas keyed by meat, with a smoker-specific low-and-slow pick
+  // two recipe ideas per protein; smoker gets its own low-and-slow pair
   var RECIPES = {
     beef:{
-      def:{dish:"Santa Maria tri-tip", how:"Rub with salt, pepper and garlic. Sear hot, then finish over indirect heat to a rosy medium-rare. Slice against the grain."},
-      smoker:{dish:"Low-and-slow brisket", how:"Trim, season simply, smoke at 225°F to about 203°F internal. Wrap once the bark sets. Rest an hour before slicing."}
+      def:[{dish:"Santa Maria tri-tip", how:"Rub with salt, pepper and garlic. Sear hot, finish over indirect heat to a rosy medium-rare, slice against the grain."},
+           {dish:"Smash burgers", how:"Press loose balls thin on a hot grate or griddle, one flip, melt the cheese in the last 30 seconds."}],
+      smoker:[{dish:"Low-and-slow brisket", how:"Trim, season simply, smoke at 225°F to ~203°F internal. Wrap once the bark sets, rest an hour."},
+              {dish:"Smoked beef short ribs", how:"Big beef ribs, salt and pepper, smoke at 250°F until probe-tender, about 7 to 8 hours."}]
     },
     pork:{
-      def:{dish:"Baby back ribs", how:"Dry rub, cook low over indirect heat until the meat pulls back from the bone, then glaze and crisp the last few minutes."},
-      smoker:{dish:"Pulled pork shoulder", how:"Rub a bone-in shoulder, smoke at 225°F to about 200°F internal, rest, then pull. Plan for a long cook."}
+      def:[{dish:"Baby back ribs", how:"Dry rub, cook low over indirect heat until the meat pulls from the bone, glaze and crisp at the end."},
+           {dish:"Grilled pork chops", how:"Brine thick chops, sear over direct heat, finish indirect to 140°F, rest before serving."}],
+      smoker:[{dish:"Pulled pork shoulder", how:"Rub a bone-in shoulder, smoke at 225°F to ~200°F internal, rest, then pull. Plan for a long cook."},
+              {dish:"Smoked St. Louis ribs", how:"Trimmed spare ribs, smoke at 225°F about 5 to 6 hours, wrap midway, sauce at the end."}]
     },
     chicken:{
-      def:{dish:"Spatchcock chicken", how:"Flatten by removing the backbone so it cooks evenly. Season under the skin, grill skin-side down first, then flip."},
-      smoker:{dish:"Smoked chicken thighs", how:"Thighs stay juicy. Smoke at 275°F, then blast the skin over direct heat at the end so it isn't rubbery."}
+      def:[{dish:"Spatchcock chicken", how:"Flatten by removing the backbone so it cooks evenly. Grill skin-side down first, then flip."},
+           {dish:"Grilled chicken thighs", how:"Boneless thighs over direct heat, flipping often, until charred and 175°F. Forgiving and juicy."}],
+      smoker:[{dish:"Smoked chicken thighs", how:"Smoke at 275°F, then blast the skin over direct heat at the end so it isn't rubbery."},
+              {dish:"Smoked whole chicken", how:"Spatchcock, smoke at 275°F to 165°F in the breast. Higher heat keeps the skin from going soft."}]
     },
     sausage:{
-      def:{dish:"Beer-braised brats", how:"Simmer in beer and onions, then finish on the grates for color and snap. Keep a cooler zone so they don't split."},
-      smoker:{dish:"Smoked sausage links", how:"Smoke whole links at 250°F until they hit 160°F internal, then kiss them over direct heat for a crackling skin."}
+      def:[{dish:"Beer-braised brats", how:"Simmer in beer and onions, then finish on the grates for color and snap. Keep a cool zone so they don't split."},
+           {dish:"Italian sausage & peppers", how:"Grill links alongside sliced peppers and onion, then pile it all onto rolls."}],
+      smoker:[{dish:"Smoked sausage links", how:"Smoke whole at 250°F to 160°F internal, then kiss over direct heat for a crackling skin."},
+              {dish:"Smoked kielbasa", how:"Score the links, smoke at 225°F about 2 hours until deeply colored and hot through."}]
     },
     fish:{
-      def:{dish:"Cedar-plank salmon", how:"Soak the plank, lay the fillet skin-side down, grill covered over medium. The plank keeps it moist and adds smoke."},
-      smoker:{dish:"Smoked salmon fillet", how:"Brine first, then smoke low at around 180°F until just flaky. Low and slow keeps it from drying out."}
+      def:[{dish:"Cedar-plank salmon", how:"Soak the plank, lay the fillet skin-side down, grill covered over medium. Stays moist, adds smoke."},
+           {dish:"Grilled branzino", how:"Whole fish, oiled and stuffed with lemon and herbs, grill in a basket a few minutes a side."}],
+      smoker:[{dish:"Smoked salmon fillet", how:"Brine first, then smoke low at ~180°F until just flaky. Low and slow keeps it from drying."},
+              {dish:"Smoked trout", how:"Brine, air-dry for a tacky skin, smoke at 200°F until the flesh flakes, about 1.5 hours."}]
     },
     shell:{
-      def:{dish:"Garlic-butter shrimp skewers", how:"Thread shell-on or peeled shrimp, grill hot and fast, two to three minutes a side, basting with garlic butter."},
-      smoker:{dish:"Smoked garlic shrimp", how:"Toss in oil and spice, smoke at 225°F in a single layer for about 30 minutes until pink and just firm."}
+      def:[{dish:"Garlic-butter shrimp skewers", how:"Thread shrimp, grill hot and fast, 2 to 3 minutes a side, basting with garlic butter."},
+           {dish:"Grilled oysters", how:"On the half shell over high heat with butter, garlic and a squeeze of lemon until bubbling."}],
+      smoker:[{dish:"Smoked garlic shrimp", how:"Toss in oil and spice, smoke at 225°F in one layer about 30 minutes until pink and just firm."},
+              {dish:"Smoked scallops", how:"Pat dry, smoke at 225°F about 25 minutes, then sear briefly for color. Don't overcook."}]
     },
     paneer:{
-      def:{dish:"Paneer tikka skewers", how:"Marinate cubes in spiced yogurt, thread with onion and pepper, and grill hot until the edges char. Don't overcook or it dries out."},
-      smoker:{dish:"Smoked paneer tikka", how:"Marinate, smoke at 225°F for about 20 minutes, then finish over direct heat for char. Paneer takes smoke fast, so keep it short."}
+      def:[{dish:"Paneer tikka skewers", how:"Marinate cubes in spiced yogurt, thread with onion and pepper, grill hot until the edges char."},
+           {dish:"Grilled paneer & veg", how:"Thick slabs and vegetables brushed with oil and spice, quick char on each side."}],
+      smoker:[{dish:"Smoked paneer tikka", how:"Marinate, smoke at 225°F about 20 minutes, then finish over direct heat for char. Keep it short."},
+              {dish:"Smoked paneer bites", how:"Cube, smoke at 225°F ~15 minutes for a mild smoke, then toss in warm spiced butter."}]
     },
     tofu:{
-      def:{dish:"Grilled teriyaki tofu", how:"Press extra-firm tofu, slab it thick, marinate, then grill on well-oiled grates until crisp-edged. Glaze in the last minute."},
-      smoker:{dish:"Smoked tofu steaks", how:"Press firm tofu hard, marinate, then smoke at 225°F for about 45 minutes for a chewy, smoky slab. Firmer tofu holds up best."}
+      def:[{dish:"Grilled teriyaki tofu", how:"Press extra-firm tofu, slab it thick, marinate, grill on oiled grates until crisp-edged. Glaze at the end."},
+           {dish:"Grilled tofu skewers", how:"Press firm tofu, cube, marinate, thread and grill, turning for even char on all sides."}],
+      smoker:[{dish:"Smoked tofu steaks", how:"Press hard, marinate, smoke at 225°F about 45 minutes for a chewy, smoky slab."},
+              {dish:"Smoked tofu & mushroom", how:"Smoke pressed tofu with meaty mushrooms at 225°F, then finish together in a glaze."}]
     }
   };
 
@@ -488,47 +565,47 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     women:{count:2, appetite:3},
     kids:{count:0, appetite:3},
     kidFactor:kidFactor(8),
-    meats:{beef:true, chicken:true, pork:false, sausage:false, fish:false, shell:false, paneer:false, tofu:false},
-    weights:{},
+    weights:{beef:0, pork:0, chicken:0, sausage:0, fish:0, shell:0, paneer:0, tofu:0},
     grill:"charcoal",
     sides:false
   };
 
-  // ---------- build meat + grill stamps ----------
-  var meatsEl = document.getElementById("meats");
-  MEATS.forEach(function(m){
-    var b=document.createElement("button");
-    b.type="button"; b.className="stamp"; b.dataset.meat=m.id;
-    b.setAttribute("aria-pressed", state.meats[m.id] ? "true":"false");
-    b.innerHTML='<span class="tick">✕</span>'+m.icon()+'<span>'+m.name+'</span>';
-    b.addEventListener("click",function(){
-      state.meats[m.id]=!state.meats[m.id];
-      if(state.meats[m.id] && !state.weights[m.id]) state.weights[m.id]=10; // new pick starts even
-      b.setAttribute("aria-pressed", state.meats[m.id]?"true":"false");
-      renderBalance();
+  // ---------- thumb icons: the slider handle IS the critter ----------
+  function makeThumb(inner){
+    var svg="<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'><g fill='#28201a'>"+inner+"</g></svg>";
+    return "url(\"data:image/svg+xml,"+encodeURIComponent(svg)+"\")";
+  }
+  var THUMB = {
+    men:   "<circle cx='16' cy='9.5' r='3.3'/><path d='M11 15.5 q5 -4 10 0 l-1.4 6.5 h-7.2 Z'/><rect x='12.6' y='21.5' width='2.1' height='5.4'/><rect x='17.3' y='21.5' width='2.1' height='5.4'/>",
+    women: "<circle cx='16' cy='9' r='3.1'/><path d='M16 12 L10.6 24 H21.4 Z'/><rect x='14.3' y='24' width='1.5' height='3'/><rect x='16.2' y='24' width='1.5' height='3'/>",
+    kids:  "<circle cx='16' cy='11' r='2.7'/><path d='M12.7 15.5 q3.3 -3 6.6 0 l-1 5.6 h-4.6 Z'/><rect x='13.8' y='21' width='1.7' height='4.4'/><rect x='16.5' y='21' width='1.7' height='4.4'/>",
+    beef:  "<ellipse cx='14' cy='17' rx='7' ry='4.1'/><circle cx='22' cy='15.2' r='2.7'/><path d='M20 13 l-1.4 -2.4 l2.1 1 Z'/><path d='M24 13 l1.4 -2.4 l-2.1 1 Z'/><rect x='9' y='20.4' width='1.5' height='4'/><rect x='12' y='20.6' width='1.5' height='4'/><rect x='16' y='20.6' width='1.5' height='4'/><rect x='19' y='20.4' width='1.5' height='4'/>",
+    pork:  "<ellipse cx='15' cy='17' rx='7' ry='4.2'/><circle cx='22.8' cy='16' r='2.9'/><ellipse cx='25.4' cy='16.6' rx='1.2' ry='1.6'/><path d='M20.6 12.8 l-1 -2 l2 0.6 Z'/><rect x='10' y='20.6' width='1.5' height='4'/><rect x='13.5' y='20.8' width='1.5' height='4'/><rect x='17.5' y='20.8' width='1.5' height='4'/><rect x='20.5' y='20.6' width='1.5' height='4'/>",
+    chicken:"<ellipse cx='14.5' cy='17' rx='6' ry='4.2'/><circle cx='21.3' cy='12.8' r='2.5'/><path d='M23.4 11.9 l3 0.6 l-3 1.3 Z'/><path d='M8.5 15 l-3.2 -2 l1 4.2 Z'/><rect x='13' y='20.8' width='1.4' height='4'/><rect x='16.3' y='20.8' width='1.4' height='4'/>",
+    sausage:"<path d='M9 11 q-3 -2 -1.2 -3.6 q1.8 -1.4 3 0.8 q7 4 11.2 11.1 q2 3.4 -0.4 4.8 q-2.3 1.3 -3.6 -1 q-4.1 -7 -9 -12.1 Z'/>",
+    fish:  "<path d='M6.5 16 Q15 9 24 14 Q28 16 24 18 Q15 23 6.5 16 Z'/><path d='M24 14 l4 -2.4 l-1 4.4 l1.8 3 l-4.8 -1 Z'/><circle cx='12' cy='15.5' r='1' fill='#e3b78a'/>",
+    shell: "<path d='M11 8.5 q-3 -1 -3 2.2 q0 3 3 4 q4 1.5 7.8 4 q3 2 2 4.6 q-1 2.5 -3.9 1.5 q-6 -2 -9 -7.2 q-2 -3.3 -0.6 -6.4 q1 -2 3.7 -2.3 Z'/>",
+    paneer:"<path d='M11 20 l3.2 -3.2 l3.2 3.2 l-3.2 3.2 Z'/><path d='M15.2 15 l3.2 -3.2 l3.2 3.2 l-3.2 3.2 Z'/><path d='M19.4 10.2 l3 -3 l3 3 l-3 3 Z'/>",
+    tofu:  "<path d='M9 13 h14 v10 h-14 Z'/><path d='M9 18 h14 M16 13 v10' stroke='#e3b78a' stroke-width='1.3' fill='none'/>"
+  };
+
+  // ---------- combined offerings: choose + balance in one slider per protein ----------
+  var proteinsEl=document.getElementById("proteins");
+  proteinsEl.innerHTML=MEATS.map(function(m){
+    return '<div class="prow" data-prow="'+m.id+'">'+
+      '<span class="picon">'+m.icon()+'</span>'+
+      '<span class="pname">'+m.name+'</span>'+
+      '<input type="range" min="0" max="10" value="0" step="1" data-weight="'+m.id+'" aria-label="'+m.name+' amount">'+
+      '<span class="ppct" data-wpct="'+m.id+'">off</span>'+
+      '</div>';
+  }).join("");
+  proteinsEl.querySelectorAll("[data-weight]").forEach(function(inp){
+    inp.style.setProperty("--thumb", makeThumb(THUMB[inp.dataset.weight]));
+    inp.addEventListener("input",function(){
+      state.weights[this.dataset.weight]=parseInt(this.value,10);
       compute();
     });
-    meatsEl.appendChild(b);
   });
-
-  // ---------- balance panel: a share slider per chosen protein ----------
-  var balanceEl=document.getElementById("balance");
-  var balanceSec=document.getElementById("balance-sec");
-  function renderBalance(){
-    var chosen=MEATS.filter(function(m){return state.meats[m.id];});
-    if(chosen.length<2){ balanceSec.style.display="none"; balanceEl.innerHTML=""; return; }
-    balanceSec.style.display="";
-    balanceEl.innerHTML=chosen.map(function(m){
-      var w=state.weights[m.id]||10;
-      return '<div class="wrow">'+
-        '<div class="wtop"><span class="wname">'+m.name+'</span><span class="wpct" data-wpct="'+m.id+'">–</span></div>'+
-        '<input type="range" min="1" max="19" value="'+w+'" data-weight="'+m.id+'" aria-label="'+m.name+' share">'+
-        '</div>';
-    }).join("");
-    balanceEl.querySelectorAll("[data-weight]").forEach(function(inp){
-      inp.addEventListener("input",function(){ state.weights[this.dataset.weight]=parseInt(this.value,10); compute(); });
-    });
-  }
 
   var grillsEl=document.getElementById("grills");
   GRILLS.forEach(function(g){
@@ -559,6 +636,7 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     });
     var slider=row.querySelector("[data-appetite]");
     if(slider){
+      slider.style.setProperty("--thumb", makeThumb(THUMB[grp]));
       var lab=row.querySelector("[data-aplabel]");
       slider.addEventListener("input",function(){
         state[grp].appetite=parseInt(slider.value,10);
@@ -568,6 +646,7 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     }
     var age=row.querySelector("[data-age]");
     if(age){
+      age.style.setProperty("--thumb", makeThumb(THUMB.kids));
       var ageLab=row.querySelector("[data-agelabel]");
       age.addEventListener("input",function(){
         var a=parseInt(age.value,10);
@@ -612,62 +691,85 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     return out;
   }
 
+  var viewBtn=document.getElementById("view-recipes");
+  var rxSub=document.getElementById("rx-sub");
+
+  function chosenMeats(){ return MEATS.filter(function(m){ return (state.weights[m.id]||0)>0; }); }
+
+  function updatePcts(shares){
+    MEATS.forEach(function(m){
+      var w=state.weights[m.id]||0;
+      var row=proteinsEl.querySelector('[data-prow="'+m.id+'"]');
+      var pct=proteinsEl.querySelector('[data-wpct="'+m.id+'"]');
+      if(w<=0){ if(row) row.classList.remove("on"); if(pct) pct.textContent="off"; }
+      else { if(row) row.classList.add("on"); if(pct) pct.textContent=(shares?shares[m.id]:0)+"%"; }
+    });
+  }
+
+  function renderRecipes(chosen){
+    var recipesEl=document.getElementById("recipes");
+    var grillLabel=GRILLS.filter(function(g){return g.id===state.grill;})[0].name;
+    if(rxSub) rxSub.textContent="two ideas each, tuned for your "+grillLabel.toLowerCase();
+    if(!chosen.length){ recipesEl.innerHTML='<p class="empty">Add a protein to see recipes.</p>'; return; }
+    recipesEl.innerHTML=chosen.map(function(m){
+      var r=RECIPES[m.id];
+      var picks=(state.grill==="smoker" && r.smoker) ? r.smoker : r.def;
+      var cards=picks.map(function(p){
+        var q=encodeURIComponent(p.dish+" recipe");
+        return '<div class="rec"><p class="dish">'+p.dish+'</p><p class="how">'+p.how+'</p>'+
+          '<a class="find" href="https://www.google.com/search?q='+q+'" target="_blank" rel="noopener">Find recipes</a></div>';
+      }).join("");
+      return '<div class="rec-group">'+m.icon()+'<div><p class="meat">'+m.name+'</p>'+cards+'</div></div>';
+    }).join("");
+  }
+
   function compute(){
-    // cooked target
     var cooked = state.men.count*COOKED.men*APPETITE[state.men.appetite]
                + state.women.count*COOKED.women*APPETITE[state.women.appetite]
                + state.kids.count*COOKED.kidBase*state.kidFactor*APPETITE[state.kids.appetite];
     if(state.sides) cooked *= 0.75;
 
-    var chosen = MEATS.filter(function(m){ return state.meats[m.id]; });
+    var chosen = chosenMeats();
     var breakdownEl=document.getElementById("breakdown");
-    var recipesEl=document.getElementById("recipes");
     var totalEl=document.querySelector("[data-total]");
     var rawNote=document.querySelector("[data-rawnote]");
-
     var people = state.men.count+state.women.count+state.kids.count;
 
-    if(people===0){ totalEl.textContent="0"; breakdownEl.innerHTML=""; recipesEl.innerHTML='<p class="empty">No eaters yet. Add some souls to the gathering.</p>'; rawNote.style.visibility="hidden"; return; }
-    if(chosen.length===0){ totalEl.textContent="0"; breakdownEl.innerHTML=""; recipesEl.innerHTML='<p class="empty">Pick at least one meat and the eye will reckon.</p>'; rawNote.style.visibility="hidden"; return; }
-    rawNote.style.visibility="visible";
+    if(people===0){ totalEl.textContent="0"; breakdownEl.innerHTML='<p class="empty">Add some eaters in The Gathering.</p>'; rawNote.style.visibility="hidden"; updatePcts(null); renderRecipes([]); viewBtn.disabled=true; return; }
+    if(chosen.length===0){ totalEl.textContent="0"; breakdownEl.innerHTML='<p class="empty">Drag a protein up to begin.</p>'; rawNote.style.visibility="hidden"; updatePcts(null); renderRecipes([]); viewBtn.disabled=true; return; }
+    rawNote.style.visibility="visible"; viewBtn.disabled=false;
 
     var smokerBump = state.grill==="smoker" ? 1.10 : 1.0;
     var shares = snapShares(chosen.map(function(m){return m.id;}));
 
     var rows=[], total=0;
     chosen.forEach(function(m){
-      var share = shares[m.id]/100;
-      var cookedPortion = cooked*share;
+      var cookedPortion = cooked*(shares[m.id]/100);
       var raw = round1((cookedPortion/m.yield)*smokerBump);
       if(raw<0.1 && cookedPortion>0) raw=0.1;
       total += raw;
       rows.push({name:m.name, amt:raw});
-      var pct=document.querySelector('[data-wpct="'+m.id+'"]');
-      if(pct) pct.textContent=shares[m.id]+"%";
     });
 
+    updatePcts(shares);
     totalEl.textContent = (Math.round(total*10)/10).toFixed(1);
-
-    breakdownEl.innerHTML='<div class="bhead">What to buy</div>'+rows.map(function(r){
+    breakdownEl.innerHTML=rows.map(function(r){
       return '<div class="brow"><span class="nm">'+r.name+'</span><span class="dots"></span><span class="amt">'+r.amt.toFixed(1)+' lb</span></div>';
     }).join("");
-
-    // recipes
-    var grillLabel=GRILLS.filter(function(g){return g.id===state.grill;})[0].name;
-    var recHTML='<div class="bhead">The oracle suggests</div><div class="rsub">tuned for your '+grillLabel.toLowerCase()+'</div>';
-    chosen.forEach(function(m){
-      var r=RECIPES[m.id];
-      var pick=(state.grill==="smoker" && r.smoker) ? r.smoker : r.def;
-      var q=encodeURIComponent(pick.dish+" recipe");
-      recHTML+='<div class="rec">'+m.icon()+'<div>'+
-        '<p class="meat">'+m.name+'</p>'+
-        '<p class="dish">'+pick.dish+'</p>'+
-        '<p class="how">'+pick.how+'</p>'+
-        '<a class="find" href="https://www.google.com/search?q='+q+'" target="_blank" rel="noopener">Find recipes</a>'+
-        '</div></div>';
-    });
-    recipesEl.innerHTML=recHTML;
+    renderRecipes(chosen);
   }
+
+  // ---------- recipe modal open / close ----------
+  var rxBackdrop=document.getElementById("rx-backdrop");
+  var rxModal=document.getElementById("rx-modal");
+  function openRx(){ if(viewBtn.disabled) return; rxBackdrop.hidden=false; rxModal.hidden=false;
+    requestAnimationFrame(function(){ rxBackdrop.classList.add("open"); rxModal.classList.add("open"); }); }
+  function closeRx(){ rxBackdrop.classList.remove("open"); rxModal.classList.remove("open");
+    setTimeout(function(){ rxBackdrop.hidden=true; rxModal.hidden=true; }, 300); }
+  viewBtn.addEventListener("click", openRx);
+  document.getElementById("rx-close").addEventListener("click", closeRx);
+  rxBackdrop.addEventListener("click", closeRx);
+  document.addEventListener("keydown", function(e){ if(e.key==="Escape" && rxModal.classList.contains("open")) closeRx(); });
 
   // ---------- build sunbeam rays around the small eye mark ----------
   (function rays(){
@@ -684,7 +786,6 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     g.innerHTML=paths;
   })();
 
-  renderBalance();
   compute();
 
   // ---------- hand-drawn linocut meat icons ----------
