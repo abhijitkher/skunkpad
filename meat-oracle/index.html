@@ -302,7 +302,9 @@ details.reck .body b{font-weight:400;border-bottom:1.5px solid var(--ink-35)}
 @media(min-width:900px){ .mini-foot{margin-top:auto;padding-top:14px} }
 
 /* clearer slider scale labels */
-.scale{display:flex;justify-content:space-between;align-items:baseline;margin-top:5px;font-size:12px;color:var(--ink-80)}
+.scale{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;align-items:start;margin-top:5px;font-size:11.5px;line-height:1.2;color:var(--ink-55)}
+.scale span:nth-child(1){text-align:left}.scale span:nth-child(2){text-align:center}.scale span:nth-child(3){text-align:right}
+.scale span.on{font-weight:700;color:var(--ink);text-shadow:.45px 0 currentColor}
 .scale span{font-size:11px;letter-spacing:.04em;color:var(--ink-55)}
 .scale b{font-family:"Rye",serif;font-weight:400;font-size:15px;color:var(--ink);letter-spacing:.02em}
 
@@ -418,8 +420,8 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
         <div class="who"><b>Men</b></div>
         <div class="stepper"><button type="button" data-step="-1" aria-label="fewer men">–</button><span class="count" data-count>2</span><button type="button" data-step="1" aria-label="more men">+</button></div>
         <div class="appetite">
-          <input type="range" min="1" max="5" value="3" step="1" data-appetite aria-label="men average appetite">
-          <div class="scale"><span>Lighter</span><b data-aplabel>Regular</b><span>Heartier</span></div>
+          <input type="range" min="1" max="5" value="3" step="2" data-appetite aria-label="men average appetite">
+          <div class="scale" data-scale><span data-opt="1">Just a little bit</span><span data-opt="3" class="on">Normal</span><span data-opt="5">I'm a carnivore</span></div>
         </div>
       </div>
 
@@ -427,8 +429,8 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
         <div class="who"><b>Women</b></div>
         <div class="stepper"><button type="button" data-step="-1" aria-label="fewer women">–</button><span class="count" data-count>2</span><button type="button" data-step="1" aria-label="more women">+</button></div>
         <div class="appetite">
-          <input type="range" min="1" max="5" value="3" step="1" data-appetite aria-label="women average appetite">
-          <div class="scale"><span>Lighter</span><b data-aplabel>Regular</b><span>Heartier</span></div>
+          <input type="range" min="1" max="5" value="3" step="2" data-appetite aria-label="women average appetite">
+          <div class="scale" data-scale><span data-opt="1">Just a little bit</span><span data-opt="3" class="on">Normal</span><span data-opt="5">I'm a carnivore</span></div>
         </div>
       </div>
 
@@ -437,10 +439,10 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
         <div class="stepper"><button type="button" data-step="-1" aria-label="fewer kids">–</button><span class="count" data-count>0</span><button type="button" data-step="1" aria-label="more kids">+</button></div>
         <div class="appetite">
           <input type="range" min="2" max="17" value="8" step="1" data-age aria-label="kids average age">
-          <div class="scale"><span>Younger</span><b data-agelabel>Age 8</b><span>Older</span></div>
+          <div class="scale" data-scale><span data-opt="1">Little ones</span><span data-opt="3" class="on">Middle kids</span><span data-opt="5">Teens</span></div>
         </div>
       </div>
-      <p class="hint">Kids use average age: a 4 and a 14 average to about 9.</p>
+      <p class="hint">Average age: <b data-agenow>8</b>. A 4 and a 14 average to about 9.</p>
     </section>
 
     <!-- ===== PANE 2: PROTEINS + SIDES ===== -->
@@ -515,6 +517,7 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
 
   // appetite only nudges the total (~15% each way), it doesn't swing it
   var APPETITE = {1:0.85, 2:0.93, 3:1.0, 4:1.08, 5:1.15};
+  function setScale(el,key){ if(!el) return; el.querySelectorAll("[data-opt]").forEach(function(n){ n.classList.toggle("on", n.dataset.opt===String(key)); }); }
   var APPETITE_LABEL = {1:"Light", 2:"Bit light", 3:"Regular", 4:"Bit hearty", 5:"Hearty"};
 
   // yield = cooked edible / raw purchased
@@ -761,21 +764,22 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     var slider=row.querySelector("[data-appetite]");
     if(slider){
       slider.classList.add("bare"); slider.style.setProperty("--thumb", makeThumbFull(THUMB_FULL[grp]));
-      var lab=row.querySelector("[data-aplabel]");
+      var scaleEl=row.querySelector("[data-scale]");
       slider.addEventListener("input",function(){
         state[grp].appetite=parseInt(slider.value,10);
-        if(lab) lab.textContent=APPETITE_LABEL[slider.value];
+        setScale(scaleEl, slider.value);
         compute();
       });
     }
     var age=row.querySelector("[data-age]");
     if(age){
       age.classList.add("bare"); age.style.setProperty("--thumb", makeThumbFull(THUMB_FULL.kids));
-      var ageLab=row.querySelector("[data-agelabel]");
+      var ageScale=row.querySelector("[data-scale]"), ageNow=document.querySelector("[data-agenow]");
       age.addEventListener("input",function(){
         var a=parseInt(age.value,10);
         state.kidFactor=kidFactor(a);
-        if(ageLab) ageLab.textContent="Age "+a;
+        setScale(ageScale, a<=5?"1":(a<=11?"3":"5"));
+        if(ageNow) ageNow.textContent=a;
         compute();
       });
     }
