@@ -9,7 +9,7 @@ import { buildResumeTerms, passesFilters, scoreJob, classifyWorkMode } from "./s
 // bundling, because the function's location (not src/) became import.meta.url.
 const { companies } = companiesData;
 
-// Resume text comes from the RESUME_TEXT env var (use this on Netlify, the file
+// Resume text comes from the RESUME_TEXT env var (use this on Vercel, the file
 // is gitignored so it is never deployed), then resume.txt, then the example.
 async function loadResume() {
   if (process.env.RESUME_TEXT) return process.env.RESUME_TEXT;

@@ -6,9 +6,9 @@
   "engines": { "node": ">=18" },
   "scripts": {
     "refresh": "node scripts/refresh-local.js",
-    "serve": "npx netlify-cli dev --dir public"
+    "serve": "npx serve public"
   },
   "dependencies": {
-    "@netlify/blobs": "^8.1.0"
+    "@vercel/blob": "^2.8.2"
   }
 }

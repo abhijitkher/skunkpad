@@ -11,8 +11,9 @@ A daily job feed that scores every opening against my own resume, so I see the b
 
 ## How it's built
 
-- **`netlify/functions/refresh-feed.mjs`**: a Netlify Scheduled Function (weekdays, 14:00 UTC). Fetches the ATS feeds, scores, and stores the result in Netlify Blobs.
-- **`netlify/functions/feed.mjs`**: serves the stored feed at `/api/feed`.
+- **`api/refresh.js`**: the refresh job. A Vercel Cron (weekdays, 14:00 UTC, set in `vercel.json`) calls it. It fetches the ATS feeds, scores, and stores the result in a private Vercel Blob. You can also hit `/api/refresh` by hand.
+- **`api/feed.js`**: serves the stored feed at `/api/feed`.
+- **`src/store.js`**: reads and writes the feed and the "seen" list in Vercel Blob.
 - **`src/sources.js`**: one adapter per ATS. Each company is a `{ source, slug }` entry in `companies.json`.
 - **`src/score.js`**: the resume-match scorer. Heuristic, not ML. The score is directional.
 - **`src/pipeline.js`**: fetch, filter, score, dedupe, and flag what is new since the last run.
@@ -32,13 +33,14 @@ The scoring and filtering logic is tested. The live calls to Greenhouse, Lever, 
 ## Setup
 
 1. `npm install`
-2. Locally: save your resume text as `resume.txt` (gitignored). On Netlify: set the `RESUME_TEXT` environment variable. The resume never goes in the repo.
+2. Locally: save your resume text as `resume.txt` (gitignored). On Vercel: set the `RESUME_TEXT` environment variable. The resume never goes in the repo.
 3. Edit `companies.json` and `profile.json` to taste.
-4. Deploy: in Netlify, New site, import this repo, set base directory to `job-agent`. The schedule lives in the function file.
+4. Deploy: in Vercel, Add New Project, import this repo, set Root Directory to `job-agent`, framework Other. Then Storage, create a private Blob store and connect it to the project (this adds `BLOB_READ_WRITE_TOKEN`). The schedule lives in `vercel.json`.
+5. Optional: set `CRON_SECRET` (Vercel then signs cron calls) and `RUN_TOKEN` (lets you run `/api/refresh?token=...` by hand). With neither set the refresh endpoint is open.
 
 ## Local run
 
 ```
 npm run refresh   # runs the fetch + score once, writes public/feed.json
-npm run serve     # serves public/ at localhost:8888
+npm run serve     # serves public/ locally
 ```

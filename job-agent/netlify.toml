@@ -1,7 +1,0 @@
-[build]
-  publish = "public"
-
-[functions]
-  directory = "netlify/functions"
-  node_bundler = "esbuild"
-  included_files = ["profile.json", "companies.json", "resume.example.txt"]
