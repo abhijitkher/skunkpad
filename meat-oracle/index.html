@@ -165,7 +165,7 @@ input[type=range].bare::-moz-range-thumb{width:48px;height:48px;border:0;border-
 .prow:has(input.bare){position:relative;z-index:2}
 /* combined protein rows */
 #proteins{margin-top:2px}
-.prow{display:grid;grid-template-columns:24px 84px 1fr 38px;align-items:center;gap:8px;padding:6.75px 2px;border-bottom:1.5px dotted var(--ink-35);opacity:.5;transition:opacity .15s ease}
+.prow{display:grid;grid-template-columns:24px 84px 1fr 38px;align-items:center;gap:8px;padding:10.5px 2px;border-bottom:1.5px dotted var(--ink-35);opacity:.5;transition:opacity .15s ease}
 .prow:last-child{border-bottom:0}
 .prow.on{opacity:1}
 .picon{display:flex}
@@ -635,14 +635,28 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     var svg="<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'><g fill='#28201a'>"+inner+"</g></svg>";
     return "url(\"data:image/svg+xml,"+encodeURIComponent(svg)+"\")";
   }
+  // full-size, single-ink, tan-filled handles (48px). The animal itself is the handle.
+  function W(inner){ return "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60' width='60' height='60' fill='none' stroke='#28201a' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'>"+inner+"</svg>"; }
+  var F="fill='#e3b78a'", DOT="fill='#28201a' stroke='none'";
   var THUMB_FULL = {
-    beef: "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60' width='60' height='60' fill='none' stroke='#28201a' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'>"+
-      "<path d='M20 17 Q11 15 7 5 Q17 5 25 13' fill='#e3b78a'/><path d='M40 17 Q49 15 53 5 Q43 5 35 13' fill='#e3b78a'/>"+
-      "<path d='M16 24 Q4 21 3 28 Q4 35 15 33' fill='#e3b78a'/><path d='M44 24 Q56 21 57 28 Q56 35 45 33' fill='#e3b78a'/>"+
-      "<path d='M20 15 Q30 11 40 15 Q46 21 45 31 Q44 38 41 42 L19 42 Q16 38 15 31 Q14 21 20 15 Z' fill='#e3b78a'/>"+
-      "<path d='M20 42 Q20 35 30 35 Q40 35 40 42 Q42 52 30 54 Q18 52 20 42 Z' fill='#e3b78a'/>"+
+    beef: W("<path d='M20 17 Q11 15 7 5 Q17 5 25 13' "+F+"/><path d='M40 17 Q49 15 53 5 Q43 5 35 13' "+F+"/>"+
+      "<path d='M16 24 Q4 21 3 28 Q4 35 15 33' "+F+"/><path d='M44 24 Q56 21 57 28 Q56 35 45 33' "+F+"/>"+
+      "<path d='M20 15 Q30 11 40 15 Q46 21 45 31 Q44 38 41 42 L19 42 Q16 38 15 31 Q14 21 20 15 Z' "+F+"/>"+
+      "<path d='M20 42 Q20 35 30 35 Q40 35 40 42 Q42 52 30 54 Q18 52 20 42 Z' "+F+"/>"+
       "<ellipse cx='25.5' cy='44' rx='1.5' ry='2.3'/><ellipse cx='34.5' cy='44' rx='1.5' ry='2.3'/>"+
-      "<circle cx='24' cy='27' r='1.6' fill='#28201a' stroke='none'/><circle cx='36' cy='27' r='1.6' fill='#28201a' stroke='none'/></svg>"
+      "<circle cx='24' cy='27' r='1.6' "+DOT+"/><circle cx='36' cy='27' r='1.6' "+DOT+"/>"),
+    pork: W("<path d='M15 24 L10 7 L28 15 Z' "+F+"/><path d='M45 24 L50 7 L32 15 Z' "+F+"/>"+
+      "<ellipse cx='30' cy='32' rx='18' ry='17' "+F+"/><ellipse cx='30' cy='39' rx='10' ry='7.5' "+F+"/>"+
+      "<ellipse cx='26' cy='39' rx='1.4' ry='2.3'/><ellipse cx='34' cy='39' rx='1.4' ry='2.3'/>"+
+      "<circle cx='21' cy='28' r='1.7' "+DOT+"/><circle cx='39' cy='28' r='1.7' "+DOT+"/>"),
+    chicken: W("<circle cx='23' cy='13' r='5.5' "+F+"/><circle cx='31' cy='9.5' r='5.5' "+F+"/><circle cx='39' cy='13' r='5.5' "+F+"/>"+
+      "<ellipse cx='30' cy='46' rx='4.5' ry='7' "+F+"/><ellipse cx='30' cy='30' rx='16' ry='16' "+F+"/>"+
+      "<path d='M25 31 L35 31 L30 42 Z' "+F+"/><circle cx='22' cy='26' r='1.7' "+DOT+"/><circle cx='38' cy='26' r='1.7' "+DOT+"/>"),
+    sausage: W("<g transform='rotate(-35 30 30)'><rect x='5' y='20' width='50' height='20' rx='10' "+F+"/><path d='M13 20 L13 16 M47 20 L47 16 M13 40 L13 44 M47 40 L47 44'/><path d='M23 26 L26 34 M31 26 L34 34 M39 26 L42 34'/></g>"),
+    fish: W("<path d='M5 30 Q21 12 40 25 L55 14 Q51 30 55 46 L40 35 Q21 48 5 30 Z' "+F+"/><path d='M25 22 Q31 30 25 38'/><circle cx='15' cy='28' r='1.9' "+DOT+"/>"),
+    shell: W("<path d='M30 50 L7 31 Q6 11 30 9 Q54 11 53 31 Z' "+F+"/><path d='M30 50 L15 20 M30 50 L24 12 M30 50 L36 12 M30 50 L45 20'/><path d='M23 50 L37 50 L35 56 L25 56 Z' "+F+"/>"),
+    paneer: W("<path d='M30 7 L53 19 L30 31 L7 19 Z' fill='#f0d2ac'/><path d='M7 19 L30 31 L30 55 L7 43 Z' "+F+"/><path d='M53 19 L30 31 L30 55 L53 43 Z' fill='#d9a874'/><circle cx='26' cy='19' r='1.6' "+DOT+"/><circle cx='36' cy='21' r='1.6' "+DOT+"/><circle cx='30' cy='15' r='1.3' "+DOT+"/>"),
+    tofu: W("<path d='M30 7 L53 19 L30 31 L7 19 Z' fill='#f0d2ac'/><path d='M7 19 L30 31 L30 55 L7 43 Z' "+F+"/><path d='M53 19 L30 31 L30 55 L53 43 Z' fill='#d9a874'/><path d='M13 29 L24 35 M13 36 L24 42' stroke-width='2'/>")
   };
   function makeThumbFull(svg){ return "url(\"data:image/svg+xml,"+encodeURIComponent(svg)+"\")"; }
   var THUMB = {
