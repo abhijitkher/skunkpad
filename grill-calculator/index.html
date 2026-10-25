@@ -217,8 +217,8 @@ select{
 .brow .amt{font-family:"Rye",serif;font-size:16px;white-space:nowrap}
 
 /* view-recipes button + note */
-.view-recipes{display:inline-block;margin:16px 0 0;padding:12px 18px;cursor:pointer;
-  background:var(--ink);color:var(--kraft-hi);border:0;border-radius:3px;
+.view-recipes{align-self:flex-start;margin:16px 0 0;padding:11px 22px;cursor:pointer;
+  background:var(--ink);color:var(--kraft-hi);border:0;border-radius:999px;
   font-family:"Rye",serif;font-size:18px;letter-spacing:.03em;
   box-shadow:0 3px 0 rgba(40,32,26,.35);transition:transform .07s ease}
 .view-recipes:active{transform:translateY(3px);box-shadow:0 0 0 var(--ink)}
@@ -281,7 +281,8 @@ details.reck[open] summary::after{content:" ▴"}
 details.reck .body{color:var(--ink-80);line-height:1.55;padding:10px 2px 0}
 details.reck .body p{margin:0 0 8px}
 details.reck .body b{font-weight:400;border-bottom:1.5px solid var(--ink-35)}
-.mini-foot{margin:22px 0 6px;font-size:11px;letter-spacing:.06em;color:var(--ink-55);text-align:left}
+.mini-foot{margin:22px 0 0;font-size:11px;letter-spacing:.06em;color:var(--ink-55);text-align:right}
+@media(min-width:900px){ .mini-foot{margin-top:auto;padding-top:14px} }
 
 /* clearer slider scale labels */
 .scale{display:flex;justify-content:space-between;align-items:baseline;margin-top:5px;font-size:12px;color:var(--ink-80)}
