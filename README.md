@@ -8,8 +8,8 @@ I'm a product manager who builds. These are the builds.
 
 | Project | What it does | Live |
 |---|---|---|
-| [job-agent](./job-agent) | Pulls open roles from company hiring systems daily, scores each against my resume, and publishes a ranked feed. | _(link once deployed)_ |
-| [grill-calculator](./grill-calculator) | Works out how much meat to buy for a cookout from who's coming and how hungry they are, then suggests what to cook. | _(link once deployed)_ |
+| [job-agent](./job-agent) | Pulls open roles from company hiring systems daily, scores each against my resume, and publishes a ranked feed. | [the-meat-oracle.netlify.app](https://the-meat-oracle.netlify.app/) |
+| [grill-calculator](./grill-calculator) | Works out how much meat to buy for a cookout from who's coming and how hungry they are, then suggests what to cook. | [the-meat-oracle.netlify.app](https://the-meat-oracle.netlify.app/) |
 
 ## Why this exists
 
