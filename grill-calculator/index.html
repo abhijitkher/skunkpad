@@ -75,9 +75,10 @@ body::after{
   html,body{height:100%}
   body{overflow:hidden}
   .app{height:100vh;display:flex;flex-direction:column}
-  .panes{flex:1;min-height:0;grid-template-columns:1.05fr 1.05fr 1fr;gap:14px}
+  .panes{flex:1;min-height:0;grid-template-columns:2fr 3fr 5fr;gap:14px}
   .pane{min-height:0;overflow:hidden}
   .pane.p3{display:flex;flex-direction:column}
+  .p3 .grills{grid-template-columns:repeat(4,1fr)}
 }
 
 /* ---------- TOP BAR ---------- */
@@ -190,7 +191,9 @@ select{
 .stamp[aria-pressed=true] svg{color:var(--kraft)}
 .stamp .tick{position:absolute;top:5px;right:6px;font-family:"Rye",serif;font-size:13px;opacity:0;line-height:1}
 .stamp[aria-pressed=true] .tick{opacity:1}
-.grills{grid-template-columns:repeat(2,1fr)}
+.grills{grid-template-columns:repeat(4,1fr);gap:8px}
+.grills .stamp{padding:8px 3px 6px;gap:3px}
+.grills .stamp svg{width:24px;height:24px}
 .stamp{min-width:0}
 
 .sides{display:flex;align-items:center;gap:11px;margin-top:14px;padding:9px 11px;border:1.5px dashed var(--ink-55);border-radius:3px;cursor:pointer}
@@ -250,10 +253,13 @@ select{
 
 /* desktop: right side panel */
 @media(min-width:900px){
-  .rx-modal{top:0;right:0;bottom:0;width:min(460px,42vw);transform:translateX(100%);transition:transform .28s ease}
+  .rx-modal{top:0;right:0;bottom:0;width:50vw;transform:translateX(100%);transition:transform .28s ease}
   .rx-modal.open{transform:translateX(0)}
   .rx-backdrop{opacity:0;transition:opacity .28s ease}
   .rx-backdrop.open{opacity:1}
+  .rx-body #recipes{display:grid;grid-template-columns:repeat(2,1fr);column-gap:30px}
+  .rec-group{border-top:1.5px solid var(--ink-35)}
+  .rec-group:first-child,.rec-group:nth-child(2){border-top:0}
 }
 /* mobile: bottom sheet */
 @media(max-width:899px){
@@ -419,7 +425,7 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
       <p class="hint">Kids use average age: a 4 and a 14 average to about 9.</p>
     </section>
 
-    <!-- ===== PANE 2: PROTEINS + BALANCE + FLAME ===== -->
+    <!-- ===== PANE 2: PROTEINS + SIDES ===== -->
     <section class="pane" aria-labelledby="o-h">
       <h2 class="pane-h" id="o-h">The Offerings</h2>
       <p class="pane-sub">Fill the plate in 25% steps. When it hits 100% the rest lock.</p>
@@ -430,13 +436,9 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
         <div class="box" aria-hidden="true"></div>
         <div class="cap"><b>A great spread of sides awaits</b><span>Trims the meat by a quarter.</span></div>
       </div>
-
-      <h3 class="sub-h">The Flame</h3>
-      <p class="pane-sub">Shapes the cook, not the amount. The smoker buys a touch more for the long shrink.</p>
-      <div class="stamps grills" id="grills"></div>
     </section>
 
-    <!-- ===== PANE 3: VERDICT + RECIPES ===== -->
+    <!-- ===== PANE 3: VERDICT + FLAME + RECIPES ===== -->
     <section class="pane p3" aria-labelledby="v-h">
       <div class="verdict-grid" aria-live="polite">
         <div class="vcol">
@@ -450,8 +452,12 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
         </div>
       </div>
 
+      <h3 class="sub-h">The Flame</h3>
+      <p class="pane-sub">Pick your fire. It sets the recipes, and nudges the smoker up for the long shrink.</p>
+      <div class="stamps grills" id="grills"></div>
+
       <button class="view-recipes" id="view-recipes" type="button">View the recipes &nbsp;→</button>
-      <p class="recipe-note">Two ideas for each protein, tuned to your grill.</p>
+      <p class="recipe-note">Two ideas for each protein, tuned to your fire.</p>
 
       <details class="reck">
         <summary>How the eye reckons</summary>
@@ -606,14 +612,19 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
   proteinsEl.querySelectorAll("[data-weight]").forEach(function(inp){
     inp.style.setProperty("--thumb", makeThumb(THUMB[inp.dataset.weight]));
     inp.addEventListener("input",function(){
-      state.weights[this.dataset.weight]=parseInt(this.value,10);
+      var id=this.dataset.weight;
+      var requested=parseInt(this.value,10)||0;
+      var others=0; MEATS.forEach(function(m){ if(m.id!==id) others+=(state.weights[m.id]||0); });
+      var allowed=Math.max(0, Math.min(requested, 100-others)); // the plate can't exceed 100%
+      state.weights[id]=allowed;
+      if(allowed!==requested) this.value=allowed;              // snap the thumb back to what fits
       applyCaps();
       compute();
     });
   });
 
-  // keep the plate at or under 100%: each slider can only reach its value + the headroom,
-  // and a protein still at 0 locks once the plate is full
+  // sliders keep their full 0-100 track (no remapping). A protein still at 0 locks
+  // only once the plate is actually full; everything else stays draggable.
   function applyCaps(){
     var total=0; MEATS.forEach(function(m){ total+=(state.weights[m.id]||0); });
     var head=100-total;
@@ -621,7 +632,6 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
       var inp=proteinsEl.querySelector('[data-weight="'+m.id+'"]');
       var row=proteinsEl.querySelector('[data-prow="'+m.id+'"]');
       var v=state.weights[m.id]||0;
-      if(inp) inp.max=Math.min(100, v+head);
       var locked=(v===0 && head<=0);
       if(inp) inp.disabled=locked;
       if(row) row.classList.toggle("capped", locked);
