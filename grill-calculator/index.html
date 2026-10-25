@@ -183,14 +183,6 @@ select{
 .sides .cap b{font-family:"Rye",serif;font-weight:400;font-size:16px;display:block}
 .sides .cap span{font-size:12.5px;color:var(--ink-55)}
 
-/* consult button */
-/* compact consult button in the top bar */
-.consult{display:inline-block;padding:9px 16px;cursor:pointer;
-  background:var(--ink);color:var(--kraft-hi);border:0;border-radius:3px;
-  font-family:"Rye",serif;font-size:16px;letter-spacing:.04em;
-  box-shadow:0 3px 0 rgba(40,32,26,.35);transition:transform .07s ease;white-space:nowrap}
-.consult:active{transform:translateY(3px);box-shadow:0 0 0 var(--ink)}
-
 /* ---------- VERDICT (top of pane 3) ---------- */
 .verdict{flex:0 0 auto;text-align:left}
 .total-line{display:flex;align-items:baseline;gap:10px;margin:6px 0 0;flex-wrap:wrap}
@@ -337,7 +329,6 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     </div>
     <div class="topmeta">
       <a class="byline" href="https://github.com/abhijitkher" target="_blank" rel="noopener">@Abhi K</a>
-      <button class="consult" id="consult" type="button">Consult the Eye</button>
     </div>
   </header>
 
@@ -677,14 +668,6 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     });
     recipesEl.innerHTML=recHTML;
   }
-
-  // ---------- consult: one ceremonial pulse ----------
-  document.getElementById("consult").addEventListener("click",function(){
-    compute();
-    var rays=document.querySelector(".rays"), iris=document.querySelector(".iris");
-    [rays,iris].forEach(function(el){ if(!el) return; el.classList.remove("pulse"); void el.offsetWidth; el.classList.add("pulse"); });
-    document.getElementById("verdict").scrollIntoView({behavior:"smooth", block:"start"});
-  });
 
   // ---------- build sunbeam rays around the small eye mark ----------
   (function rays(){
