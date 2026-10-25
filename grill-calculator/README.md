@@ -17,7 +17,7 @@ Output is total **raw** pounds to buy and a per-protein breakdown rounded to a t
 
 ## How the math works
 
-Each eater gets a target of **cooked** edible meat (a regular man ~0.5 lb, a regular woman a bit less, a kid scaled by age), nudged about 15% each way by the average appetite slider. That cooked target is split across the chosen proteins by the balance sliders (even by default), then grossed up to raw buying weight using a per-protein yield factor that accounts for cooking shrink plus bone and shell waste. Shellfish needs the most raw weight (mostly shell); sausage, paneer, and tofu the least. These are grill-day rules of thumb, not lab figures.
+Each eater gets a target of **cooked** edible meat (a regular man ~0.5 lb, a regular woman a bit less, a kid scaled by age), nudged about 15% each way by the average appetite slider. That cooked target is split across the proteins by the share you give each one (you fill a 100% plate in 5% steps, and it locks at full), then grossed up to raw buying weight using a per-protein yield factor that accounts for cooking shrink plus bone and shell waste. Shellfish needs the most raw weight (mostly shell); sausage, paneer, and tofu the least. These are grill-day rules of thumb, not lab figures.
 
 ## Design
 

@@ -428,7 +428,7 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     <!-- ===== PANE 2: PROTEINS + SIDES ===== -->
     <section class="pane" aria-labelledby="o-h">
       <h2 class="pane-h" id="o-h">The Offerings</h2>
-      <p class="pane-sub">Fill the plate in 25% steps. When it hits 100% the rest lock.</p>
+      <p class="pane-sub">Fill the plate in 5% steps. When it hits 100% the rest lock.</p>
       <div id="proteins"></div>
       <div class="plate" id="plate"></div>
 
@@ -605,7 +605,7 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     return '<div class="prow" data-prow="'+m.id+'">'+
       '<span class="picon">'+m.icon()+'</span>'+
       '<span class="pname">'+m.name+'</span>'+
-      '<input type="range" min="0" max="100" value="0" step="25" data-weight="'+m.id+'" aria-label="'+m.name+' share">'+
+      '<input type="range" min="0" max="100" value="0" step="5" data-weight="'+m.id+'" aria-label="'+m.name+' share">'+
       '<span class="ppct" data-wpct="'+m.id+'">off</span>'+
       '</div>';
   }).join("");
