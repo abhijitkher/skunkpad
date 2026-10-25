@@ -1,4 +1,4 @@
-# grill-calculator
+# meat-oracle
 
 **The Meat Oracle** — a single-page grilling calculator that divines how much meat to buy for a cookout, then suggests what to cook with it.
 
@@ -31,4 +31,4 @@ Open `index.html` in a browser. That's the whole thing.
 
 ## Deploy
 
-Netlify, base directory `grill-calculator`, publish `.` — static, no build command. See `netlify.toml`.
+Netlify, base directory `meat-oracle`, publish `.` — static, no build command. See `netlify.toml`.
