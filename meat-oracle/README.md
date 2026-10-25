@@ -13,7 +13,7 @@ You tell it who's coming and the rest follows:
 - **The Flame** — charcoal, gas, smoker, or electric. This doesn't change how much people eat; it shapes the cooking tips and nudges the smoker number up for the long low-and-slow shrink.
 - **Sides toggle** — trims the meat by a quarter when there's a real spread of sides.
 
-Output is total **raw** pounds to buy and a per-protein breakdown rounded to a tenth of a pound, shown side by side. A **View the recipes** button opens a panel (a side modal on desktop, a bottom sheet on mobile) with two ideas per protein, low-and-slow cuts when a smoker is selected, each linking out to a recipe search.
+Output is total **raw** pounds to buy and a per-protein breakdown rounded to a tenth of a pound, shown side by side. A **View the recipes** button opens a panel (a side modal on desktop, a bottom sheet on mobile) with two recipes per protein for the selected grill (8 proteins x 4 grills, 64 picks). Each links to the original recipe, plus a "similar on Google" link built from the dish and grill. The picks were researched on the web in Oct 2026 from publishers like Serious Eats, America's Test Kitchen, NYT Cooking, Food Network and AmazingRibs. They are curated and baked into the page (it is a static site, so there is no live search). Electric, paneer-smoker and shellfish picks lean on smaller blogs where the big publishers had little.
 
 ## How the math works
 

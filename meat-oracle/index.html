@@ -212,6 +212,8 @@ select{
 .breakdown{margin:4px 0 0;text-align:left}
 .breakdown .bhead{display:none}
 .brow{display:flex;align-items:baseline;gap:7px;padding:4px 0;font-size:14px}
+.breakdown.dense .brow{padding:0;font-size:13px}
+.breakdown.dense .brow .amt{font-size:14px}
 .brow .nm{white-space:nowrap}
 .brow .dots{flex:1;border-bottom:2px dotted var(--ink-35);transform:translateY(-4px)}
 .brow .amt{font-family:"Rye",serif;font-size:16px;white-space:nowrap}
@@ -245,6 +247,10 @@ select{
 .rec-group .meat{font-family:"Rye",serif;font-size:17px;letter-spacing:.02em;margin:0 0 6px}
 .rec{padding:0 0 12px}
 .rec .dish{font-size:15px;margin:0;font-weight:400}
+.rec .dish a{color:var(--ink);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+.rec .src{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-55);margin:2px 0 0}
+.rec a.find.alt{margin-left:6px;border-style:dashed}
+.rec-group a.more{display:inline-block;font-size:11px;color:var(--ink-80);margin:0 0 8px}
 .rec .how{font-size:13px;color:var(--ink-80);margin:3px 0 7px;line-height:1.45}
 .rec a.find{display:inline-block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);
   border:1.5px solid var(--ink);border-radius:2px;padding:4px 10px;text-decoration:none;background:rgba(40,32,26,.04)}
@@ -273,13 +279,14 @@ select{
 }
 
 /* reckoning */
-details.reck{margin:22px 0 0;font-size:13px}
+@media (min-width:900px) and (max-height:800px){.recipe-note{display:none}.p3 .pane-sub{display:none}details.reck .body{padding-top:3px}}
+details.reck{margin:12px 0 0;font-size:12px}
 details.reck summary{cursor:pointer;text-align:left;font-family:"Rye",serif;font-size:15px;letter-spacing:.02em;list-style:none}
 details.reck summary::-webkit-details-marker{display:none}
 details.reck summary::after{content:" ▾";color:var(--ink-55)}
 details.reck[open] summary::after{content:" ▴"}
-details.reck .body{color:var(--ink-80);line-height:1.55;padding:10px 2px 0}
-details.reck .body p{margin:0 0 8px}
+details.reck .body{color:var(--ink-80);line-height:1.4;padding:6px 2px 0}
+details.reck .body p{margin:0 0 5px}
 details.reck .body b{font-weight:400;border-bottom:1.5px solid var(--ink-35)}
 .mini-foot{margin:22px 0 0;font-size:11px;letter-spacing:.06em;color:var(--ink-55);text-align:right}
 @media(min-width:900px){ .mini-foot{margin-top:auto;padding-top:14px} }
@@ -458,13 +465,13 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
       <div class="stamps grills" id="grills"></div>
 
       <button class="view-recipes" id="view-recipes" type="button">View the recipes &nbsp;→</button>
-      <p class="recipe-note">Two ideas for each protein, tuned to your fire.</p>
+      <p class="recipe-note">Two sourced recipes per protein, picked for your fire.</p>
 
       <details class="reck" open>
         <summary>How the eye reckons</summary>
         <div class="body">
           <p>Grill-day rules of thumb, not lab facts. A regular man targets about half a pound of cooked meat, a woman a bit less, a kid by age. Appetite nudges that about 15% each way.</p>
-          <p>The cooked target splits across your proteins by the balance sliders, then grosses up to raw buying weight, because meat shrinks on the fire and bone and shell don't feed anyone. Shellfish needs the most raw weight; sausage, paneer and tofu the least.</p>
+          <p>The cooked target splits across your proteins by the share you give each protein (in 5% steps), then grosses up to raw buying weight, because meat shrinks on the fire and bone and shell don't feed anyone. Shellfish needs the most raw weight; sausage, paneer and tofu the least.</p>
           <p>Smoker adds ~10% for the long shrink. Sides trims a quarter. Weights round to a tenth of a pound.</p>
         </div>
       </details>
@@ -519,55 +526,89 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     {id:"electric", name:"Electric"}
   ];
 
-  // two recipe ideas per protein; smoker gets its own low-and-slow pair
+  // Two sourced recipes per protein per grill. Picked from web research (Oct 2026):
+  // each links to the original page. "src" is the publisher. Google link is built live.
+  function R(dish,src,url,how){ return {dish:dish,src:src,url:url,how:how}; }
   var RECIPES = {
     beef:{
-      def:[{dish:"Santa Maria tri-tip", how:"Rub with salt, pepper and garlic. Sear hot, finish over indirect heat to a rosy medium-rare, slice against the grain."},
-           {dish:"Smash burgers", how:"Press loose balls thin on a hot grate or griddle, one flip, melt the cheese in the last 30 seconds."}],
-      smoker:[{dish:"Low-and-slow brisket", how:"Trim, season simply, smoke at 225°F to ~203°F internal. Wrap once the bark sets, rest an hour."},
-              {dish:"Smoked beef short ribs", how:"Big beef ribs, salt and pepper, smoke at 250°F until probe-tender, about 7 to 8 hours."}]
+      charcoal:[R("Perfect grilled ribeye steaks","Serious Eats","https://www.seriouseats.com/the-food-labs-perfect-grilled-ribeye-steaks","Salt 40 minutes ahead, cook gently on the cool side to 105°F, then sear over the coals to a deep char."),
+                R("Grilled hamburgers","NYT Cooking","https://cooking.nytimes.com/recipes/1020292-grilled-hamburgers","80/20 beef, salt and pepper, no pressing. Cheese on, lid down to melt. Charcoal is best.")],
+      gas:[R("Perfectly grilled steak","Food Network (Bobby Flay)","https://www.foodnetwork.com/recipes/bobby-flay/perfectly-grilled-steak-recipe-1973350","Oil and season, high heat, 4 to 5 minutes a side for golden char, rest 5 minutes."),
+           R("Grilled chuck steaks","America's Test Kitchen","https://www.americastestkitchen.com/recipes/7451-grilled-chuck-steaks","Chipotle-cocoa rub, sear on the hot side, finish on the cooler side. Gas directions included.")],
+      smoker:[R("Texas-style smoked brisket","AmazingRibs (Meathead)","https://amazingribs.com/tested-recipes/beef-and-bison-recipes/smoked-brisket-texas-style/","Dry brine, smoke at 225°F, wrap at the stall, hold at 195 to 205°F, rest in a cooler."),
+              R("Texas-style smoked beef ribs","AmazingRibs (Meathead)","https://amazingribs.com/tested-recipes/beef-and-bison-recipes/smoked-texas-style-bbq-beef-ribs-recipe/","Salt and beef rub, 225°F indirect to about 203°F. No foil wrap.")],
+      electric:[R("Steak on an indoor grill","Hamilton Beach","https://blog.hamiltonbeach.com/how-to-grill-a-great-steak-on-an-indoor-grill/","Preheat on SEAR, rest the steak at room temp, about 450°F for 8 to 16 minutes for a strip."),
+                R("New York steak, indoor grill","A Day in Candiland","https://adayincandiland.com/steak-indoor-grill-recipe/","Herb and cumin rub, highest sear setting, about 5 minutes a side to 135°F.")]
     },
     pork:{
-      def:[{dish:"Baby back ribs", how:"Dry rub, cook low over indirect heat until the meat pulls from the bone, glaze and crisp at the end."},
-           {dish:"Grilled pork chops", how:"Brine thick chops, sear over direct heat, finish indirect to 140°F, rest before serving."}],
-      smoker:[{dish:"Pulled pork shoulder", how:"Rub a bone-in shoulder, smoke at 225°F to ~200°F internal, rest, then pull. Plan for a long cook."},
-              {dish:"Smoked St. Louis ribs", how:"Trimmed spare ribs, smoke at 225°F about 5 to 6 hours, wrap midway, sauce at the end."}]
+      charcoal:[R("Charcoal-grilled pork chops","America's Test Kitchen","https://www.americastestkitchen.com/recipes/166-charcoal-grilled-pork-chops","Brine an hour, two-level fire, sear then finish covered to 135°F, rest to 145°F."),
+                R("Grilled pork tenderloin","Serious Eats","https://www.seriouseats.com/grilled-pork-tenderloin-recipe-7505776","Dry-brine, brown on the hot side, finish on the cool side to 130 to 140°F.")],
+      gas:[R("Gas-grilled pork chops","America's Test Kitchen","https://www.americastestkitchen.com/recipes/167-gas-grilled-pork-chops","Brine, one burner high, sear 3 to 4 minutes a side then move to the cool side to 135°F."),
+           R("Grilled pork chops, barbecue rub","NYT Cooking (Steven Raichlen)","https://cooking.nytimes.com/recipes/1024190-grilled-pork-chops","Salt, pepper, paprika and brown sugar rub on well-marbled chops, grilled in minutes.")],
+      smoker:[R("Low-and-slow pulled pork","Serious Eats","https://www.seriouseats.com/real-barbecued-pulled-pork","Overnight dry brine, 225°F to 195°F internal, then shred with the bark."),
+              R("Easy BBQ pulled pork","AmazingRibs (Meathead)","https://amazingribs.com/tested-recipes/pork-recipes/perfect-pulled-pork-recipe/","Salt a day ahead, rub, smoke at about 225°F with a leave-in probe.")],
+      electric:[R("Pork chops on an indoor electric grill","Grill It Better","https://grillitbetter.com/how-to-cook-pork-chops-on-indoor-electric-grill/","Preheat 5 to 10 minutes, medium-high for thin chops, 145°F, rest 5 minutes."),
+                R("Indoor grill pork chops","Southern Home Express","https://southernhomeexpress.com/george-foreman-grill-pork-chop/","Oil and season, rest in the fridge, about 4 minutes in a contact grill to 145°F.")]
     },
     chicken:{
-      def:[{dish:"Spatchcock chicken", how:"Flatten by removing the backbone so it cooks evenly. Grill skin-side down first, then flip."},
-           {dish:"Grilled chicken thighs", how:"Boneless thighs over direct heat, flipping often, until charred and 175°F. Forgiving and juicy."}],
-      smoker:[{dish:"Smoked chicken thighs", how:"Smoke at 275°F, then blast the skin over direct heat at the end so it isn't rubbery."},
-              {dish:"Smoked whole chicken", how:"Spatchcock, smoke at 275°F to 165°F in the breast. Higher heat keeps the skin from going soft."}]
+      charcoal:[R("Spatchcock chicken on charcoal","King of the Coal","https://kingofthecoal.com/recipes/spatchcock-chicken/","Flatten, dry-brine with baking powder, indirect at 375°F, crisp over the coals at the end."),
+                R("Beer-can chicken","NYT Cooking (Sam Sifton)","https://cooking.nytimes.com/recipes/1014853-beer-can-chicken","Spice-rubbed bird on a half-full can, smoke-roasted upright.")],
+      gas:[R("Italian-style gas-grilled chicken","America's Test Kitchen","https://www.americastestkitchen.com/recipes/4738-italian-style-gas-grilled-chicken","Butterflied bird with garlic and herb oil, cooked under hot bricks for crisp skin."),
+           R("All-purpose grilled chicken breasts","America's Test Kitchen","https://www.americastestkitchen.com/recipes/12583-all-purpose-grilled-boneless-skinless-chicken-breasts","Pound to 1/2 inch, 30-minute fish-sauce brine, 3 to 5 minutes a side on gas.")],
+      smoker:[R("Smoked whole chicken","America's Test Kitchen","https://www.americastestkitchen.com/recipes/16369-smoked-whole-chicken","Salt overnight, smoke over indirect heat to 160°F breast and 175°F thigh."),
+              R("Smoked whole chicken","Epicurious","https://www.epicurious.com/recipes/food/views/slow-smoked-chicken","Brown-sugar and espresso rub, 200 to 225°F for 3 to 5 hours to 165°F.")],
+      electric:[R("BBQ orange chicken thighs","Zojirushi","https://www.zojirushi.com/app/recipe/bbq-orange-chicken","Orange-honey-mustard marinade, boneless thighs flipped every 3 minutes to 165°F."),
+                R("Easy grilled chicken (Foodi Grill)","Recipes That Crock","https://www.recipesthatcrock.com/easy-grilled-chicken-ninja-foodi-grill/","Boneless thighs, about 7 minutes a side on a medium indoor grill.")]
     },
     sausage:{
-      def:[{dish:"Beer-braised brats", how:"Simmer in beer and onions, then finish on the grates for color and snap. Keep a cool zone so they don't split."},
-           {dish:"Italian sausage & peppers", how:"Grill links alongside sliced peppers and onion, then pile it all onto rolls."}],
-      smoker:[{dish:"Smoked sausage links", how:"Smoke whole at 250°F to 160°F internal, then kiss over direct heat for a crackling skin."},
-              {dish:"Smoked kielbasa", how:"Score the links, smoke at 225°F about 2 hours until deeply colored and hot through."}]
+      charcoal:[R("Grilled bratwurst, beer and sauerkraut","Serious Eats","https://www.seriouseats.com/grilled-bratwurst-with-beer-mustard-and-sauerkraut-recipe","Simmer in a pan of beer, mustard and kraut on the grill, then char on the hot side."),
+                R("Bratwurst with sauerkraut and apples","America's Test Kitchen","https://www.americastestkitchen.com/recipes/4317-charcoal-grilled-bratwurst-with-sauerkraut-and-apples","Steam over apples and kraut in a pan, then brown directly over the coals.")],
+      gas:[R("Gas-grilled sausages, peppers and onions","America's Test Kitchen","https://www.americastestkitchen.com/recipes/4334-gas-grilled-sausages-with-peppers-and-onions","Cook covered in a pan with the onions, then brown sausages and char peppers on the grate."),
+           R("Juiciest grilled brats","Food Network Kitchen","https://www.foodnetwork.com/recipes/food-network-kitchen/juiciest-grilled-brats-22118610","Poach in beer, then grill over medium-low to 160°F so the casings do not burst.")],
+      smoker:[R("How to grill and smoke sausages","Barbecue Bible (Steven Raichlen)","https://barbecuebible.com/2014/12/16/how-to-grill-smoke-sausages/","Indirect heat with wood chips, pull at 160°F."),
+              R("Smoked Louisiana andouille","AmazingRibs (Meathead)","https://amazingribs.com/tested-recipes/sausage-recipes/louisiana-andouille-sausage-recipe/","Homemade andouille, smoked at 225°F to 165°F. The smoking step works on store-bought links too.")],
+      electric:[R("Weeknight Italian sausages and peppers","ElectricGrill","https://electricgrill.com/recipes/weeknight-grilled-sausages","Sausages and a veg basket at 400°F, 12 to 15 minutes, turn every 3 to 4."),
+                R("Grilled sausage, peppers and onions","The Pioneer Woman","https://www.thepioneerwoman.com/food-cooking/recipes/a36079335/grilled-sausage-peppers-onions/","Medium heat, sausages beside a veg basket, 160°F. Grill pan works too.")]
     },
     fish:{
-      def:[{dish:"Cedar-plank salmon", how:"Soak the plank, lay the fillet skin-side down, grill covered over medium. Stays moist, adds smoke."},
-           {dish:"Grilled branzino", how:"Whole fish, oiled and stuffed with lemon and herbs, grill in a basket a few minutes a side."}],
-      smoker:[{dish:"Smoked salmon fillet", how:"Brine first, then smoke low at ~180°F until just flaky. Low and slow keeps it from drying."},
-              {dish:"Smoked trout", how:"Brine, air-dry for a tacky skin, smoke at 200°F until the flesh flakes, about 1.5 hours."}]
+      charcoal:[R("Whole grilled fish","Serious Eats","https://www.seriouseats.com/whole-grilled-fish-recipe-11744350","Two-zone fire, oiled grate, stuff the cavity, flip with a carving fork, 135°F."),
+                R("Whole grilled salmon, mustard and dill","NYT Cooking","https://cooking.nytimes.com/recipes/4231-whole-grilled-salmon-with-mustard-and-dill","Big-crowd salmon with a mustard-dill coating.")],
+      gas:[R("Grilled salmon","NYT Cooking (Ali Slagle)","https://cooking.nytimes.com/recipes/1025814-grilled-salmon","Mayo on the skin so nothing sticks, skin-side down the whole time, no flip."),
+           R("Whole grilled fish","Serious Eats","https://www.seriouseats.com/whole-grilled-fish-recipe-11744350","Preheat, clean and oil the grate, whole branzino or similar, two zones.")],
+      smoker:[R("Hot-smoked salmon","Serious Eats","https://www.seriouseats.com/hot-smoked-salmon-recipe-11718524","Cure, air-dry to a tacky skin, smoke at 225 to 275°F to 120 to 125°F."),
+              R("The best smoked salmon","Platter Talk","https://www.plattertalk.com/how-to-smoke-salmon-recipe/","Sweet brine, start at 140°F then ramp to 180°F, brush with maple syrup.")],
+      electric:[R("Indoor grill salmon","Stay Snatched","https://www.staysnatched.com/indoor-grill-salmon/","Skin-side up on a 450°F indoor grill, about 4 minutes, flip, 1 to 2 more."),
+                R("Ninja grilled salmon","Girls Can Grill","https://girlscangrill.com/ninja-grill-recipes/main-dishes/ninja-grilled-salmon/","Brown-sugar rub, high heat, 5 to 6 minutes then flip to 145°F.")]
     },
     shell:{
-      def:[{dish:"Garlic-butter shrimp skewers", how:"Thread shrimp, grill hot and fast, 2 to 3 minutes a side, basting with garlic butter."},
-           {dish:"Grilled oysters", how:"On the half shell over high heat with butter, garlic and a squeeze of lemon until bubbling."}],
-      smoker:[{dish:"Smoked garlic shrimp", how:"Toss in oil and spice, smoke at 225°F in one layer about 30 minutes until pink and just firm."},
-              {dish:"Smoked scallops", how:"Pat dry, smoke at 225°F about 25 minutes, then sear briefly for color. Don't overcook."}]
+      charcoal:[R("Grilled shrimp, garlic and lemon","Serious Eats","https://www.seriouseats.com/grilled-shrimp-garlic-lemon-food-lab-recipe","Baking-soda salt brine, double skewers, 4 to 5 minutes over the hot side."),
+                R("Grilled lobster tails","America's Test Kitchen","https://www.americastestkitchen.com/recipes/16228-grilled-lobster-tails","Split tails, grill cut-side down, top with garlic-panko butter, finish to 140°F.")],
+      gas:[R("The best grilled lobster tails","Food Network Kitchen","https://www.foodnetwork.com/recipes/food-network-kitchen/the-best-grilled-lobster-tails-13702117","Butterfly, skewer to stay flat, baste with herb butter, about 8 minutes."),
+           R("Grilled shrimp skewers","Wholesome Yum","https://www.wholesomeyum.com/shrimp-skewers/","Lemon-garlic marinade 15 to 30 minutes, 2 to 3 minutes a side.")],
+      smoker:[R("Smoked buttery shrimp","Learning to Smoke","https://www.learningtosmoke.com/smoked-buttery-shrimp/","Butter and garlic in a foil pan at 275°F, 20 to 25 minutes to 120°F."),
+              R("Smoked scallops","Simple Seafood Recipes","https://simpleseafoodrecipes.com/smoked-scallops/","Olive oil and smoked paprika, 225°F, about 45 minutes until opaque.")],
+      electric:[R("Grilled shrimp and scallop kabobs","Culinary Ginger","https://culinaryginger.com/grilled-shrimp-scallop-kabobs/","Works on an indoor or outdoor grill. Very hot, 1 to 2 minutes a side, grilled lemon."),
+                R("Herby shrimp and scallop skewers","Food Network (Ree Drummond)","https://www.foodnetwork.com/recipes/ree-drummond/herby-grilled-shrimp-and-scallop-skewers-19673189","Rosemary-chile-lemon marinade, about 3 minutes a side. General grill, not electric-specific.")]
     },
     paneer:{
-      def:[{dish:"Paneer tikka skewers", how:"Marinate cubes in spiced yogurt, thread with onion and pepper, grill hot until the edges char."},
-           {dish:"Grilled paneer & veg", how:"Thick slabs and vegetables brushed with oil and spice, quick char on each side."}],
-      smoker:[{dish:"Smoked paneer tikka", how:"Marinate, smoke at 225°F about 20 minutes, then finish over direct heat for char. Keep it short."},
-              {dish:"Smoked paneer bites", how:"Cube, smoke at 225°F ~15 minutes for a mild smoke, then toss in warm spiced butter."}]
+      charcoal:[R("Paneer barbeque","Culinary Shades","https://culinaryshades.com/paneer-tikka-grill/","Yogurt and tandoori masala marinade, skewered with peppers, about 10 minutes over coals."),
+                R("Achari paneer tikka","Archana's Kitchen","https://www.archanaskitchen.com/recipe/achari-paneer-tikka","Pickling-spice marinade, charcoal barbecue until charred on all sides.")],
+      gas:[R("Paneer tikka kebabs","Saveur","https://www.saveur.com/paneer-tikka-kebabs-recipe/","Mint-cilantro marinade, oil the cheese well, about 400°F for 3 minutes a side, finish with chaat masala."),
+           R("Paneer tikka (air fryer, oven or grill)","Spice Cravings","https://spicecravings.com/paneer-tikka","Medium grill, 5 to 7 minutes, flip halfway until the edges char.")],
+      smoker:[R("Smoked tandoori paneer tikka","What2Eat","https://www.what2eat.in/recipes/smoked-tandoori-paneer-tikka-recipe","Coal-smoked in a covered pan (dhungar style). Adapt the marinade for a smoker.")  ,
+              R("Paneer ke sooley (smoked paneer)","SBS Food","https://www.sbs.com.au/food/the-cook-up-with-adam-liaw/recipe/paneer-ke-sooley-smoked-paneer/1wafsuwae","Mustard-oil marinade, smoked with live coal and cloves. A stovetop method.")],
+      electric:[R("Paneer tikka, 3 methods","Ministry of Curry","https://ministryofcurry.com/paneer-tikka/","Wooden skewers work for indoor grills. Tandoori marinade, 10 to 12 minutes."),
+                R("Tandoori tofu or paneer, electric indoor grill","Food, Fitness, Beauty & More","https://www.foodfitnessbeautyandmore.com/tandoori-tofu-pan-electric-indoor-grill-methods-included/","Skewer with zucchini, brush the grill with ghee, cover, flip once.")]
     },
     tofu:{
-      def:[{dish:"Grilled teriyaki tofu", how:"Press extra-firm tofu, slab it thick, marinate, grill on oiled grates until crisp-edged. Glaze at the end."},
-           {dish:"Grilled tofu skewers", how:"Press firm tofu, cube, marinate, thread and grill, turning for even char on all sides."}],
-      smoker:[{dish:"Smoked tofu steaks", how:"Press hard, marinate, smoke at 225°F about 45 minutes for a chewy, smoky slab."},
-              {dish:"Smoked tofu & mushroom", how:"Smoke pressed tofu with meaty mushrooms at 225°F, then finish together in a glaze."}]
+      charcoal:[R("Grilled tofu, chipotle-miso sauce","Serious Eats","https://www.seriouseats.com/grilled-tofu-chipotle-miso-recipe","Blot dry, marinate, cook over low indirect heat about 10 minutes a side."),
+                R("Grilled soy-ginger glazed tofu","America's Test Kitchen","https://www.americastestkitchen.com/recipes/14381-grilled-soy-ginger-glazed-tofu","1-inch planks, brown on the hot side, then glaze on the cooler side.")],
+      gas:[R("Grilled soy-ginger glazed tofu","America's Test Kitchen","https://www.americastestkitchen.com/recipes/14381-grilled-soy-ginger-glazed-tofu","Gas directions: hot grill to brown, then medium to lacquer with glaze."),
+           R("Grilled tofu","NYT Cooking (Kay Chun)","https://cooking.nytimes.com/recipes/1022297-grilled-tofu","Hot soy-garlic marinade poured over slices, 3 to 6 hours.")],
+      smoker:[R("Smoked tofu","Cooking with Janica","https://cookingwithjanica.com/smoked-tofu/","Pressed extra-firm tofu, BBQ sauce, 225°F for 2 hours with apple or cherry wood."),
+              R("Marinated and smoked tofu steaks","M Recipes","https://mrecipes.com/smoker/misc/tofu-steaks/","Tamari-mirin-sesame marinade, 225°F for about 90 minutes.")],
+      electric:[R("Grilled peanut tofu skewers","Chloe E Vegan","https://chloeevegan.com/recipe/cook-tofu-in-two-minutes-with-a/","Electric grill or sandwich press, about 2 minutes, then peanut satay."),
+                R("How to grill tofu","Sharon Palmer, RD","https://sharonpalmer.com/2014-07-22-how-to-grill-tofu/","Pressed slabs, marinate an hour, indoor or electric grill about 10 minutes a side.")]
     }
   };
 
@@ -743,17 +784,21 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
   function renderRecipes(chosen){
     var recipesEl=document.getElementById("recipes");
     var grillLabel=GRILLS.filter(function(g){return g.id===state.grill;})[0].name;
-    if(rxSub) rxSub.textContent="two ideas each, tuned for your "+grillLabel.toLowerCase();
+    if(rxSub) rxSub.textContent="two sourced picks each, for your "+grillLabel.toLowerCase();
     if(!chosen.length){ recipesEl.innerHTML='<p class="empty">Add a protein to see recipes.</p>'; return; }
+    function esc(t){ return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;"); }
     recipesEl.innerHTML=chosen.map(function(m){
-      var r=RECIPES[m.id];
-      var picks=(state.grill==="smoker" && r.smoker) ? r.smoker : r.def;
+      var picks=(RECIPES[m.id]||{})[state.grill]||[];
       var cards=picks.map(function(p){
-        var q=encodeURIComponent(p.dish+" recipe");
-        return '<div class="rec"><p class="dish">'+p.dish+'</p><p class="how">'+p.how+'</p>'+
-          '<a class="find" href="https://www.google.com/search?q='+q+'" target="_blank" rel="noopener">Find recipes</a></div>';
+        var g="https://www.google.com/search?q="+encodeURIComponent(p.dish+" "+grillLabel.toLowerCase()+" grill recipe");
+        return '<div class="rec"><p class="dish"><a href="'+esc(p.url)+'" target="_blank" rel="noopener">'+esc(p.dish)+'</a></p>'+
+          '<p class="src">'+esc(p.src)+'</p><p class="how">'+esc(p.how)+'</p>'+
+          '<a class="find" href="'+esc(p.url)+'" target="_blank" rel="noopener">Full recipe</a>'+
+          '<a class="find alt" href="'+g+'" target="_blank" rel="noopener">Similar on Google</a></div>';
       }).join("");
-      return '<div class="rec-group">'+m.icon()+'<div><p class="meat">'+m.name+'</p>'+cards+'</div></div>';
+      var more="https://www.google.com/search?q="+encodeURIComponent("best "+m.name.toLowerCase()+" recipes for a "+grillLabel.toLowerCase()+" grill");
+      return '<div class="rec-group">'+m.icon()+'<div><p class="meat">'+m.name+'</p>'+cards+
+        '<a class="more" href="'+more+'" target="_blank" rel="noopener">More '+m.name.toLowerCase()+' ideas on Google</a></div></div>';
     }).join("");
   }
 
@@ -786,6 +831,7 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
 
     updatePcts();
     totalEl.textContent = (Math.round(total*10)/10).toFixed(1);
+    breakdownEl.className="breakdown"+(rows.length>4?" dense":"");
     breakdownEl.innerHTML=rows.map(function(r){
       return '<div class="brow"><span class="nm">'+r.name+'</span><span class="dots"></span><span class="amt">'+r.amt.toFixed(1)+' lb</span></div>';
     }).join("");
