@@ -9,12 +9,11 @@ No build step, no dependencies. One self-contained `index.html`: markup, styles,
 You tell it who's coming and the rest follows:
 
 - **The Gathering** — counts of men, women, and kids, each with an average appetite slider. Appetite only nudges the total (~15% each way), so a crowd of carnivores buys a bit more, not double. The slider is the group average, so a mixed group (say two big eaters and one regular) just lands near the middle. Kids use an average-age slider (2 to 17) that scales the portion smoothly, so in-between ages and mixed-age kids both work: a 4 and a 14 average to about 9.
-- **The Offerings** — pick your proteins (beef, pork, chicken, sausage, fish, shellfish, paneer, tofu).
-- **The Balance** — a share slider per chosen protein, even by default. Drag to favor one. Shares are portions of the meal; raw buy-weights still differ because bonier or shell proteins need more weight to hit the same cooked amount.
+- **The Offerings** — choice and balance in one control. Each protein (beef, pork, chicken, sausage, fish, shellfish, paneer, tofu) is a slider: at 0 it's off, drag it up to add it and the further you push the bigger its share. Shares snap to 5% and sum to 100. The slider handle is the critter itself (beef is a cow, pork a pig, and so on); the people sliders are a man, a woman, and a child. Because it's a fixed list, the layout never grows or scrolls no matter how many you pick.
 - **The Flame** — charcoal, gas, smoker, or electric. This doesn't change how much people eat; it shapes the cooking tips and nudges the smoker number up for the long low-and-slow shrink.
 - **Sides toggle** — trims the meat by a quarter when there's a real spread of sides.
 
-Output is total **raw** pounds to buy, a per-protein breakdown rounded to a tenth of a pound, and a recipe suggestion per protein (low-and-slow cuts when a smoker is selected), each linking out to a recipe search. The balance sliders set each protein's share in 5% steps.
+Output is total **raw** pounds to buy and a per-protein breakdown rounded to a tenth of a pound, shown side by side. A **View the recipes** button opens a panel (a side modal on desktop, a bottom sheet on mobile) with two ideas per protein, low-and-slow cuts when a smoker is selected, each linking out to a recipe search.
 
 ## How the math works
 

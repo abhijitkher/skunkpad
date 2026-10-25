@@ -156,14 +156,17 @@ input[type=range]::-moz-range-thumb{width:30px;height:30px;border-radius:50%;
   background-image:var(--thumb,none);background-size:22px 22px;background-position:center;background-repeat:no-repeat;cursor:grab}
 /* combined protein rows */
 #proteins{margin-top:2px}
-.prow{display:grid;grid-template-columns:26px minmax(54px,auto) 1fr 40px;align-items:center;gap:8px;padding:5px 2px;border-bottom:1.5px dotted var(--ink-35);opacity:.5;transition:opacity .15s ease}
+.prow{display:grid;grid-template-columns:24px 84px 1fr 38px;align-items:center;gap:8px;padding:5px 2px;border-bottom:1.5px dotted var(--ink-35);opacity:.5;transition:opacity .15s ease}
 .prow:last-child{border-bottom:0}
 .prow.on{opacity:1}
 .picon{display:flex}
 .picon svg{width:24px;height:24px;display:block}
-.pname{font-family:"Rye",serif;font-size:15px;letter-spacing:.02em;white-space:nowrap}
+.pname{font-family:"Rye",serif;font-size:14px;letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ppct{font-family:"Rye",serif;font-size:14px;text-align:right;color:var(--ink-80)}
 .prow:not(.on) .ppct{font-family:"Special Elite",monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-55)}
+.prow.capped{opacity:.3}
+.prow.capped input{cursor:not-allowed}
+.plate{margin:9px 2px 0;font-family:"Rye",serif;font-size:14px;letter-spacing:.02em;color:var(--ink-80)}
 .age-wrap{display:flex;align-items:center;gap:8px}
 select{
   font-family:"Special Elite",monospace;font-size:14px;color:var(--ink);
@@ -419,8 +422,9 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     <!-- ===== PANE 2: PROTEINS + BALANCE + FLAME ===== -->
     <section class="pane" aria-labelledby="o-h">
       <h2 class="pane-h" id="o-h">The Offerings</h2>
-      <p class="pane-sub">Drag a protein up to add it. The further you push, the bigger its share. Shares snap to 5%.</p>
+      <p class="pane-sub">Fill the plate in 25% steps. When it hits 100% the rest lock.</p>
       <div id="proteins"></div>
+      <div class="plate" id="plate"></div>
 
       <div class="sides" id="sides" role="button" tabindex="0" aria-pressed="false">
         <div class="box" aria-hidden="true"></div>
@@ -595,7 +599,7 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     return '<div class="prow" data-prow="'+m.id+'">'+
       '<span class="picon">'+m.icon()+'</span>'+
       '<span class="pname">'+m.name+'</span>'+
-      '<input type="range" min="0" max="10" value="0" step="1" data-weight="'+m.id+'" aria-label="'+m.name+' amount">'+
+      '<input type="range" min="0" max="100" value="0" step="25" data-weight="'+m.id+'" aria-label="'+m.name+' share">'+
       '<span class="ppct" data-wpct="'+m.id+'">off</span>'+
       '</div>';
   }).join("");
@@ -603,9 +607,28 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     inp.style.setProperty("--thumb", makeThumb(THUMB[inp.dataset.weight]));
     inp.addEventListener("input",function(){
       state.weights[this.dataset.weight]=parseInt(this.value,10);
+      applyCaps();
       compute();
     });
   });
+
+  // keep the plate at or under 100%: each slider can only reach its value + the headroom,
+  // and a protein still at 0 locks once the plate is full
+  function applyCaps(){
+    var total=0; MEATS.forEach(function(m){ total+=(state.weights[m.id]||0); });
+    var head=100-total;
+    MEATS.forEach(function(m){
+      var inp=proteinsEl.querySelector('[data-weight="'+m.id+'"]');
+      var row=proteinsEl.querySelector('[data-prow="'+m.id+'"]');
+      var v=state.weights[m.id]||0;
+      if(inp) inp.max=Math.min(100, v+head);
+      var locked=(v===0 && head<=0);
+      if(inp) inp.disabled=locked;
+      if(row) row.classList.toggle("capped", locked);
+    });
+    var plate=document.getElementById("plate");
+    if(plate){ plate.textContent = total===0 ? "Plate empty" : (total>=100 ? "Plate full" : "Plate "+total+"% full, "+head+"% left"); }
+  }
 
   var grillsEl=document.getElementById("grills");
   GRILLS.forEach(function(g){
@@ -696,13 +719,13 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
 
   function chosenMeats(){ return MEATS.filter(function(m){ return (state.weights[m.id]||0)>0; }); }
 
-  function updatePcts(shares){
+  function updatePcts(){
     MEATS.forEach(function(m){
       var w=state.weights[m.id]||0;
       var row=proteinsEl.querySelector('[data-prow="'+m.id+'"]');
       var pct=proteinsEl.querySelector('[data-wpct="'+m.id+'"]');
       if(w<=0){ if(row) row.classList.remove("on"); if(pct) pct.textContent="off"; }
-      else { if(row) row.classList.add("on"); if(pct) pct.textContent=(shares?shares[m.id]:0)+"%"; }
+      else { if(row) row.classList.add("on"); if(pct) pct.textContent=w+"%"; }
     });
   }
 
@@ -735,23 +758,22 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     var rawNote=document.querySelector("[data-rawnote]");
     var people = state.men.count+state.women.count+state.kids.count;
 
-    if(people===0){ totalEl.textContent="0"; breakdownEl.innerHTML='<p class="empty">Add some eaters in The Gathering.</p>'; rawNote.style.visibility="hidden"; updatePcts(null); renderRecipes([]); viewBtn.disabled=true; return; }
-    if(chosen.length===0){ totalEl.textContent="0"; breakdownEl.innerHTML='<p class="empty">Drag a protein up to begin.</p>'; rawNote.style.visibility="hidden"; updatePcts(null); renderRecipes([]); viewBtn.disabled=true; return; }
+    if(people===0){ totalEl.textContent="0"; breakdownEl.innerHTML='<p class="empty">Add some eaters in The Gathering.</p>'; rawNote.style.visibility="hidden"; updatePcts(); renderRecipes([]); viewBtn.disabled=true; return; }
+    if(chosen.length===0){ totalEl.textContent="0"; breakdownEl.innerHTML='<p class="empty">Drag a protein up to begin.</p>'; rawNote.style.visibility="hidden"; updatePcts(); renderRecipes([]); viewBtn.disabled=true; return; }
     rawNote.style.visibility="visible"; viewBtn.disabled=false;
 
     var smokerBump = state.grill==="smoker" ? 1.10 : 1.0;
-    var shares = snapShares(chosen.map(function(m){return m.id;}));
 
     var rows=[], total=0;
     chosen.forEach(function(m){
-      var cookedPortion = cooked*(shares[m.id]/100);
+      var cookedPortion = cooked*((state.weights[m.id]||0)/100);
       var raw = round1((cookedPortion/m.yield)*smokerBump);
       if(raw<0.1 && cookedPortion>0) raw=0.1;
       total += raw;
       rows.push({name:m.name, amt:raw});
     });
 
-    updatePcts(shares);
+    updatePcts();
     totalEl.textContent = (Math.round(total*10)/10).toFixed(1);
     breakdownEl.innerHTML=rows.map(function(r){
       return '<div class="brow"><span class="nm">'+r.name+'</span><span class="dots"></span><span class="amt">'+r.amt.toFixed(1)+' lb</span></div>';
@@ -786,6 +808,7 @@ footer .peace{font-family:"Rye",serif;letter-spacing:.04em;font-size:14px}
     g.innerHTML=paths;
   })();
 
+  applyCaps();
   compute();
 
   // ---------- hand-drawn linocut meat icons ----------
