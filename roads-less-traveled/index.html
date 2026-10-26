@@ -1,0 +1,1412 @@
+<title>Roads Less Traveled</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
+<style>
+  /* White, field-guide look. Left 25% filters, right 75% itinerary assembled from a city pool. */
+  :root{
+    color-scheme:light;
+    --bg:#ffffff; --panel:#ffffff; --panel-2:#f5f7f9; --ink:#17191d; --muted:#616b78;
+    --line:#e9ecf1; --line-strong:#d6dbe2; --gold:#b47c22; --gold-soft:#f3e7cd; --teal:#258069;
+    --teal-soft:#e0f0eb; --good:#2a8a5e; --warn:#b5791a; --shadow:rgba(23,25,29,.07); --motif:#e9edf2;
+    --serif:'Fraunces',Georgia,serif; --sans:'Hanken Grotesk',system-ui,sans-serif; --mono:'Space Mono',ui-monospace,monospace;
+  }
+  html,body{margin:0;height:100%}*{box-sizing:border-box}img{max-width:100%}[hidden]{display:none!important}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased}
+  .app{height:100%;display:grid;grid-template-columns:minmax(300px,25%) 1fr;position:relative;z-index:1}
+  .motif{position:fixed;left:0;right:0;bottom:0;height:min(34vh,280px);z-index:0;pointer-events:none;overflow:hidden}
+  .motif svg{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:min(1180px,98%);height:100%;display:block}
+
+  .deck{background:var(--panel);border-right:1px solid var(--line);overflow-y:auto;overflow-x:hidden;
+    padding:0 clamp(16px,1.4vw,22px);padding-left:max(clamp(16px,1.4vw,22px),env(safe-area-inset-left,0px));
+    display:flex;flex-direction:column;gap:16px}
+  .brand{position:sticky;top:0;z-index:5;background:var(--panel);padding:18px 0 12px;border-bottom:1px solid var(--line)}
+  .brand h1{font-family:var(--serif);font-weight:600;font-size:25px;letter-spacing:-.01em;margin:0;line-height:1.02}
+  .brand h1 b{color:var(--gold);font-weight:600}
+  .brand .city{margin-top:6px;display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--muted)}
+  .brand .city b{color:var(--ink);font-weight:700;font-size:13px}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--good);flex:none}
+
+  .field{display:flex;flex-direction:column;gap:7px}
+  .field>label,.legend{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+  input[type=date]{font:inherit;font-size:13.5px;color:var(--ink);background:var(--panel-2);border:1px solid var(--line-strong);border-radius:9px;padding:9px 10px;width:100%}
+  input[type=date]:focus{outline:2px solid var(--gold);border-color:var(--gold)}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .step2{display:flex;flex-direction:column;gap:8px;background:var(--panel-2);border:1px solid var(--line-strong);border-radius:9px;padding:9px 11px}
+  .step2 .lab{font-size:12px;font-weight:600;color:var(--ink)}
+  .stepctl{display:flex;align-items:center;justify-content:space-between;gap:2px}
+  .stepctl button{font:inherit;width:26px;height:26px;border-radius:7px;border:1px solid var(--line-strong);background:var(--panel);color:var(--ink);cursor:pointer;font-size:16px;line-height:1;display:grid;place-items:center}
+  .stepctl button:hover{border-color:var(--gold);color:var(--gold)}
+  .stepctl .val{font-family:var(--mono);font-size:14px;min-width:20px;text-align:center;font-variant-numeric:tabular-nums}
+
+  .slider .legend{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  .slider .now{font-weight:700;letter-spacing:.02em;text-transform:none;font-size:11.5px;color:var(--ink)}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:8px;border-radius:99px;margin:8px 0 2px;cursor:pointer;background:var(--line-strong)}
+  #style{background:linear-gradient(90deg,var(--gold),var(--teal))}
+  #pace{background:linear-gradient(90deg,var(--teal),var(--gold))}
+  #dist{background:linear-gradient(90deg,var(--teal),var(--gold))}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--panel);border:3px solid var(--ink);box-shadow:0 1px 4px var(--shadow);cursor:pointer}
+  input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--panel);border:3px solid var(--ink);cursor:pointer}
+  .ends{display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted)}
+
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{font:inherit;font-size:12px;padding:7px 11px;border-radius:99px;border:1px solid var(--line-strong);background:var(--panel-2);color:var(--ink);cursor:pointer;user-select:none}
+  .chip[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+  .seg{display:flex;border:1px solid var(--line-strong);border-radius:9px;overflow:hidden}
+  .seg button{flex:1;font:inherit;font-size:13px;padding:9px 4px;background:var(--panel-2);color:var(--muted);border:0;cursor:pointer;border-right:1px solid var(--line-strong)}
+  .seg button:last-child{border-right:0}
+  .seg button[aria-pressed="true"]{background:var(--gold);color:#fff;font-weight:700}
+
+  .build{position:sticky;bottom:0;background:linear-gradient(to top,var(--panel) 72%,transparent);padding:14px 0 18px;margin-top:auto;display:flex;flex-direction:column;gap:6px}
+  .btn-primary{font:inherit;font-weight:700;font-size:15px;color:#fff;background:var(--gold);border:0;border-radius:10px;padding:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 2px 10px var(--shadow)}
+  .btn-primary:hover{filter:brightness(1.06)}
+  .mini{font-size:11px;color:var(--muted);text-align:center}
+
+  .guide{overflow-y:auto;overflow-x:hidden;position:relative;padding:0 clamp(20px,3.2vw,46px);padding-right:max(clamp(20px,3.2vw,46px),env(safe-area-inset-right,0px))}
+  .guide-inner{max-width:760px;margin:0 auto;padding-block:clamp(22px,3vw,38px) 70px}
+  .trip-head .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:0 0 6px}
+  .trip-head h2{font-family:var(--serif);font-weight:600;font-size:clamp(28px,4.4vw,42px);line-height:1.02;margin:0;letter-spacing:-.015em;text-wrap:balance}
+  .trip-head .sub{color:var(--muted);margin:10px 0 0;font-size:14px}
+  .facts{display:flex;flex-wrap:wrap;gap:8px;margin:15px 0 0}
+  .fact{font-size:12px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 10px;display:flex;gap:6px;align-items:center}
+  .fact .k{color:var(--muted)} .fact .v{font-weight:600;font-variant-numeric:tabular-nums}
+
+  .day{margin-top:26px}
+  .day-head{display:flex;align-items:baseline;gap:12px;border-bottom:2px solid var(--line-strong);padding-bottom:9px}
+  .day-num{font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:var(--gold);flex:none}
+  .day-head h3{font-family:var(--serif);font-weight:600;font-size:20px;margin:0}
+  .day-head .meta{margin-left:auto;font-size:11.5px;color:var(--muted);font-family:var(--mono);flex:none}
+  .stop{display:grid;grid-template-columns:62px 1fr;gap:12px;padding:14px 0;border-bottom:1px solid var(--line);min-width:0}
+  .stop:last-child{border-bottom:0}
+  .stop .time{font-family:var(--mono);font-size:12.5px;color:var(--ink);padding-top:2px}
+  .stop .body{min-width:0}
+  .title-row{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .emoji{font-size:16px;flex:none}
+  .stop h4{margin:0;font-size:15.5px;font-weight:700}
+  .dur{font-family:var(--mono);font-size:11px;color:var(--muted);flex:none}
+  .stop p{margin:6px 0 0;font-size:13.5px;color:var(--ink)}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+  .tag{font-size:11px;padding:3px 8px;border-radius:7px;background:var(--panel-2);border:1px solid var(--line);color:var(--muted)}
+  .tag.area{background:var(--gold-soft);border-color:var(--gold);color:var(--gold)}
+  .tag.veg{background:var(--teal-soft);border-color:var(--teal);color:var(--teal)}
+  .tag.kid{background:var(--gold-soft);border-color:var(--gold);color:var(--gold)}
+  .links{display:flex;gap:14px;margin-top:9px;align-items:center}
+  a.lnk{color:var(--gold);font-size:12.5px;font-weight:600;text-decoration:none;border-bottom:1px solid transparent}
+  a.lnk:hover{border-bottom-color:var(--gold)}
+  .swap{font:inherit;font-size:12.5px;font-weight:600;color:var(--teal);background:none;border:0;cursor:pointer;padding:0;display:inline-flex;align-items:center;gap:4px}
+  .swap:hover{text-decoration:underline}
+  .travel{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--muted);font-family:var(--mono);padding:2px 0 2px 74px}
+  .travel::before{content:"";width:16px;height:1px;background:var(--line-strong)}
+  .foot{margin-top:28px;padding-top:16px;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted);line-height:1.6}
+  .empty{margin-top:40px;text-align:center;color:var(--muted);font-size:14px}
+
+  .toast{position:fixed;left:50%;transform:translateX(-50%) translateY(8px);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--panel);padding:12px 18px;border-radius:11px;box-shadow:0 6px 24px var(--shadow);font-size:13.5px;font-weight:600;z-index:40;display:flex;align-items:center;gap:10px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;max-width:calc(100vw - 32px)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  @media (max-width:880px){
+    .app{grid-template-columns:1fr;height:auto}html,body{height:auto}
+    .deck{border-right:0;border-bottom:1px solid var(--line);overflow:visible}
+    .brand,.build{position:static}.build{background:none}
+    .guide{overflow:visible}
+  }
+  :focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+</style>
+
+<div class="motif" aria-hidden="true"><svg viewBox="0 0 1200 300" preserveAspectRatio="xMidYMax slice" fill="var(--motif)">
+<g opacity=".85"><ellipse cx="215" cy="54" rx="44" ry="17"/><ellipse cx="255" cy="46" rx="32" ry="21"/><ellipse cx="960" cy="74" rx="50" ry="19"/><ellipse cx="1008" cy="66" rx="32" ry="23"/></g>
+<path d="M90,165 Q430,60 780,120" fill="none" stroke="var(--motif)" stroke-width="4" stroke-dasharray="1 12" stroke-linecap="round"/>
+<g transform="translate(772,112) rotate(20)"><path d="M0,0 L44,7 L46,-6 L64,-3 L64,9 L46,15 L0,20 L-16,10 Z"/></g>
+<g><rect x="0" y="252" width="1200" height="48"/>
+<polygon points="300,118 270,200 330,200"/><polygon points="286,200 314,200 330,252 270,252"/><rect x="296" y="150" width="8" height="102"/>
+<rect x="46" y="196" width="42" height="104"/><rect x="96" y="168" width="30" height="132"/>
+<rect x="556" y="206" width="70" height="94"/><path d="M556,206 a35,35 0 0 1 70,0 Z"/>
+<rect x="660" y="150" width="34" height="150"/><rect x="700" y="120" width="40" height="180"/><rect x="746" y="170" width="30" height="130"/>
+<g fill="none" stroke="var(--motif)" stroke-width="5"><circle cx="900" cy="196" r="52"/><line x1="900" y1="144" x2="900" y2="248"/><line x1="848" y1="196" x2="952" y2="196"/><line x1="863" y1="159" x2="937" y2="233"/><line x1="863" y1="233" x2="937" y2="159"/></g>
+<polygon points="900,196 876,300 924,300"/>
+<rect x="1044" y="172" width="30" height="128"/><rect x="1080" y="214" width="40" height="86"/></g>
+</svg></div>
+
+<div class="app">
+  <aside class="deck">
+    <div class="brand">
+      <h1>Roads Less <b>Traveled</b></h1>
+      <span class="city"><span class="dot"></span>Exploring <b id="cityName">Denver</b></span>
+    </div>
+
+    <div class="field">
+      <label class="legend">Dates</label>
+      <div class="two">
+        <div class="field"><label for="start" style="font-size:10px">Arrive</label><input type="date" id="start"></div>
+        <div class="field"><label for="end" style="font-size:10px">Depart</label><input type="date" id="end"></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="legend">Who's going</label>
+      <div class="two">
+        <div class="step2"><span class="lab">Adults</span><span class="stepctl"><button data-step="adults" data-d="-1">&minus;</button><span class="val" id="v-adults">2</span><button data-step="adults" data-d="1">+</button></span></div>
+        <div class="step2"><span class="lab">Kids</span><span class="stepctl"><button data-step="kids" data-d="-1">&minus;</button><span class="val" id="v-kids">1</span><button data-step="kids" data-d="1">+</button></span></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="legend">Food in the group</label>
+      <div class="two">
+        <div class="step2"><span class="lab">Veg</span><span class="stepctl"><button data-step="veg" data-d="-1">&minus;</button><span class="val" id="v-veg">1</span><button data-step="veg" data-d="1">+</button></span></div>
+        <div class="step2"><span class="lab">Non-veg</span><span class="stepctl"><button data-step="nonveg" data-d="-1">&minus;</button><span class="val" id="v-nonveg">1</span><button data-step="nonveg" data-d="1">+</button></span></div>
+      </div>
+    </div>
+
+    <div class="field slider">
+      <div class="legend"><span>How far will you roam</span><span class="now" id="dist-now">Within 60 mi</span></div>
+      <input type="range" id="dist" min="10" max="500" value="60" step="10">
+      <div class="ends"><span>In Denver</span><span>Day trips &#9654;</span></div>
+    </div>
+
+    <div class="field slider">
+      <div class="legend"><span>Travel style</span><span class="now" id="style-now">Camera always out</span></div>
+      <input type="range" id="style" min="0" max="100" value="35" step="5">
+      <div class="ends"><span>&#9664; Here for the hits</span><span>Off the map &#9654;</span></div>
+    </div>
+
+    <div class="field slider">
+      <div class="legend"><span>Daily pace</span><span class="now" id="pace-now">Steady</span></div>
+      <input type="range" id="pace" min="0" max="100" value="45" step="5">
+      <div class="ends"><span>&#9664; Relaxed</span><span>Packed &#9654;</span></div>
+    </div>
+
+    <div class="field">
+      <label class="legend">Interests <span style="font-weight:500;text-transform:none;letter-spacing:0">(tap any; none = everything)</span></label>
+      <div class="chips" id="interests">
+        <button class="chip" data-int="nature" aria-pressed="false">Nature</button>
+        <button class="chip" data-int="culture" aria-pressed="false">Culture</button>
+        <button class="chip" data-int="food" aria-pressed="false">Food</button>
+        <button class="chip" data-int="history" aria-pressed="false">History</button>
+        <button class="chip" data-int="architecture" aria-pressed="false">Architecture</button>
+        <button class="chip" data-int="markets" aria-pressed="false">Markets</button>
+        <button class="chip" data-int="nightlife" aria-pressed="false">Nightlife</button>
+        <button class="chip" data-int="sports" aria-pressed="false">Sports</button>
+        <button class="chip" data-int="adventure" aria-pressed="false">Adventure</button>
+        <button class="chip" data-int="relax" aria-pressed="false">Relax</button>
+        <button class="chip" data-int="art" aria-pressed="false">Art/Museums</button>
+        <button class="chip" data-int="wildlife" aria-pressed="false">Wildlife</button>
+        <button class="chip" data-int="water" aria-pressed="false">Water</button>
+        <button class="chip" data-int="scenic" aria-pressed="false">Scenic</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="legend">Budget</label>
+      <div class="seg" id="budget">
+        <button data-bud="1" aria-pressed="false">$</button>
+        <button data-bud="2" aria-pressed="true">$$</button>
+        <button data-bud="3" aria-pressed="false">$$$</button>
+      </div>
+    </div>
+
+    <div class="build">
+      <button class="btn-primary" id="build">&#10022; Build my plan</button>
+      <div class="mini" id="poolinfo"></div>
+    </div>
+  </aside>
+
+  <main class="guide"><div class="guide-inner" id="guide-inner"></div></main>
+</div>
+
+<div class="toast" id="toast"><span>&#10022;</span><div id="toast-msg"></div></div>
+
+<script id="wf-pool" type="application/json">{
+ "city": "Denver",
+ "state": "CO",
+ "center": {
+  "lat": 39.7392,
+  "lng": -104.9903
+ },
+ "source": "Google Places (names + coordinates); attributes tagged editorially; verify hours/prices before booking",
+ "count": 49,
+ "items": [
+  {
+   "id": "d01",
+   "name": "Denver Art Museum",
+   "type": "museum",
+   "area": "Golden Triangle",
+   "lat": 39.73719,
+   "lng": -104.98935,
+   "distMi": 0.1,
+   "local": 25,
+   "kid": 1,
+   "interests": [
+    "art",
+    "culture",
+    "architecture"
+   ],
+   "durMin": 150,
+   "cost": 2,
+   "note": "Denver's flagship art museum, bold architecture."
+  },
+  {
+   "id": "d02",
+   "name": "Clyfford Still Museum",
+   "type": "museum",
+   "area": "Golden Triangle",
+   "lat": 39.73632,
+   "lng": -104.98979,
+   "distMi": 0.2,
+   "local": 55,
+   "kid": 0,
+   "interests": [
+    "art",
+    "culture"
+   ],
+   "durMin": 75,
+   "cost": 1,
+   "note": "Quiet single-artist abstract expressionist museum."
+  },
+  {
+   "id": "d03",
+   "name": "Molly Brown House Museum",
+   "type": "museum",
+   "area": "Capitol Hill",
+   "lat": 39.73749,
+   "lng": -104.98073,
+   "distMi": 0.5,
+   "local": 40,
+   "kid": 1,
+   "interests": [
+    "history",
+    "culture"
+   ],
+   "durMin": 75,
+   "cost": 1,
+   "note": "Victorian home of the 'Unsinkable' Molly Brown."
+  },
+  {
+   "id": "d04",
+   "name": "Denver Museum of Nature & Science",
+   "type": "museum",
+   "area": "City Park",
+   "lat": 39.74753,
+   "lng": -104.94281,
+   "distMi": 2.6,
+   "local": 25,
+   "kid": 2,
+   "interests": [
+    "culture",
+    "wildlife",
+    "nature"
+   ],
+   "durMin": 180,
+   "cost": 2,
+   "note": "Dinosaurs, gems, planetarium; great for kids."
+  },
+  {
+   "id": "d05",
+   "name": "Museum of Contemporary Art Denver",
+   "type": "museum",
+   "area": "LoDo",
+   "lat": 39.7523,
+   "lng": -105.00421,
+   "distMi": 1.2,
+   "local": 60,
+   "kid": 0,
+   "interests": [
+    "art",
+    "culture"
+   ],
+   "durMin": 75,
+   "cost": 1,
+   "note": "Rotating contemporary shows, rooftop cafe."
+  },
+  {
+   "id": "d06",
+   "name": "Denver Zoo",
+   "type": "activity",
+   "area": "City Park",
+   "lat": 39.7496,
+   "lng": -104.95085,
+   "distMi": 2.2,
+   "local": 25,
+   "kid": 2,
+   "interests": [
+    "wildlife",
+    "nature"
+   ],
+   "durMin": 180,
+   "cost": 2,
+   "note": "Large zoo in City Park, free parking."
+  },
+  {
+   "id": "d07",
+   "name": "Meow Wolf Denver's Convergence Station",
+   "type": "activity",
+   "area": "Sun Valley",
+   "lat": 39.74081,
+   "lng": -105.01565,
+   "distMi": 1.4,
+   "local": 35,
+   "kid": 2,
+   "interests": [
+    "art",
+    "adventure",
+    "culture"
+   ],
+   "durMin": 180,
+   "cost": 3,
+   "note": "Immersive surreal art playground; plan 3 hrs."
+  },
+  {
+   "id": "d08",
+   "name": "Big Blue Bear",
+   "type": "landmark",
+   "area": "Downtown",
+   "lat": 39.74362,
+   "lng": -104.99529,
+   "distMi": 0.4,
+   "local": 20,
+   "kid": 2,
+   "interests": [
+    "art"
+   ],
+   "durMin": 15,
+   "cost": 0,
+   "note": "40ft bear peering into the convention center."
+  },
+  {
+   "id": "d09",
+   "name": "Denver Union Station",
+   "type": "landmark",
+   "area": "LoDo",
+   "lat": 39.75315,
+   "lng": -105.00015,
+   "distMi": 1.1,
+   "local": 25,
+   "kid": 1,
+   "interests": [
+    "architecture",
+    "history",
+    "food"
+   ],
+   "durMin": 60,
+   "cost": 1,
+   "note": "Restored grand hall with bars and eateries.",
+   "veg": 1
+  },
+  {
+   "id": "d10",
+   "name": "Larimer Street & 16th Street Mall",
+   "type": "landmark",
+   "area": "Downtown",
+   "lat": 39.74923,
+   "lng": -104.99744,
+   "distMi": 0.8,
+   "local": 30,
+   "kid": 1,
+   "interests": [
+    "markets",
+    "food"
+   ],
+   "durMin": 90,
+   "cost": 1,
+   "note": "Historic block and downtown pedestrian mall."
+  },
+  {
+   "id": "d11",
+   "name": "Denver Botanic Gardens",
+   "type": "park",
+   "area": "Cheesman Park",
+   "lat": 39.7321,
+   "lng": -104.96128,
+   "distMi": 1.6,
+   "local": 30,
+   "kid": 2,
+   "interests": [
+    "nature",
+    "relax",
+    "water"
+   ],
+   "durMin": 120,
+   "cost": 2,
+   "note": "24 acres of themed gardens."
+  },
+  {
+   "id": "d12",
+   "name": "Confluence Park",
+   "type": "park",
+   "area": "LoDo",
+   "lat": 39.75465,
+   "lng": -105.00735,
+   "distMi": 1.4,
+   "local": 45,
+   "kid": 2,
+   "interests": [
+    "nature",
+    "water",
+    "relax"
+   ],
+   "durMin": 60,
+   "cost": 0,
+   "note": "Where Cherry Creek meets the Platte; summer tubing.",
+   "seasonNote": "Tubing in summer"
+  },
+  {
+   "id": "d13",
+   "name": "Washington Park",
+   "type": "park",
+   "area": "Wash Park",
+   "lat": 39.7005,
+   "lng": -104.97,
+   "distMi": 2.9,
+   "local": 55,
+   "kid": 2,
+   "interests": [
+    "nature",
+    "relax",
+    "water"
+   ],
+   "durMin": 75,
+   "cost": 0,
+   "note": "Big local park with lakes and flower gardens."
+  },
+  {
+   "id": "d14",
+   "name": "RiNo Art Park",
+   "type": "park",
+   "area": "RiNo",
+   "lat": 39.77065,
+   "lng": -104.98115,
+   "distMi": 2.2,
+   "local": 70,
+   "kid": 1,
+   "interests": [
+    "art",
+    "nature"
+   ],
+   "durMin": 45,
+   "cost": 0,
+   "note": "Arts-district green space and murals."
+  },
+  {
+   "id": "d15",
+   "name": "City O' City",
+   "type": "food",
+   "area": "Capitol Hill",
+   "lat": 39.73669,
+   "lng": -104.98464,
+   "distMi": 0.3,
+   "local": 60,
+   "kid": 1,
+   "interests": [
+    "food"
+   ],
+   "durMin": 75,
+   "cost": 2,
+   "note": "Beloved all-day vegetarian and vegan spot.",
+   "veg": 2
+  },
+  {
+   "id": "d16",
+   "name": "Watercourse Foods",
+   "type": "food",
+   "area": "Uptown",
+   "lat": 39.74356,
+   "lng": -104.97668,
+   "distMi": 0.8,
+   "local": 55,
+   "kid": 1,
+   "interests": [
+    "food"
+   ],
+   "durMin": 75,
+   "cost": 2,
+   "note": "Longtime vegan comfort-food institution.",
+   "veg": 2
+  },
+  {
+   "id": "d17",
+   "name": "GAIA MASALA & BURGER",
+   "type": "food",
+   "area": "Downtown",
+   "lat": 39.72613,
+   "lng": -104.98396,
+   "distMi": 1.0,
+   "local": 65,
+   "kid": 1,
+   "interests": [
+    "food"
+   ],
+   "durMin": 60,
+   "cost": 2,
+   "note": "Indian plus burgers; strong veg menu.",
+   "veg": 2
+  },
+  {
+   "id": "d18",
+   "name": "Sputnik",
+   "type": "food",
+   "area": "Baker",
+   "lat": 39.7164,
+   "lng": -104.98775,
+   "distMi": 1.6,
+   "local": 70,
+   "kid": 1,
+   "interests": [
+    "food",
+    "nightlife"
+   ],
+   "durMin": 75,
+   "cost": 2,
+   "note": "Quirky diner with big veg options.",
+   "veg": 2
+  },
+  {
+   "id": "d19",
+   "name": "Somebody People",
+   "type": "food",
+   "area": "Baker",
+   "lat": 39.69533,
+   "lng": -104.98767,
+   "distMi": 3.0,
+   "local": 75,
+   "kid": 0,
+   "interests": [
+    "food"
+   ],
+   "durMin": 90,
+   "cost": 3,
+   "note": "Plant-based small plates and natural wine.",
+   "veg": 2
+  },
+  {
+   "id": "d20",
+   "name": "The Denver Central Market",
+   "type": "food",
+   "area": "RiNo",
+   "lat": 39.75936,
+   "lng": -104.98461,
+   "distMi": 1.4,
+   "local": 55,
+   "kid": 1,
+   "interests": [
+    "food",
+    "markets"
+   ],
+   "durMin": 75,
+   "cost": 2,
+   "note": "Artisan food hall in RiNo.",
+   "veg": 1
+  },
+  {
+   "id": "d21",
+   "name": "Avanti Food & Beverage",
+   "type": "food",
+   "area": "LoHi",
+   "lat": 39.76223,
+   "lng": -105.00625,
+   "distMi": 1.8,
+   "local": 55,
+   "kid": 1,
+   "interests": [
+    "food",
+    "markets",
+    "nightlife"
+   ],
+   "durMin": 75,
+   "cost": 2,
+   "note": "Multi-stall food hall with a skyline rooftop.",
+   "veg": 1
+  },
+  {
+   "id": "d22",
+   "name": "Spectra Art Space",
+   "type": "activity",
+   "area": "Overland",
+   "lat": 39.68323,
+   "lng": -104.98728,
+   "distMi": 3.9,
+   "local": 80,
+   "kid": 1,
+   "interests": [
+    "art"
+   ],
+   "durMin": 45,
+   "cost": 1,
+   "note": "Immersive local art and neon rooms."
+  },
+  {
+   "id": "d23",
+   "name": "Coors Field",
+   "type": "stadium",
+   "area": "LoDo",
+   "lat": 39.75611,
+   "lng": -104.99417,
+   "distMi": 1.2,
+   "local": 20,
+   "kid": 2,
+   "interests": [
+    "sports"
+   ],
+   "durMin": 180,
+   "cost": 2,
+   "note": "Colorado Rockies (MLB) ballpark, classic feel."
+  },
+  {
+   "id": "d24",
+   "name": "Ball Arena",
+   "type": "stadium",
+   "area": "Downtown",
+   "lat": 39.74865,
+   "lng": -105.0076,
+   "distMi": 1.1,
+   "local": 20,
+   "kid": 2,
+   "interests": [
+    "sports"
+   ],
+   "durMin": 180,
+   "cost": 3,
+   "note": "Nuggets (NBA) and Avalanche (NHL)."
+  },
+  {
+   "id": "d25",
+   "name": "Empower Field at Mile High",
+   "type": "stadium",
+   "area": "Sun Valley",
+   "lat": 39.7439,
+   "lng": -105.02014,
+   "distMi": 1.6,
+   "local": 20,
+   "kid": 2,
+   "interests": [
+    "sports"
+   ],
+   "durMin": 180,
+   "cost": 3,
+   "note": "Denver Broncos (NFL)."
+  },
+  {
+   "id": "d26",
+   "name": "Dick\u2019s Sporting Goods Park",
+   "type": "stadium",
+   "area": "Commerce City",
+   "lat": 39.80556,
+   "lng": -104.89161,
+   "distMi": 7.0,
+   "local": 30,
+   "kid": 2,
+   "interests": [
+    "sports"
+   ],
+   "durMin": 150,
+   "cost": 2,
+   "note": "Colorado Rapids (MLS) soccer."
+  },
+  {
+   "id": "d27",
+   "name": "Red Rocks Park and Amphitheatre",
+   "type": "park",
+   "area": "Morrison",
+   "lat": 39.66554,
+   "lng": -105.20521,
+   "distMi": 12.5,
+   "local": 25,
+   "kid": 2,
+   "interests": [
+    "nature",
+    "scenic",
+    "sports",
+    "adventure"
+   ],
+   "durMin": 120,
+   "cost": 0,
+   "note": "Iconic red-rock amphitheatre and hiking; free off-show."
+  },
+  {
+   "id": "d28",
+   "name": "Coors Brewery Tour",
+   "type": "activity",
+   "area": "Golden",
+   "lat": 39.75558,
+   "lng": -105.21692,
+   "distMi": 12.1,
+   "local": 40,
+   "kid": 0,
+   "interests": [
+    "food",
+    "history"
+   ],
+   "durMin": 90,
+   "cost": 1,
+   "note": "Tour of the giant Golden brewery."
+  },
+  {
+   "id": "d29",
+   "name": "Downtown Golden",
+   "type": "landmark",
+   "area": "Golden",
+   "lat": 39.75542,
+   "lng": -105.2216,
+   "distMi": 12.3,
+   "local": 55,
+   "kid": 2,
+   "interests": [
+    "relax",
+    "markets",
+    "water",
+    "history"
+   ],
+   "durMin": 120,
+   "cost": 0,
+   "note": "Charming creek-side western town."
+  },
+  {
+   "id": "d30",
+   "name": "Chautauqua Park",
+   "type": "park",
+   "area": "Boulder",
+   "lat": 39.9992,
+   "lng": -105.2815,
+   "distMi": 23.7,
+   "local": 40,
+   "kid": 2,
+   "interests": [
+    "nature",
+    "adventure",
+    "relax"
+   ],
+   "durMin": 150,
+   "cost": 0,
+   "note": "Flatirons trailhead and meadow in Boulder."
+  },
+  {
+   "id": "d31",
+   "name": "Pearl Street Mall",
+   "type": "landmark",
+   "area": "Boulder",
+   "lat": 40.01835,
+   "lng": -105.27866,
+   "distMi": 24.6,
+   "local": 40,
+   "kid": 2,
+   "interests": [
+    "markets",
+    "food",
+    "relax"
+   ],
+   "durMin": 120,
+   "cost": 1,
+   "note": "Boulder's pedestrian shopping street.",
+   "veg": 1
+  },
+  {
+   "id": "d32",
+   "name": "Indian Hot Springs",
+   "type": "activity",
+   "area": "Idaho Springs",
+   "lat": 39.73917,
+   "lng": -105.51275,
+   "distMi": 27.8,
+   "local": 55,
+   "kid": 1,
+   "interests": [
+    "relax",
+    "water"
+   ],
+   "durMin": 120,
+   "cost": 2,
+   "note": "Historic geothermal soaking pools."
+  },
+  {
+   "id": "d33",
+   "name": "Argo Gold Mill and Tunnel",
+   "type": "activity",
+   "area": "Idaho Springs",
+   "lat": 39.74273,
+   "lng": -105.50673,
+   "distMi": 27.4,
+   "local": 50,
+   "kid": 2,
+   "interests": [
+    "history",
+    "adventure"
+   ],
+   "durMin": 120,
+   "cost": 2,
+   "note": "Gold mill and mine tour with panning."
+  },
+  {
+   "id": "d34",
+   "name": "AVA Cliffside Zipline",
+   "type": "activity",
+   "area": "Idaho Springs",
+   "lat": 39.73774,
+   "lng": -105.23556,
+   "distMi": 13.0,
+   "local": 55,
+   "kid": 1,
+   "interests": [
+    "adventure"
+   ],
+   "durMin": 150,
+   "cost": 3,
+   "note": "Ziplining and rafting outfitter."
+  },
+  {
+   "id": "d35",
+   "name": "Georgetown Loop Railroad",
+   "type": "activity",
+   "area": "Georgetown",
+   "lat": 39.70103,
+   "lng": -105.70678,
+   "distMi": 38.2,
+   "local": 45,
+   "kid": 2,
+   "interests": [
+    "history",
+    "scenic",
+    "adventure"
+   ],
+   "durMin": 150,
+   "cost": 2,
+   "note": "Historic narrow-gauge mountain railroad.",
+   "openMonths": [
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12
+   ],
+   "seasonNote": "Runs May to Oct + holiday trains"
+  },
+  {
+   "id": "d36",
+   "name": "Mt. Blue Sky Scenic Byway North",
+   "type": "scenic",
+   "area": "Idaho Springs",
+   "lat": 39.73872,
+   "lng": -105.52261,
+   "distMi": 28.3,
+   "local": 50,
+   "kid": 1,
+   "interests": [
+    "nature",
+    "scenic",
+    "adventure"
+   ],
+   "durMin": 240,
+   "cost": 1,
+   "note": "Among the highest paved roads; alpine views (seasonal).",
+   "openMonths": [
+    6,
+    7,
+    8,
+    9
+   ],
+   "seasonNote": "Open ~late May to early Sep"
+  },
+  {
+   "id": "d37",
+   "name": "Estes Park",
+   "type": "scenic",
+   "area": "Estes Park",
+   "lat": 40.37721,
+   "lng": -105.52167,
+   "distMi": 52.3,
+   "local": 45,
+   "kid": 2,
+   "interests": [
+    "nature",
+    "scenic",
+    "wildlife"
+   ],
+   "durMin": 240,
+   "cost": 1,
+   "note": "Gateway town to Rocky Mountain NP."
+  },
+  {
+   "id": "d38",
+   "name": "Rocky Mountain National Park",
+   "type": "park",
+   "area": "Estes Park",
+   "lat": 40.34279,
+   "lng": -105.68364,
+   "distMi": 55.5,
+   "local": 35,
+   "kid": 2,
+   "interests": [
+    "nature",
+    "adventure",
+    "wildlife",
+    "scenic"
+   ],
+   "durMin": 360,
+   "cost": 1,
+   "note": "Alpine peaks, wildlife, Trail Ridge Road.",
+   "seasonNote": "Open all year; Trail Ridge Rd closed in winter"
+  },
+  {
+   "id": "d39",
+   "name": "Garden of the Gods",
+   "type": "park",
+   "area": "Colorado Springs",
+   "lat": 38.87179,
+   "lng": -104.88618,
+   "distMi": 60.2,
+   "local": 30,
+   "kid": 2,
+   "interests": [
+    "nature",
+    "scenic",
+    "adventure"
+   ],
+   "durMin": 180,
+   "cost": 0,
+   "note": "Dramatic free red-rock formations."
+  },
+  {
+   "id": "d40",
+   "name": "Cave of the Winds Mountain Park",
+   "type": "activity",
+   "area": "Colorado Springs",
+   "lat": 38.87259,
+   "lng": -104.92013,
+   "distMi": 60.0,
+   "local": 45,
+   "kid": 2,
+   "interests": [
+    "adventure",
+    "nature"
+   ],
+   "durMin": 150,
+   "cost": 2,
+   "note": "Cave tours and cliffside thrill rides."
+  },
+  {
+   "id": "d41",
+   "name": "Breckenridge",
+   "type": "landmark",
+   "area": "Breckenridge",
+   "lat": 39.47617,
+   "lng": -106.04494,
+   "distMi": 59.0,
+   "local": 45,
+   "kid": 2,
+   "interests": [
+    "relax",
+    "markets",
+    "adventure",
+    "scenic"
+   ],
+   "durMin": 240,
+   "cost": 1,
+   "note": "Historic ski town; Main Street and Maggie Pond.",
+   "seasonNote": "Ski Dec to Mar; hike & festivals Jun to Sep"
+  },
+  {
+   "id": "d42",
+   "name": "Vail Village",
+   "type": "landmark",
+   "area": "Vail",
+   "lat": 39.64332,
+   "lng": -106.37808,
+   "distMi": 74.1,
+   "local": 40,
+   "kid": 2,
+   "interests": [
+    "relax",
+    "markets",
+    "scenic",
+    "adventure"
+   ],
+   "durMin": 240,
+   "cost": 2,
+   "note": "Bavarian-style alpine village with a gondola.",
+   "seasonNote": "Ski Dec to Apr; summer village Jun to Sep"
+  },
+  {
+   "id": "d43",
+   "name": "Aspen",
+   "type": "landmark",
+   "area": "Aspen",
+   "lat": 39.18797,
+   "lng": -106.81957,
+   "distMi": 104.7,
+   "local": 45,
+   "kid": 1,
+   "interests": [
+    "relax",
+    "markets",
+    "culture",
+    "scenic"
+   ],
+   "durMin": 300,
+   "cost": 3,
+   "note": "Chic mountain town; galleries and dining.",
+   "seasonNote": "Ski Dec to Mar; summer culture Jun to Sep"
+  },
+  {
+   "id": "d44",
+   "name": "Maroon Bells Scenic Area",
+   "type": "scenic",
+   "area": "Aspen",
+   "lat": 39.09983,
+   "lng": -106.94221,
+   "distMi": 113.2,
+   "local": 40,
+   "kid": 2,
+   "interests": [
+    "nature",
+    "scenic",
+    "adventure",
+    "wildlife"
+   ],
+   "durMin": 240,
+   "cost": 1,
+   "note": "The most-photographed peaks in Colorado; reservation and shuttle required.",
+   "seasonNote": "Shuttle mid-May to late Oct",
+   "openMonths": [
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+   ]
+  },
+  {
+   "id": "d45",
+   "name": "Strawberry Park Hot Springs",
+   "type": "activity",
+   "area": "Steamboat Springs",
+   "lat": 40.55976,
+   "lng": -106.84943,
+   "distMi": 113.4,
+   "local": 55,
+   "kid": 1,
+   "interests": [
+    "relax",
+    "water",
+    "nature"
+   ],
+   "durMin": 180,
+   "cost": 2,
+   "note": "Rustic natural hot springs near Steamboat.",
+   "seasonNote": "Year-round; 4x4 or shuttle in winter"
+  },
+  {
+   "id": "d46",
+   "name": "Glenwood Caverns Adventure Park",
+   "type": "activity",
+   "area": "Glenwood Springs",
+   "lat": 39.55366,
+   "lng": -107.33243,
+   "distMi": 125.3,
+   "local": 45,
+   "kid": 2,
+   "interests": [
+    "adventure",
+    "nature"
+   ],
+   "durMin": 300,
+   "cost": 3,
+   "note": "Mountaintop cave tours and thrill rides.",
+   "seasonNote": "Open all year",
+   "overnight": true
+  },
+  {
+   "id": "d47",
+   "name": "Great Sand Dunes National Park",
+   "type": "park",
+   "area": "Great Sand Dunes",
+   "lat": 37.76585,
+   "lng": -105.6236,
+   "distMi": 140.6,
+   "local": 40,
+   "kid": 2,
+   "interests": [
+    "nature",
+    "scenic",
+    "adventure"
+   ],
+   "durMin": 300,
+   "cost": 1,
+   "note": "The tallest sand dunes in North America; sledding.",
+   "seasonNote": "Spring/fall best; summer sand ~140F midday",
+   "overnight": true
+  },
+  {
+   "id": "d48",
+   "name": "Box Canon Falls (Ouray)",
+   "type": "scenic",
+   "area": "Ouray",
+   "lat": 38.01819,
+   "lng": -107.67763,
+   "distMi": 187.2,
+   "local": 55,
+   "kid": 2,
+   "interests": [
+    "nature",
+    "scenic",
+    "adventure",
+    "water"
+   ],
+   "durMin": 180,
+   "cost": 1,
+   "note": "Thundering waterfall gorge in Ouray, gateway to the San Juans.",
+   "seasonNote": "Open all year",
+   "overnight": true
+  },
+  {
+   "id": "d49",
+   "name": "Trail Ridge Road Summit",
+   "type": "scenic",
+   "area": "Estes Park",
+   "lat": 40.42837,
+   "lng": -105.75965,
+   "distMi": 62.6,
+   "local": 35,
+   "kid": 1,
+   "interests": [
+    "nature",
+    "scenic",
+    "adventure"
+   ],
+   "durMin": 120,
+   "cost": 1,
+   "note": "Highest continuous paved road in the US; alpine tundra.",
+   "seasonNote": "Open ~late May to mid-Oct only",
+   "openMonths": [
+    6,
+    7,
+    8,
+    9
+   ]
+  }
+ ]
+}</script>
+<script>
+"use strict";
+const $=s=>document.querySelector(s);
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;};
+const esc=s=>String(s==null?"":s);
+let POOL={items:[],center:{lat:39.7392,lng:-104.9903},city:"Denver"};
+try{POOL=JSON.parse(document.getElementById("wf-pool").textContent)||POOL;}catch(e){}
+
+/* city from hash (one URL per city). Only Denver has a pool today. */
+const cityToken=(location.hash||"").replace(/[^a-z0-9]/gi,"").toLowerCase()||"denver";
+$("#cityName").textContent=POOL.city||"Denver";
+
+const state={adults:2,kids:1,veg:1,nonveg:1};
+function sync(){for(const k in state){const v=$("#v-"+k);if(v)v.textContent=state[k];}}
+document.querySelectorAll("[data-step]").forEach(b=>b.onclick=()=>{const k=b.dataset.step,d=+b.dataset.d;state[k]=Math.max(k==="adults"?1:0,state[k]+d);sync();build();});
+function wire(sel,single){const h=$(sel);h.querySelectorAll("button").forEach(b=>b.onclick=()=>{if(single){h.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed","false"));b.setAttribute("aria-pressed","true");}else b.setAttribute("aria-pressed",b.getAttribute("aria-pressed")==="true"?"false":"true");build();});}
+wire("#interests",false);wire("#budget",true);
+const pressed=sel=>Array.from(document.querySelectorAll(sel+' [aria-pressed="true"]'));
+
+const styleWord=v=>v<20?"Full tourist, proudly":v<40?"Camera always out":v<60?"A healthy mix":v<80?"Local-ish, trying hard":"Basically a local now";
+const paceWord=v=>v<25?"Relaxed":v<50?"Steady":v<75?"Full":"Packed";
+$("#style").oninput=e=>{$("#style-now").textContent=styleWord(+e.target.value);build();};
+$("#pace").oninput=e=>{$("#pace-now").textContent=paceWord(+e.target.value);build();};
+$("#dist").oninput=e=>{$("#dist-now").textContent="Within "+e.target.value+" mi";build();};
+
+function setDates(){const a=new Date();a.setDate(a.getDate()+30);const b=new Date(a);b.setDate(b.getDate()+2);
+  const f=d=>d.toISOString().slice(0,10);$("#start").value=f(a);$("#end").value=f(b);}
+$("#start").onchange=build;$("#end").onchange=build;
+
+function readCfg(){
+  const s=$("#start").value,e=$("#end").value;
+  let days=3;if(s&&e){const d=Math.round((new Date(e)-new Date(s))/864e5)+1;if(d>=1)days=Math.min(6,d);}
+  const month=s?(new Date(s+"T00:00:00").getMonth()+1):(new Date().getMonth()+1);
+  return {days,month,adults:state.adults,kids:state.kids,veg:state.veg,nonveg:state.nonveg,
+    maxDist:+$("#dist").value,style:+$("#style").value,pace:+$("#pace").value,
+    interests:new Set(pressed("#interests").map(b=>b.dataset.int)),
+    budget:+((pressed("#budget")[0]||{dataset:{bud:"2"}}).dataset.bud),start:s,end:e};
+}
+
+/* ---------- geo + time ---------- */
+function hav(a,b){const R=3958.8,r=Math.PI/180;
+  const dp=(b.lat-a.lat)*r,dl=(b.lng-a.lng)*r,p1=a.lat*r,p2=b.lat*r;
+  const x=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;return 2*R*Math.asin(Math.sqrt(x));}
+function travel(a,b){const d=hav(a,b);let min,mode;
+  if(d<0.4){min=d/3*60;mode="walk";}else{const mph=d>15?50:24;min=d/mph*60;mode="drive";}
+  min=Math.max(5,Math.round(min/5)*5);return {min,mode,label:min+" min "+mode+(d>=1?" ("+d.toFixed(d<10?1:0)+" mi)":"")};}
+function fmtTime(m){let h=Math.floor(m/60),mm=m%60;const ap=h>=12?"PM":"AM";h=h%12;if(h===0)h=12;return h+":"+String(mm).padStart(2,"0")+" "+ap;}
+
+/* ---------- assembly ---------- */
+const EMOJI={museum:"🏛",activity:"🎟",landmark:"📸",park:"🌳",food:"🍽",stadium:"🏟",scenic:"🚗"};
+
+function assemble(cfg){
+  let items=POOL.items.filter(it=>it.distMi<=cfg.maxDist && it.cost<=cfg.budget && (!it.openMonths||it.openMonths.includes(cfg.month)));
+  const food=items.filter(it=>it.type==="food");
+  let sights=items.filter(it=>it.type!=="food");
+  if(cfg.interests.size) sights=sights.filter(it=>it.interests.some(x=>cfg.interests.has(x)));
+  const totalMatch=sights.length;
+  const vegNeed=cfg.veg>0;
+  const score=it=>(100-Math.abs(it.local-cfg.style))
+     +(cfg.interests.size?it.interests.filter(x=>cfg.interests.has(x)).length*25:0)
+     +(cfg.kids>0?it.kid*12:0);
+  sights.sort((a,b)=>score(b)-score(a));
+  const spd=cfg.pace<25?2:cfg.pace<50?3:cfg.pace<75?4:5;
+
+  const near=sights.filter(s=>s.distMi<=20);
+  const far=sights.filter(s=>s.distMi>20);
+  // group far by area
+  const farAreas={};far.forEach(s=>{(farAreas[s.area]=farAreas[s.area]||[]).push(s);});
+  const farGroups=Object.values(farAreas).sort((a,b)=>score(b[0])-score(a[0]));
+
+  let D=cfg.days;
+  let dayTrips=far.length?Math.min(Math.floor(D/2),farGroups.length):0;
+  let townDays=D-dayTrips;
+  if(townDays<1&&D>=1){townDays=1;dayTrips=D-1;}
+
+  const usedFood=new Set();
+  function pickFood(center){
+    let best=null,bd=1e9;
+    food.forEach(f=>{if(usedFood.has(f.id))return;
+      if(vegNeed&&cfg.nonveg===0&&(f.veg||0)<1)return;
+      const d=hav(center,f);const pref=(vegNeed&&(f.veg||0)>=2)?-5:0;
+      if(d+pref<bd){bd=d+pref;best=f;}});
+    if(best)usedFood.add(best.id);return best;
+  }
+  function centroid(arr){const a={lat:0,lng:0};arr.forEach(s=>{a.lat+=s.lat;a.lng+=s.lng;});return {lat:a.lat/arr.length,lng:a.lng/arr.length};}
+
+  const avail=near.slice();
+  const days=[];
+  // town days via nearest-neighbor chains
+  for(let d=0;d<townDays&&avail.length;d++){
+    const chain=[avail.shift()];
+    while(chain.length<spd&&avail.length){
+      let bi=0,bd=1e9;for(let i=0;i<avail.length;i++){const dd=hav(chain[chain.length-1],avail[i]);if(dd<bd){bd=dd;bi=i;}}
+      chain.push(avail.splice(bi,1)[0]);
+    }
+    days.push({kind:"town",sights:chain});
+  }
+  // day-trip days
+  for(let d=0;d<dayTrips&&farGroups.length;d++){
+    const g=farGroups.shift().slice(0,Math.max(2,spd-1));
+    days.push({kind:"trip",sights:g});
+  }
+  if(!days.length) return {days:[],totalMatch,pulled:0};
+
+  // build timed stops per day
+  let pulled=0;
+  const built=days.map((day,di)=>{
+    const sg=day.sights.slice();pulled+=sg.length;
+    // order: nearest-neighbor from first
+    const ordered=[sg.shift()];
+    while(sg.length){let bi=0,bd=1e9;for(let i=0;i<sg.length;i++){const dd=hav(ordered[ordered.length-1],sg[i]);if(dd<bd){bd=dd;bi=i;}}ordered.push(sg.splice(bi,1)[0]);}
+    const cen=centroid(ordered);
+    const lunch=ordered.length>=2?pickFood(cen):null;
+    const dinner=day.kind==="town"?pickFood(cen):null;
+    // weave: s0,(s1),lunch,(rest),dinner
+    const stops=[];
+    ordered.forEach((s,i)=>{stops.push({...s,_stop:"sight"});if(i===Math.min(1,ordered.length-1)&&lunch)stops.push({...lunch,_stop:"meal",_meal:"Lunch"});});
+    if(dinner)stops.push({...dinner,_stop:"meal",_meal:"Dinner"});
+    // time
+    let t=(day.kind==="trip"?8.5:9)*60;
+    stops.forEach((s,i)=>{if(i>0){s._travel=travel(stops[i-1],s);t+=s._travel.min;}s._time=fmtTime(t);t+=s.durMin;});
+    const areas=[...new Set(ordered.map(s=>s.area))];
+    return {kind:day.kind,theme:day.kind==="trip"?("Day trip • "+areas[0]):areas.slice(0,2).join(" & "),stops};
+  });
+  return {days:built,totalMatch,pulled};
+}
+
+/* ---------- render ---------- */
+function mapLink(it){return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(it.name+" "+(POOL.city||"")+" "+(POOL.state||""));}
+let lastCfg=null;
+function render(plan,cfg){
+  const root=$("#guide-inner");root.innerHTML="";
+  const head=el("div","trip-head");
+  head.innerHTML='<p class="eyebrow">'+esc(styleWord(cfg.style))+'</p>'+
+    '<h2>'+esc(POOL.city||"Denver")+'<span style="color:var(--muted)">, '+esc(POOL.state||"CO")+'</span></h2>'+
+    '<p class="sub">A plan routed to keep each day tight, pulled live from the '+esc(POOL.city)+' pool and filtered to what you picked.</p>';
+  const facts=el("div","facts");
+  const addF=(k,v)=>{const f=el("div","fact");f.innerHTML='<span class="k">'+k+'</span><span class="v">'+esc(v)+'</span>';facts.appendChild(f);};
+  addF("Days",plan.days.length);addF("Roam","≤ "+cfg.maxDist+" mi");
+  addF("Party",cfg.adults+" adult"+(cfg.adults>1?"s":"")+(cfg.kids?" · "+cfg.kids+" kid"+(cfg.kids>1?"s":""):""));
+  addF("Food",cfg.veg+" veg · "+cfg.nonveg+" non-veg");
+  addF("When",["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][cfg.month-1]);
+  head.appendChild(facts);root.appendChild(head);
+
+  if(!plan.days.length){root.appendChild(Object.assign(el("div","empty"),{textContent:"Nothing matched those filters. Widen the distance or clear some interests."}));return;}
+
+  plan.days.forEach((day,di)=>{
+    const d=el("div","day");
+    const dh=el("div","day-head");
+    dh.innerHTML='<span class="day-num">DAY '+String(di+1).padStart(2,"0")+'</span><h3>'+esc(day.theme||"")+'</h3>'+
+      '<span class="meta">'+day.stops.filter(s=>s._stop==="sight").length+' stops</span>';
+    d.appendChild(dh);
+    day.stops.forEach((s,si)=>{
+      if(s._travel){d.appendChild(Object.assign(el("div","travel"),{textContent:s._travel.label}));}
+      const stop=el("div","stop");
+      const emoji=s._stop==="meal"?"🍽":(EMOJI[s.type]||"•");
+      let tags='<span class="tag area">'+esc(s.area)+'</span>';
+      if(s._stop==="meal"&&cfg.veg>0)tags+='<span class="tag veg">'+((s.veg||0)>=2?"veg-forward":"has veg")+'</span>';
+      if(cfg.kids>0&&s.kid>=2&&s._stop==="sight")tags+='<span class="tag kid">great for kids</span>';
+      if(s.seasonNote)tags+='<span class="tag">'+esc(s.seasonNote)+'</span>';
+      if(s.overnight)tags+='<span class="tag">Better as an overnight</span>';
+      const title=(s._meal?s._meal+" · ":"")+s.name;
+      stop.innerHTML='<div class="time">'+esc(s._time)+'</div><div class="body">'+
+        '<div class="title-row"><span class="emoji">'+emoji+'</span><h4>'+esc(title)+'</h4>'+
+        '<span class="dur">~'+Math.round(s.durMin/15)*15/60+' hr</span></div>'+
+        '<p>'+esc(s.note)+'</p>'+
+        '<div class="links"><a class="lnk" target="_blank" rel="noopener" href="'+mapLink(s)+'">Map ↗</a>'+
+        (s._stop==="sight"?'<button class="swap" data-day="'+di+'" data-idx="'+si+'">↻ Swap</button>':"")+'</div></div>';
+      d.appendChild(stop);
+    });
+    root.appendChild(d);
+  });
+  root.querySelectorAll(".swap").forEach(b=>b.onclick=()=>doSwap(+b.dataset.day,+b.dataset.idx));
+
+  const foot=el("div","foot");
+  foot.textContent="Assembled from "+plan.pulled+" of "+plan.totalMatch+" matching "+POOL.city+"-area spots. Names and locations are real (Google Places); times, durations and costs are estimates. Verify hours and prices before you go.";
+  root.appendChild(foot);
+  const g=root.parentElement;if(g)g.scrollTop=0;
+}
+
+/* swap: replace a sight with the nearest unused matching one, re-time that day */
+let LAST=null;
+function doSwap(di,si){
+  if(!LAST)return;const cfg=lastCfg;
+  const plan=LAST;const day=plan.days[di];const stop=day.stops[si];
+  const inUse=new Set();plan.days.forEach(dd=>dd.stops.forEach(s=>inUse.add(s.id)));
+  let items=POOL.items.filter(it=>it.type!=="food"&&it.distMi<=cfg.maxDist&&it.cost<=cfg.budget&&!inUse.has(it.id)&&(!it.openMonths||it.openMonths.includes(cfg.month)));
+  if(cfg.interests.size)items=items.filter(it=>it.interests.some(x=>cfg.interests.has(x)));
+  if(!items.length){toast("No other spot nearby to swap in");return;}
+  items.sort((a,b)=>hav(stop,a)-hav(stop,b));
+  const repl={...items[0],_stop:"sight"};
+  day.stops[si]=repl;
+  // re-time whole day
+  let t=(day.kind==="trip"?8.5:9)*60;
+  day.stops.forEach((s,i)=>{delete s._travel;if(i>0){s._travel=travel(day.stops[i-1],s);t+=s._travel.min;}s._time=fmtTime(t);t+=s.durMin;});
+  render(plan,cfg);toast("Swapped in "+repl.name);
+}
+
+/* ---------- notifications ---------- */
+let notifOK=false;
+function askNotif(){try{if(typeof Notification==="undefined")return;
+  if(Notification.permission==="granted"){notifOK=true;}
+  else if(Notification.permission==="default")Notification.requestPermission().then(p=>{notifOK=p==="granted";}).catch(()=>{});
+}catch(e){}}
+function notifyReady(city){try{if(notifOK&&Notification.permission==="granted")new Notification("Your "+city+" plan is ready ✨",{body:"Open Roads Less Traveled to see it."});}catch(e){}}
+let tT=null;function toast(m){const t=$("#toast");$("#toast-msg").textContent=m;t.classList.add("show");clearTimeout(tT);tT=setTimeout(()=>t.classList.remove("show"),3200);}
+
+/* ---------- build ---------- */
+let firstBuild=true;
+function build(notify){
+  const cfg=readCfg();lastCfg=cfg;
+  const plan=assemble(cfg);LAST=plan;
+  render(plan,cfg);
+  $("#poolinfo").textContent=POOL.items.length+" spots in the "+POOL.city+" pool";
+  if(notify){notifyReady(POOL.city);toast("Your "+POOL.city+" plan is ready");}
+}
+$("#build").onclick=()=>{askNotif();build(true);};
+
+/* init */
+setDates();sync();
+$("#style-now").textContent=styleWord(+$("#style").value);
+$("#pace-now").textContent=paceWord(+$("#pace").value);
+$("#dist-now").textContent="Within "+$("#dist").value+" mi";
+build(false);
+</script>

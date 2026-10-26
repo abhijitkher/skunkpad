@@ -10,6 +10,7 @@ I'm a product manager who builds. These are the builds.
 |---|---|---|
 | [job-agent](./job-agent) | Pulls open roles from company hiring systems daily, scores each against my resume, and publishes a ranked feed. | [skunkpad-job-agent.vercel.app](https://skunkpad-job-agent.vercel.app/) (private, Vercel login) |
 | [meat-oracle](./meat-oracle) | Works out how much meat to buy for a cookout from who's coming and how hungry they are, then suggests what to cook. | [meat-oracle.vercel.app](https://meat-oracle.vercel.app/) |
+| [roads-less-traveled](./roads-less-traveled) | Pick a city, set filters and how far you'll roam, and it instantly routes a day-by-day trip plan from a cached pool of real places. | [skunkpad-roads-less-traveled.vercel.app](https://skunkpad-roads-less-traveled.vercel.app/) |
 
 ## Why this exists
 
