@@ -158,8 +158,8 @@
     </div>
 
     <div class="field slider">
-      <div class="legend"><span>How far will you roam</span><span class="now" id="dist-now">Within 60 mi</span></div>
-      <input type="range" id="dist" min="10" max="500" value="60" step="10">
+      <div class="legend"><span>How far will you roam</span><span class="now" id="dist-now">Within 120 mi</span></div>
+      <input type="range" id="dist" min="10" max="500" value="120" step="10">
       <div class="ends"><span>In Denver</span><span>Day trips &#9654;</span></div>
     </div>
 
@@ -181,6 +181,7 @@
         <button class="chip" data-int="hotsprings" aria-pressed="false">Hot springs</button>
         <button class="chip" data-int="hiking" aria-pressed="false">Hiking</button>
         <button class="chip" data-int="scenicdrive" aria-pressed="false">Scenic drives</button>
+        <button class="chip" data-int="trains" aria-pressed="false">Trains</button>
         <button class="chip" data-int="skitown" aria-pressed="false">Ski towns</button>
         <button class="chip" data-int="wildlife" aria-pressed="false">Wildlife</button>
         <button class="chip" data-int="adventure" aria-pressed="false">Adventure</button>
@@ -226,7 +227,7 @@
   "lng": -104.9903
  },
  "source": "Google Places (names + coordinates); attributes tagged editorially; verify hours/prices before booking",
- "count": 56,
+ "count": 61,
  "items": [
   {
    "id": "d01",
@@ -855,6 +856,7 @@
    "local": 45,
    "kid": 2,
    "interests": [
+    "trains",
     "history",
     "scenicdrive",
     "family"
@@ -1302,6 +1304,125 @@
    "cost": 2,
    "note": "Rustic creekside soaking near Buena Vista.",
    "seasonNote": "Open all year"
+  },
+  {
+   "id": "d57",
+   "name": "Royal Gorge Route Railroad",
+   "type": "activity",
+   "area": "Canon City",
+   "lat": 38.43798,
+   "lng": -105.24056,
+   "distMi": 90.9,
+   "local": 35,
+   "kid": 2,
+   "interests": [
+    "trains",
+    "scenicdrive",
+    "family"
+   ],
+   "durMin": 180,
+   "cost": 2,
+   "note": "Gorge-floor rail ride beneath the Royal Gorge Bridge along the Arkansas River.",
+   "seasonNote": "Runs year-round"
+  },
+  {
+   "id": "d58",
+   "name": "Pikes Peak Cog Railway",
+   "type": "activity",
+   "area": "Manitou Springs",
+   "lat": 38.85607,
+   "lng": -104.93126,
+   "distMi": 61.1,
+   "local": 30,
+   "kid": 2,
+   "interests": [
+    "trains",
+    "scenicdrive",
+    "family"
+   ],
+   "durMin": 200,
+   "cost": 3,
+   "note": "Cog railway to the 14,115 ft summit of Pikes Peak.",
+   "seasonNote": "Year-round, weather permitting"
+  },
+  {
+   "id": "d59",
+   "name": "Leadville Railroad",
+   "type": "activity",
+   "area": "Leadville",
+   "lat": 39.2509,
+   "lng": -106.28747,
+   "distMi": 77.0,
+   "local": 45,
+   "kid": 2,
+   "interests": [
+    "trains",
+    "scenicdrive",
+    "history"
+   ],
+   "durMin": 180,
+   "cost": 2,
+   "note": "High-country scenic train from the historic mining town of Leadville.",
+   "seasonNote": "Runs May to Oct + holiday trains",
+   "openMonths": [
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12
+   ]
+  },
+  {
+   "id": "d60",
+   "name": "Durango & Silverton Narrow Gauge Railroad",
+   "type": "activity",
+   "area": "Durango",
+   "lat": 37.53983,
+   "lng": -107.77752,
+   "distMi": 213.8,
+   "local": 40,
+   "kid": 2,
+   "interests": [
+    "trains",
+    "scenicdrive",
+    "history"
+   ],
+   "durMin": 420,
+   "cost": 3,
+   "note": "Historic steam narrow-gauge through the San Juan Mountains.",
+   "seasonNote": "Year-round; summer steam, winter Cascade Canyon",
+   "overnight": true
+  },
+  {
+   "id": "d61",
+   "name": "Cumbres & Toltec Scenic Railroad",
+   "type": "activity",
+   "area": "Antonito",
+   "lat": 37.07007,
+   "lng": -106.01208,
+   "distMi": 192.5,
+   "local": 50,
+   "kid": 2,
+   "interests": [
+    "trains",
+    "scenicdrive",
+    "history"
+   ],
+   "durMin": 360,
+   "cost": 3,
+   "note": "Steam narrow-gauge over 10,015 ft Cumbres Pass; longest and highest in the US.",
+   "seasonNote": "Runs late May to Oct",
+   "openMonths": [
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+   ],
+   "overnight": true
   }
  ]
 }</script>
@@ -1515,7 +1636,17 @@ let tT=null;function toast(m){const t=$("#toast");$("#toast-msg").textContent=m;
 /* ---------- build ---------- */
 let firstBuild=true;
 function build(notify){
-  const cfg=readCfg();lastCfg=cfg;
+  const cfg=readCfg();
+  if(cfg.interests.size){
+    const match=POOL.items.filter(it=>it.type!=="food"&&it.cost<=cfg.budget&&(!it.openMonths||it.openMonths.includes(cfg.month))&&it.interests.some(x=>cfg.interests.has(x)));
+    if(match.length && !match.some(it=>it.distMi<=cfg.maxDist)){
+      const nearest=Math.min(...match.map(it=>it.distMi));
+      const newMax=Math.min(500,Math.max(10,Math.ceil(nearest/10)*10));
+      cfg.maxDist=newMax;$("#dist").value=newMax;$("#dist-now").textContent="Within "+newMax+" mi";
+      toast("Nearest match is "+Math.round(nearest)+" mi out, widened the range");
+    }
+  }
+  lastCfg=cfg;
   const plan=assemble(cfg);LAST=plan;
   render(plan,cfg);
   $("#poolinfo").textContent=POOL.items.length+" spots in the "+POOL.city+" pool";
