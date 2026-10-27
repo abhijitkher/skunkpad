@@ -72,6 +72,7 @@
   .btn-primary{font:inherit;font-weight:700;font-size:15px;color:#fff;background:var(--gold);border:0;border-radius:10px;padding:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 2px 10px var(--shadow)}
   .btn-primary:hover{filter:brightness(1.06)}
   .mini{font-size:11px;color:var(--muted);text-align:center}
+  #share{font:inherit;font-size:12px;color:var(--muted);background:none;border:0;cursor:pointer;text-decoration:underline;text-underline-offset:2px;align-self:center}
 
   .guide{overflow-y:auto;overflow-x:hidden;position:relative;padding:0 clamp(20px,3.2vw,46px);padding-right:max(clamp(20px,3.2vw,46px),env(safe-area-inset-right,0px))}
   .guide-inner{max-width:760px;margin:0 auto;padding-block:clamp(22px,3vw,38px) 70px}
@@ -222,6 +223,7 @@
 
     <div class="build">
       <button class="btn-primary" id="build">&#10022; Build my plan</button>
+      <button id="share">Copy shareable link</button>
       <div class="mini" id="poolinfo"></div>
     </div>
   </aside>
@@ -1659,16 +1661,56 @@ function build(notify){
   const plan=assemble(cfg);LAST=plan;
   render(plan,cfg);
   $("#poolinfo").textContent=POOL.items.length+" spots in the "+POOL.city+" pool";
+  updateUrl();
   if(notify){notifyReady(POOL.city);toast("Your "+POOL.city+" plan is ready");}
 }
 $("#build").onclick=()=>{askNotif();build(true);};
 
-/* ---------- city routing: a query builds the pool, then we just filter it ---------- */
-function citySlug(){
-  const p=location.pathname.replace(/^\/+|\/+$/g,"");
-  if(p&&p!=="index.html")return p.toLowerCase();
-  const h=(location.hash||"").replace(/[^a-z0-9-]/gi,"");
-  return h?h.toLowerCase():"denver";
+/* ---------- city routing + shareable filter URLs (same URL = same plan) ---------- */
+const INT_LIST=Array.from(document.querySelectorAll('#interests button')).map(b=>b.dataset.int);
+let urlReady=false;
+function b64u(b){let s=btoa(String.fromCharCode.apply(null,b));return s.replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");}
+function ub64u(s){s=s.replace(/-/g,"+").replace(/_/g,"/");const bin=atob(s),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return a;}
+function encodeState(){
+  const c=readCfg(),b=new Uint8Array(9);
+  b[0]=Math.max(1,Math.min(50,Math.round(c.maxDist/10)));
+  b[1]=Math.max(0,Math.min(100,c.style));b[2]=Math.max(0,Math.min(100,c.pace));
+  const bud=Math.max(1,Math.min(3,c.budget)),ad=Math.max(1,Math.min(7,c.adults)),kd=Math.max(0,Math.min(7,c.kids));
+  b[3]=bud|(ad<<2)|(kd<<5);
+  b[4]=Math.min(15,c.veg)|(Math.min(15,c.nonveg)<<4);
+  const nights=Math.max(0,Math.min(15,c.days-1));
+  b[5]=(c.month&15)|(nights<<4);
+  let m=0;INT_LIST.forEach((t,i)=>{if(c.interests.has(t))m|=(1<<i);});
+  b[6]=m&255;b[7]=(m>>8)&255;b[8]=(m>>16)&255;
+  return b64u(b);
+}
+function applyToken(tok){
+  let b;try{b=ub64u(tok);}catch(e){return false;}if(b.length<9)return false;
+  $("#dist").value=Math.max(10,Math.min(500,b[0]*10));
+  $("#style").value=Math.max(0,Math.min(100,b[1]));$("#pace").value=Math.max(0,Math.min(100,b[2]));
+  const bud=(b[3]&3)||2,ad=((b[3]>>2)&7)||1,kd=(b[3]>>5)&7;
+  document.querySelectorAll("#budget button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.bud==String(bud)?"true":"false"));
+  state.adults=Math.max(1,ad);state.kids=kd;state.veg=b[4]&15;state.nonveg=(b[4]>>4)&15;sync();
+  const month=(b[5]&15)||1,nights=(b[5]>>4)&15;
+  const arrive=new Date(new Date().getFullYear(),month-1,15),depart=new Date(arrive);depart.setDate(depart.getDate()+nights);
+  const f=d=>d.toISOString().slice(0,10);$("#start").value=f(arrive);$("#end").value=f(depart);
+  const mask=b[6]|(b[7]<<8)|(b[8]<<16);
+  INT_LIST.forEach((t,i)=>{const btn=document.querySelector('#interests button[data-int="'+t+'"]');if(btn)btn.setAttribute("aria-pressed",(mask>>i)&1?"true":"false");});
+  $("#style-now").textContent=styleWord(+$("#style").value);$("#pace-now").textContent=paceWord(+$("#pace").value);$("#dist-now").textContent="Within "+$("#dist").value+" mi";
+  return true;
+}
+function slugify(s){return String(s||"denver").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");}
+function updateUrl(){
+  if(!urlReady)return;
+  const slug=slugify(POOL&&POOL.city?POOL.city:"denver"),tok=encodeState();
+  try{history.replaceState({},"","/"+slug+"/"+tok);}catch(e){try{location.hash=slug+"."+tok;}catch(e2){}}
+}
+function parseUrl(){
+  let slug="denver",token=null;
+  const parts=location.pathname.replace(/^\/+|\/+$/g,"").split("/").filter(Boolean);
+  if(parts.length&&parts[0]!=="index.html"){slug=parts[0].toLowerCase();if(parts[1])token=parts[1];}
+  else if(location.hash){const h=location.hash.replace(/^#/,""),d=h.indexOf(".");if(d>0){slug=h.slice(0,d).toLowerCase();token=h.slice(d+1);}else if(h)slug=h.toLowerCase();}
+  return {slug,token};
 }
 function titleCase(s){return s.replace(/-/g," ").replace(/\b\w/g,c=>c.toUpperCase());}
 function showBuilding(slug){
@@ -1697,13 +1739,17 @@ function goCity(){
   loadCity(slug);
 }
 $("#go").onclick=goCity;
+$("#share").onclick=async()=>{try{await navigator.clipboard.writeText(location.href);toast("Link copied");}catch(e){toast("Long-press the address bar to copy the link");}};
 $("#cityq").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();goCity();}});
-window.addEventListener("popstate",()=>loadCity(citySlug()));
+window.addEventListener("popstate",()=>{const r=parseUrl();if(r.token)applyToken(r.token);loadCity(r.slug);});
 
 /* init */
 setDates();sync();
 $("#style-now").textContent=styleWord(+$("#style").value);
 $("#pace-now").textContent=paceWord(+$("#pace").value);
 $("#dist-now").textContent="Within "+$("#dist").value+" mi";
-loadCity(citySlug());
+const route=parseUrl();
+if(route.token)applyToken(route.token);
+loadCity(route.slug);
+urlReady=true;
 </script>
