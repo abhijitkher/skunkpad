@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "name": "roads-less-traveled",
+  "dependencies": {
+    "@vercel/blob": "latest"
+  }
+}

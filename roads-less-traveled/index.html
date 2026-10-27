@@ -26,6 +26,17 @@
   .brand .city{margin-top:6px;display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--muted)}
   .brand .city b{color:var(--ink);font-weight:700;font-size:13px}
   .dot{width:7px;height:7px;border-radius:50%;background:var(--good);flex:none}
+  .citysearch{display:flex;gap:6px;margin-top:10px}
+  .citysearch input{flex:1;min-width:0;font:inherit;font-size:13px;color:var(--ink);background:var(--panel-2);border:1px solid var(--line-strong);border-radius:8px;padding:7px 9px}
+  .citysearch input:focus{outline:2px solid var(--gold);border-color:var(--gold)}
+  .citysearch button{font:inherit;font-size:13px;font-weight:700;border:0;border-radius:8px;background:var(--ink);color:var(--panel);padding:7px 12px;cursor:pointer}
+  .stage{min-height:62vh;display:grid;place-items:center;text-align:center}
+  .stage-box{max-width:440px}
+  .stage h2{font-family:var(--serif);font-weight:600;font-size:24px;margin:0 0 8px}
+  .stage p{color:var(--muted);font-size:14px;margin:0}
+  .spin{width:40px;height:40px;margin:0 auto 18px;border-radius:50%;border:3px solid var(--line-strong);border-top-color:var(--gold);animation:sp 1s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  @media (prefers-reduced-motion:reduce){.spin{animation-duration:2.6s}}
 
   .field{display:flex;flex-direction:column;gap:7px}
   .field>label,.legend{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
@@ -131,6 +142,7 @@
     <div class="brand">
       <h1>Roads Less <b>Traveled</b></h1>
       <span class="city"><span class="dot"></span>Exploring <b id="cityName">Denver</b></span>
+      <div class="citysearch"><input id="cityq" placeholder="Build another city&hellip;" autocomplete="off"><button id="go">Go</button></div>
     </div>
 
     <div class="field">
@@ -1431,12 +1443,9 @@
 const $=s=>document.querySelector(s);
 const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;};
 const esc=s=>String(s==null?"":s);
-let POOL={items:[],center:{lat:39.7392,lng:-104.9903},city:"Denver"};
-try{POOL=JSON.parse(document.getElementById("wf-pool").textContent)||POOL;}catch(e){}
-
-/* city from hash (one URL per city). Only Denver has a pool today. */
-const cityToken=(location.hash||"").replace(/[^a-z0-9]/gi,"").toLowerCase()||"denver";
-$("#cityName").textContent=POOL.city||"Denver";
+let DENVER_POOL={items:[],center:{lat:39.7392,lng:-104.9903},city:"Denver",state:"CO"};
+try{DENVER_POOL=JSON.parse(document.getElementById("wf-pool").textContent)||DENVER_POOL;}catch(e){}
+let POOL=DENVER_POOL;
 
 const state={adults:2,kids:1,veg:1,nonveg:1};
 function sync(){for(const k in state){const v=$("#v-"+k);if(v)v.textContent=state[k];}}
@@ -1654,10 +1663,47 @@ function build(notify){
 }
 $("#build").onclick=()=>{askNotif();build(true);};
 
+/* ---------- city routing: a query builds the pool, then we just filter it ---------- */
+function citySlug(){
+  const p=location.pathname.replace(/^\/+|\/+$/g,"");
+  if(p&&p!=="index.html")return p.toLowerCase();
+  const h=(location.hash||"").replace(/[^a-z0-9-]/gi,"");
+  return h?h.toLowerCase():"denver";
+}
+function titleCase(s){return s.replace(/-/g," ").replace(/\b\w/g,c=>c.toUpperCase());}
+function showBuilding(slug){
+  $("#guide-inner").innerHTML='<div class="stage"><div class="stage-box">'+
+    '<div class="spin"></div><h2>Building '+esc(titleCase(slug))+'</h2>'+
+    '<p>Finding the places and tagging them. This runs once per city, then it’s cached and instant. You can leave the tab — it’ll ping you when it’s ready.</p></div></div>';
+}
+function showBuildError(msg){$("#guide-inner").innerHTML='<div class="stage"><div class="stage-box"><h2>Couldn’t build that</h2><p style="color:var(--warn);font-size:13.5px">'+esc(msg)+'</p></div></div>';}
+async function loadCity(slug){
+  slug=(slug||"denver").toLowerCase();
+  if(slug==="denver"){POOL=DENVER_POOL;$("#cityName").textContent=POOL.city;build(false);return;}
+  showBuilding(slug); askNotif();
+  try{
+    const r=await fetch("/api/pool?city="+encodeURIComponent(slug));
+    const j=await r.json().catch(()=>({error:"Bad response from the builder."}));
+    if(!r.ok||j.error||!Array.isArray(j.items)){showBuildError(j.error||"Couldn’t build that city. Try another spelling.");return;}
+    POOL=j; $("#cityName").textContent=POOL.city||titleCase(slug);
+    build(true);
+  }catch(e){showBuildError("New-city generation runs on the live Vercel site, not inside this preview. Open the deployed URL to build a new city.");}
+}
+function goCity(){
+  const q=$("#cityq").value.trim(); if(!q)return;
+  const slug=q.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+  if(!slug)return;
+  try{history.pushState({},"","/"+slug);}catch(e){location.hash=slug;}
+  loadCity(slug);
+}
+$("#go").onclick=goCity;
+$("#cityq").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();goCity();}});
+window.addEventListener("popstate",()=>loadCity(citySlug()));
+
 /* init */
 setDates();sync();
 $("#style-now").textContent=styleWord(+$("#style").value);
 $("#pace-now").textContent=paceWord(+$("#pace").value);
 $("#dist-now").textContent="Within "+$("#dist").value+" mi";
-build(false);
+loadCity(citySlug());
 </script>
