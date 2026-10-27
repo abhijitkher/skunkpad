@@ -91,6 +91,8 @@
   .stop{display:grid;grid-template-columns:62px 1fr;gap:12px;padding:14px 0;border-bottom:1px solid var(--line);min-width:0}
   .stop:last-child{border-bottom:0}
   .stop .time{font-family:var(--mono);font-size:12.5px;color:var(--ink);padding-top:2px}
+  .stop .time .legmi{display:block;font-weight:700;font-size:13px;line-height:1.1}
+  .stop .time .legmode{display:block;font-size:10px;color:var(--muted);text-transform:lowercase}
   .stop .body{min-width:0}
   .title-row{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
   .emoji{font-size:16px;flex:none}
@@ -1482,7 +1484,7 @@ function hav(a,b){const R=3958.8,r=Math.PI/180;
   const x=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;return 2*R*Math.asin(Math.sqrt(x));}
 function travel(a,b){const d=hav(a,b);let min,mode;
   if(d<0.4){min=d/3*60;mode="walk";}else{const mph=d>15?50:24;min=d/mph*60;mode="drive";}
-  min=Math.max(5,Math.round(min/5)*5);return {min,mode,label:min+" min "+mode+(d>=1?" ("+d.toFixed(d<10?1:0)+" mi)":"")};}
+  min=Math.max(5,Math.round(min/5)*5);return {min,mode,mi:Math.round(d*10)/10,label:min+" min "+mode};}
 function fmtTime(m){let h=Math.floor(m/60),mm=m%60;const ap=h>=12?"PM":"AM";h=h%12;if(h===0)h=12;return h+":"+String(mm).padStart(2,"0")+" "+ap;}
 
 /* ---------- assembly ---------- */
@@ -1555,11 +1557,10 @@ function assemble(cfg){
     const stops=[];
     ordered.forEach((s,i)=>{stops.push({...s,_stop:"sight"});if(i===Math.min(1,ordered.length-1)&&lunch)stops.push({...lunch,_stop:"meal",_meal:"Lunch"});});
     if(dinner)stops.push({...dinner,_stop:"meal",_meal:"Dinner"});
-    // time
-    let t=(day.kind==="trip"?8.5:9)*60;
-    stops.forEach((s,i)=>{if(i>0){s._travel=travel(stops[i-1],s);t+=s._travel.min;}s._time=fmtTime(t);t+=s.durMin;});
+    stops.forEach((s,i)=>{if(i>0)s._travel=travel(stops[i-1],s);});
+    const totalMi=Math.round(stops.reduce((a,s)=>a+(s._travel?s._travel.mi:0),0));
     const areas=[...new Set(ordered.map(s=>s.area))];
-    return {kind:day.kind,theme:day.kind==="trip"?("Day trip • "+areas[0]):areas.slice(0,2).join(" & "),stops};
+    return {kind:day.kind,theme:day.kind==="trip"?("Day trip • "+areas[0]):areas.slice(0,2).join(" & "),stops,totalMi};
   });
   return {days:built,totalMatch,pulled};
 }
@@ -1587,10 +1588,9 @@ function render(plan,cfg){
     const d=el("div","day");
     const dh=el("div","day-head");
     dh.innerHTML='<span class="day-num">DAY '+String(di+1).padStart(2,"0")+'</span><h3>'+esc(day.theme||"")+'</h3>'+
-      '<span class="meta">'+day.stops.filter(s=>s._stop==="sight").length+' stops</span>';
+      '<span class="meta">'+day.stops.filter(s=>s._stop==="sight").length+' stops'+(day.totalMi?' · '+day.totalMi+' mi':'')+'</span>';
     d.appendChild(dh);
     day.stops.forEach((s,si)=>{
-      if(s._travel){d.appendChild(Object.assign(el("div","travel"),{textContent:s._travel.label}));}
       const stop=el("div","stop");
       const emoji=s._stop==="meal"?"🍽":(EMOJI[s.type]||"•");
       let tags='<span class="tag area">'+esc(s.area)+'</span>';
@@ -1599,7 +1599,7 @@ function render(plan,cfg){
       if(s.seasonNote)tags+='<span class="tag">'+esc(s.seasonNote)+'</span>';
       if(s.overnight)tags+='<span class="tag">Better as an overnight</span>';
       const title=(s._meal?s._meal+" · ":"")+s.name;
-      stop.innerHTML='<div class="time">'+esc(s._time)+'</div><div class="body">'+
+      stop.innerHTML='<div class="time">'+(s._travel?('<span class="legmi">'+s._travel.mi+' mi</span><span class="legmode">'+esc(s._travel.mode)+'</span>'):'<span class="legmode">start</span>')+'</div><div class="body">'+
         '<div class="title-row"><span class="emoji">'+emoji+'</span><h4>'+esc(title)+'</h4>'+
         '<span class="dur">~'+Math.round(s.durMin/15)*15/60+' hr</span></div>'+
         '<p>'+esc(s.note)+'</p>'+
@@ -1612,7 +1612,7 @@ function render(plan,cfg){
   root.querySelectorAll(".swap").forEach(b=>b.onclick=()=>doSwap(+b.dataset.day,+b.dataset.idx));
 
   const foot=el("div","foot");
-  foot.textContent="Assembled from "+plan.pulled+" of "+plan.totalMatch+" matching "+POOL.city+"-area spots. Names and locations are real (Google Places); times, durations and costs are estimates. Verify hours and prices before you go.";
+  foot.textContent="Assembled from "+plan.pulled+" of "+plan.totalMatch+" matching "+POOL.city+"-area spots. Distances, durations and costs are estimates; verify hours and prices before you go.";
   root.appendChild(foot);
   const g=root.parentElement;if(g)g.scrollTop=0;
 }
