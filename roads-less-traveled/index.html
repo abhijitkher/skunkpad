@@ -3,8 +3,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><rect x='1.5' y='1.5' width='45' height='45' rx='13' fill='%23f3e7cd' stroke='%23d6dbe2'/><path d='M6 37 L19 13 L27 24 L33 17 L42 37 Z' fill='%2317191d'/><path d='M19 13 L15 20.5 L23 20.5 Z' fill='%23ffffff'/><path d='M33 17 L29.5 22 L36.5 22 Z' fill='%23ffffff'/><path d='M23.5 45 C 19 40, 31 37, 25.5 31 C 21.5 26.5, 30 27, 29 23' fill='none' stroke='%23b47c22' stroke-width='3.4' stroke-linecap='round'/></svg>">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;0,900;1,400&family=Space+Mono:wght@400;700&display=swap">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><rect x='1.5' y='1.5' width='45' height='45' rx='11' fill='%23ffffff' stroke='%23d6dbe2'/><path d='M7 37 L18 15 L24 24 L30 13 L41 37 Z' fill='%2317191d'/><path d='M36 12 a3.4,3.4 0 1,1 -3.2,-4.7 a2.6,2.6 0 1,0 3.2,4.7 Z' fill='%2317191d'/><path d='M24 44 C 20 39, 28 35, 23.5 30' fill='none' stroke='%23b47c22' stroke-width='3.2' stroke-linecap='round'/></svg>">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;0,900;1,400&family=Dancing+Script:wght@600;700&family=Space+Mono:wght@400;700&display=swap">
 <style>
   /* White, field-guide look. Left 25% filters, right 75% itinerary assembled from a city pool. */
   :root{
@@ -24,10 +24,9 @@
     padding:0 clamp(16px,1.4vw,22px);padding-left:max(clamp(16px,1.4vw,22px),env(safe-area-inset-left,0px));
     display:flex;flex-direction:column;gap:16px}
   .brand{position:sticky;top:0;z-index:5;background:var(--panel);padding:18px 0 12px;border-bottom:1px solid var(--line)}
-  .brandhead{display:flex;align-items:center;gap:11px}
-  .logo{flex:none;display:block}
-  .brand h1{font-family:var(--serif);font-weight:600;font-size:25px;letter-spacing:-.01em;margin:0;line-height:1.02}
-  .brand h1 b{color:var(--gold);font-weight:600}
+  .brandhead{display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center}
+  .emblem{height:92px;width:auto;flex:none;display:block}
+  .brand h1{font-family:'Dancing Script',var(--serif);font-weight:700;font-size:31px;letter-spacing:0;margin:0;line-height:1;color:var(--ink)}
   .brand .city{margin-top:6px;display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--muted)}
   .brand .city b{color:var(--ink);font-weight:700;font-size:13px}
   .dot{width:7px;height:7px;border-radius:50%;background:var(--good);flex:none}
@@ -145,7 +144,7 @@
     .motif{height:min(24vh,200px)}
   }
   @media (max-width:420px){
-    .brand h1{font-size:26px}
+    .brand h1{font-size:28px}
   }
   :focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 </style>
@@ -168,15 +167,49 @@
   <aside class="deck">
     <div class="brand">
       <div class="brandhead">
-        <svg class="logo" viewBox="0 0 48 48" width="36" height="36" role="img" aria-label="The road less traveled">
-          <rect x="1.5" y="1.5" width="45" height="45" rx="13" fill="var(--gold-soft)" stroke="var(--line-strong)"/>
-          <path d="M6 37 L19 13 L27 24 L33 17 L42 37 Z" fill="var(--ink)"/>
-          <path d="M19 13 L15 20.5 L23 20.5 Z" fill="#ffffff"/>
-          <path d="M33 17 L29.5 22 L36.5 22 Z" fill="#ffffff"/>
-          <path d="M23.5 45 C 19 40, 31 37, 25.5 31 C 21.5 26.5, 30 27, 29 23" fill="none" stroke="var(--gold)" stroke-width="3.4" stroke-linecap="round"/>
-          <path d="M23.5 45 C 19 40, 31 37, 25.5 31 C 21.5 26.5, 30 27, 29 23" fill="none" stroke="var(--gold-soft)" stroke-width="1" stroke-dasharray="1.6 2.6" stroke-linecap="round"/>
+        <svg class="emblem" viewBox="0 0 220 200" role="img" aria-label="The road less traveled">
+          <defs><clipPath id="dia"><path d="M110,12 L208,100 L110,188 L12,100 Z"/></clipPath></defs>
+          <g clip-path="url(#dia)">
+            <!-- stars -->
+            <g fill="var(--ink)">
+              <path d="M116,26 l1.6,5 l5,1.6 l-5,1.6 l-1.6,5 l-1.6,-5 l-5,-1.6 l5,-1.6 Z"/>
+              <path d="M158,58 l1.3,4 l4,1.3 l-4,1.3 l-1.3,4 l-1.3,-4 l-4,-1.3 l4,-1.3 Z"/>
+              <path d="M84,56 l1.1,3.4 l3.4,1.1 l-3.4,1.1 l-1.1,3.4 l-1.1,-3.4 l-3.4,-1.1 l3.4,-1.1 Z"/>
+            </g>
+            <!-- moon -->
+            <path d="M146,58 a9,9 0 1,1 -8.4,-12.3 a7,7 0 1,0 8.4,12.3 Z" fill="var(--ink)"/>
+            <!-- mountains -->
+            <path d="M40,128 L74,74 L88,92 L100,78 L110,52 L132,86 L144,72 L160,90 L180,128 Z" fill="var(--panel)" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/>
+            <g fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M110,52 L121,72 L115,82"/>
+              <path d="M103,66 L110,60 L117,66"/>
+              <path d="M74,74 L81,86"/>
+              <path d="M160,90 L167,101"/>
+            </g>
+            <!-- trees -->
+            <g fill="var(--ink)">
+              <path d="M64,142 L59,142 L64,129 L69,142 Z"/>
+              <path d="M78,142 L72,142 L78,125 L84,142 Z"/>
+              <path d="M92,142 L87,142 L92,129 L97,142 Z"/>
+              <path d="M104,142 L98,142 L104,124 L110,142 Z"/>
+              <path d="M120,142 L115,142 L120,128 L125,142 Z"/>
+              <path d="M132,142 L126,142 L132,124 L138,142 Z"/>
+              <path d="M146,142 L141,142 L146,128 L151,142 Z"/>
+              <path d="M158,142 L153,142 L158,130 L163,142 Z"/>
+              <path d="M72,149 L68,149 L72,138 L76,149 Z"/>
+              <path d="M112,149 L108,149 L112,137 L116,149 Z"/>
+              <path d="M140,149 L136,149 L140,138 L144,149 Z"/>
+            </g>
+            <!-- road -->
+            <path d="M114,130 C 98,144 134,152 112,164 C 94,174 126,180 110,185" fill="none" stroke="var(--gold)" stroke-width="6" stroke-linecap="round"/>
+            <path d="M114,130 C 98,144 134,152 112,164 C 94,174 126,180 110,185" fill="none" stroke="var(--panel)" stroke-width="1.4" stroke-dasharray="2 6" stroke-linecap="round"/>
+            <!-- hiker -->
+            <circle cx="110" cy="180" r="2.3" fill="var(--ink)"/>
+            <path d="M106.5,184 Q110,181 113.5,184 L112.5,189 L107.5,189 Z" fill="var(--ink)"/>
+          </g>
+          <path d="M110,12 L208,100 L110,188 L12,100 Z" fill="none" stroke="var(--ink)" stroke-width="4" stroke-linejoin="round"/>
         </svg>
-        <h1>The road less <b>traveled</b></h1>
+        <h1>The road less traveled</h1>
       </div>
       <div class="ac">
         <input type="text" id="cityq" placeholder="Enter a city&hellip;" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="ac-city">
