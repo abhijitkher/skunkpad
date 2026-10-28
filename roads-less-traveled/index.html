@@ -3,6 +3,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><rect x='1.5' y='1.5' width='45' height='45' rx='13' fill='%23f3e7cd' stroke='%23d6dbe2'/><path d='M6 37 L19 13 L27 24 L33 17 L42 37 Z' fill='%2317191d'/><path d='M19 13 L15 20.5 L23 20.5 Z' fill='%23ffffff'/><path d='M33 17 L29.5 22 L36.5 22 Z' fill='%23ffffff'/><path d='M23.5 45 C 19 40, 31 37, 25.5 31 C 21.5 26.5, 30 27, 29 23' fill='none' stroke='%23b47c22' stroke-width='3.4' stroke-linecap='round'/></svg>">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;0,900;1,400&family=Space+Mono:wght@400;700&display=swap">
 <style>
   /* White, field-guide look. Left 25% filters, right 75% itinerary assembled from a city pool. */
@@ -23,6 +24,8 @@
     padding:0 clamp(16px,1.4vw,22px);padding-left:max(clamp(16px,1.4vw,22px),env(safe-area-inset-left,0px));
     display:flex;flex-direction:column;gap:16px}
   .brand{position:sticky;top:0;z-index:5;background:var(--panel);padding:18px 0 12px;border-bottom:1px solid var(--line)}
+  .brandhead{display:flex;align-items:center;gap:11px}
+  .logo{flex:none;display:block}
   .brand h1{font-family:var(--serif);font-weight:600;font-size:25px;letter-spacing:-.01em;margin:0;line-height:1.02}
   .brand h1 b{color:var(--gold);font-weight:600}
   .brand .city{margin-top:6px;display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--muted)}
@@ -83,7 +86,7 @@
   .btn-primary:hover{filter:brightness(1.06)}
   .mini{font-size:11px;color:var(--muted);text-align:center}
   #share{font:inherit;font-size:14px;font-weight:700;color:var(--gold);background:none;border:0;cursor:pointer;
-    align-self:flex-end;display:inline-flex;align-items:center;gap:7px;padding:4px 2px}
+    margin:14px 0 0;display:inline-flex;align-items:center;gap:7px;padding:6px 2px}
   #share svg{width:16px;height:16px;flex:none}
   #share:hover{text-decoration:underline;text-underline-offset:3px}
 
@@ -107,7 +110,8 @@
   .stop .time .legmi{display:block;font-weight:700;font-size:16px;line-height:1.1}
   .stop .time .legmode{display:block;font-size:13px;color:var(--muted);text-transform:lowercase}
   .stop .body{min-width:0}
-  .title-row{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .title-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .actions{display:inline-flex;align-items:center;gap:13px;margin-left:auto;flex:none}
   .emoji{font-size:16px;flex:none}
   .stop h4{margin:0;font-size:15.5px;font-weight:700}
   .dur{font-size:10.5px;font-weight:700;letter-spacing:.03em;color:var(--muted);background:var(--panel-2);border:1px solid var(--line-strong);border-radius:999px;padding:3px 10px;white-space:nowrap;flex:none}
@@ -163,7 +167,17 @@
 <div class="app">
   <aside class="deck">
     <div class="brand">
-      <h1>The road less <b>traveled</b></h1>
+      <div class="brandhead">
+        <svg class="logo" viewBox="0 0 48 48" width="36" height="36" role="img" aria-label="The road less traveled">
+          <rect x="1.5" y="1.5" width="45" height="45" rx="13" fill="var(--gold-soft)" stroke="var(--line-strong)"/>
+          <path d="M6 37 L19 13 L27 24 L33 17 L42 37 Z" fill="var(--ink)"/>
+          <path d="M19 13 L15 20.5 L23 20.5 Z" fill="#ffffff"/>
+          <path d="M33 17 L29.5 22 L36.5 22 Z" fill="#ffffff"/>
+          <path d="M23.5 45 C 19 40, 31 37, 25.5 31 C 21.5 26.5, 30 27, 29 23" fill="none" stroke="var(--gold)" stroke-width="3.4" stroke-linecap="round"/>
+          <path d="M23.5 45 C 19 40, 31 37, 25.5 31 C 21.5 26.5, 30 27, 29 23" fill="none" stroke="var(--gold-soft)" stroke-width="1" stroke-dasharray="1.6 2.6" stroke-linecap="round"/>
+        </svg>
+        <h1>The road less <b>traveled</b></h1>
+      </div>
       <div class="ac">
         <input type="text" id="cityq" placeholder="Enter a city&hellip;" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="ac-city">
         <ul class="ac-list" id="ac-city" role="listbox" hidden></ul>
@@ -247,7 +261,6 @@
 
     <div class="build">
       <button class="btn-primary" id="build">&#10022; Build my plan</button>
-      <button id="share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Copy shareable link</button>
       <div class="mini" id="poolinfo"></div>
     </div>
   </aside>
@@ -23293,7 +23306,8 @@ function render(plan,cfg){
   const head=el("div","trip-head");
   head.innerHTML='<p class="eyebrow">'+esc(styleWord(cfg.style))+'</p>'+
     '<h2>'+esc(POOL.city||"Denver")+'<span style="color:var(--muted)">, '+esc(POOL.state||"CO")+'</span></h2>'+
-    '<p class="sub">A plan routed to keep each day tight, pulled live from the '+esc(POOL.city)+' pool and filtered to what you picked.</p>';
+    '<p class="sub">A plan routed to keep each day tight, pulled live from the '+esc(POOL.city)+' pool and filtered to what you picked.</p>'+
+    '<button id="share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Copy shareable link</button>';
   const facts=el("div","facts");
   const addF=(k,v)=>{const f=el("div","fact");f.innerHTML='<span class="k">'+k+'</span><span class="v">'+esc(v)+'</span>';facts.appendChild(f);};
   addF("Days",plan.days.length);addF("Roam","≤ "+cfg.maxDist+" mi");
@@ -23321,10 +23335,10 @@ function render(plan,cfg){
       const title=(s._meal?s._meal+" · ":"")+s.name;
       stop.innerHTML='<div class="time">'+(s._travel?('<span class="legmi">'+s._travel.mi+' mi</span><span class="legmode">'+esc(s._travel.mode)+'</span>'):'<span class="legmode">start</span>')+'</div><div class="body">'+
         '<div class="title-row"><span class="emoji">'+emoji+'</span><h4>'+esc(title)+'</h4>'+
-        '<span class="dur">'+dwell(s.durMin)+'</span></div>'+
-        '<p>'+esc(s.note)+'</p>'+
-        '<div class="links"><a class="lnk" target="_blank" rel="noopener" href="'+mapLink(s)+'">Map ↗</a>'+
-        (s._stop==="sight"?'<button class="swap" data-day="'+di+'" data-idx="'+si+'">↻ Swap</button>':"")+'</div></div>';
+        '<span class="actions"><span class="dur">'+dwell(s.durMin)+'</span>'+
+        '<a class="lnk" target="_blank" rel="noopener" href="'+mapLink(s)+'">Map ↗</a>'+
+        (s._stop==="sight"?'<button class="swap" data-day="'+di+'" data-idx="'+si+'">↻ Swap</button>':"")+'</span></div>'+
+        '<p>'+esc(s.note)+'</p></div>';
       d.appendChild(stop);
     });
     root.appendChild(d);
@@ -23507,7 +23521,7 @@ cityInput.addEventListener("keydown",e=>{
   if(e.key==="Enter"){e.preventDefault();goCity();}
 });
 cityInput.addEventListener("blur",()=>setTimeout(acHide,150));
-$("#share").onclick=async()=>{try{await navigator.clipboard.writeText(location.href);toast("Link copied");}catch(e){toast("Long-press the address bar to copy the link");}};
+document.addEventListener("click",async e=>{if(!e.target.closest("#share"))return;try{await navigator.clipboard.writeText(location.href);toast("Link copied");}catch(err){toast("Long-press the address bar to copy the link");}});
 window.addEventListener("popstate",()=>{const r=parseUrl();if(r.token)applyToken(r.token);loadCity(r.slug);});
 
 /* init */
