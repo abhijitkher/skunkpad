@@ -111,7 +111,7 @@
   .stop .time .legmode{display:block;font-size:13px;color:var(--muted);text-transform:lowercase}
   .stop .body{min-width:0}
   .title-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .actions{display:inline-flex;align-items:center;gap:13px;margin-left:auto;flex:none}
+  .actions{display:inline-flex;align-items:center;flex-wrap:wrap;gap:8px 13px;margin-left:auto;flex:none}
   .emoji{font-size:16px;flex:none}
   .stop h4{margin:0;font-size:15.5px;font-weight:700}
   .dur{font-size:10.5px;font-weight:700;letter-spacing:.03em;color:var(--muted);background:var(--panel-2);border:1px solid var(--line-strong);border-radius:999px;padding:3px 10px;white-space:nowrap;flex:none}
@@ -141,6 +141,8 @@
     .guide{overflow:visible;padding:18px 16px 40px}
     .stage{min-height:46vh}
     .stop{grid-template-columns:58px 1fr;gap:10px}
+    .title-row{align-items:baseline}
+    .actions{margin-left:0;width:100%;justify-content:flex-start;flex-wrap:wrap;gap:8px 16px;margin-top:5px}
     .travel{padding-left:68px}
     .motif{height:min(24vh,200px)}
   }
