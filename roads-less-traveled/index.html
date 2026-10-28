@@ -1,4 +1,4 @@
-<title>The Road Less Traveled</title>
+<title>The road less traveled</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -163,7 +163,7 @@
 <div class="app">
   <aside class="deck">
     <div class="brand">
-      <h1>The Road Less <b>Traveled</b></h1>
+      <h1>The road less <b>traveled</b></h1>
       <div class="ac">
         <input type="text" id="cityq" placeholder="Enter a city&hellip;" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="ac-city">
         <ul class="ac-list" id="ac-city" role="listbox" hidden></ul>
@@ -23361,7 +23361,7 @@ function askNotif(){try{if(typeof Notification==="undefined")return;
   if(Notification.permission==="granted"){notifOK=true;}
   else if(Notification.permission==="default")Notification.requestPermission().then(p=>{notifOK=p==="granted";}).catch(()=>{});
 }catch(e){}}
-function notifyReady(city){try{if(notifOK&&Notification.permission==="granted")new Notification("Your "+city+" plan is ready ✨",{body:"Open The Road Less Traveled to see it."});}catch(e){}}
+function notifyReady(city){try{if(notifOK&&Notification.permission==="granted")new Notification("Your "+city+" plan is ready ✨",{body:"Open The road less traveled to see it."});}catch(e){}}
 let tT=null;function toast(m){const t=$("#toast");$("#toast-msg").textContent=m;t.classList.add("show");clearTimeout(tT);tT=setTimeout(()=>t.classList.remove("show"),3200);}
 
 /* ---------- build ---------- */
