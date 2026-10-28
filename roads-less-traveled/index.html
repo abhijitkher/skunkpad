@@ -1,4 +1,4 @@
-<title>Roads Less Traveled</title>
+<title>The Road Less Traveled</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -11,7 +11,7 @@
     --bg:#ffffff; --panel:#ffffff; --panel-2:#f5f7f9; --ink:#17191d; --muted:#616b78;
     --line:#e9ecf1; --line-strong:#d6dbe2; --gold:#b47c22; --gold-soft:#f3e7cd; --teal:#258069;
     --teal-soft:#e0f0eb; --good:#2a8a5e; --warn:#b5791a; --shadow:rgba(23,25,29,.07); --motif:#e9edf2;
-    --serif:'Lato','Roboto',Arial,sans-serif; --sans:'Lato','Roboto',Arial,sans-serif; --mono:'Space Mono',ui-monospace,monospace;
+    --serif:'Lato',-apple-system,BlinkMacSystemFont,'Roboto',Arial,sans-serif; --sans:'Lato',-apple-system,BlinkMacSystemFont,'Roboto',Arial,sans-serif; --mono:'Lato',-apple-system,BlinkMacSystemFont,'Roboto',Arial,sans-serif;
   }
   html,body{margin:0;height:100%}*{box-sizing:border-box}img{max-width:100%}[hidden]{display:none!important}
   body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased}
@@ -82,7 +82,10 @@
   .btn-primary{font:inherit;font-weight:700;font-size:15px;color:#fff;background:var(--gold);border:0;border-radius:10px;padding:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 2px 10px var(--shadow)}
   .btn-primary:hover{filter:brightness(1.06)}
   .mini{font-size:11px;color:var(--muted);text-align:center}
-  #share{font:inherit;font-size:12px;color:var(--muted);background:none;border:0;cursor:pointer;text-decoration:underline;text-underline-offset:2px;align-self:center}
+  #share{font:inherit;font-size:14px;font-weight:700;color:var(--gold);background:none;border:0;cursor:pointer;
+    align-self:flex-end;display:inline-flex;align-items:center;gap:7px;padding:4px 2px}
+  #share svg{width:16px;height:16px;flex:none}
+  #share:hover{text-decoration:underline;text-underline-offset:3px}
 
   .guide{overflow-y:auto;overflow-x:hidden;position:relative;padding:0 clamp(20px,3.2vw,46px);padding-right:max(clamp(20px,3.2vw,46px),env(safe-area-inset-right,0px))}
   .guide-inner{max-width:760px;margin:0 auto;padding-block:clamp(22px,3vw,38px) 70px}
@@ -107,7 +110,7 @@
   .title-row{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
   .emoji{font-size:16px;flex:none}
   .stop h4{margin:0;font-size:15.5px;font-weight:700}
-  .dur{font-family:var(--mono);font-size:11px;color:var(--muted);flex:none}
+  .dur{font-size:10.5px;font-weight:700;letter-spacing:.03em;color:var(--muted);background:var(--panel-2);border:1px solid var(--line-strong);border-radius:999px;padding:3px 10px;white-space:nowrap;flex:none}
   .stop p{margin:6px 0 0;font-size:13.5px;color:var(--ink)}
   .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
   .tag{font-size:11px;padding:3px 8px;border-radius:7px;background:var(--panel-2);border:1px solid var(--line);color:var(--muted)}
@@ -160,7 +163,7 @@
 <div class="app">
   <aside class="deck">
     <div class="brand">
-      <h1>Roads Less <b>Traveled</b></h1>
+      <h1>The Road Less <b>Traveled</b></h1>
       <div class="ac">
         <input type="text" id="cityq" placeholder="Enter a city&hellip;" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="ac-city">
         <ul class="ac-list" id="ac-city" role="listbox" hidden></ul>
@@ -244,7 +247,7 @@
 
     <div class="build">
       <button class="btn-primary" id="build">&#10022; Build my plan</button>
-      <button id="share">Copy shareable link</button>
+      <button id="share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Copy shareable link</button>
       <div class="mini" id="poolinfo"></div>
     </div>
   </aside>
@@ -23318,7 +23321,7 @@ function render(plan,cfg){
       const title=(s._meal?s._meal+" · ":"")+s.name;
       stop.innerHTML='<div class="time">'+(s._travel?('<span class="legmi">'+s._travel.mi+' mi</span><span class="legmode">'+esc(s._travel.mode)+'</span>'):'<span class="legmode">start</span>')+'</div><div class="body">'+
         '<div class="title-row"><span class="emoji">'+emoji+'</span><h4>'+esc(title)+'</h4>'+
-        '<span class="dur">'+dwell(s.durMin)+' here</span></div>'+
+        '<span class="dur">'+dwell(s.durMin)+'</span></div>'+
         '<p>'+esc(s.note)+'</p>'+
         '<div class="links"><a class="lnk" target="_blank" rel="noopener" href="'+mapLink(s)+'">Map ↗</a>'+
         (s._stop==="sight"?'<button class="swap" data-day="'+di+'" data-idx="'+si+'">↻ Swap</button>':"")+'</div></div>';
@@ -23358,7 +23361,7 @@ function askNotif(){try{if(typeof Notification==="undefined")return;
   if(Notification.permission==="granted"){notifOK=true;}
   else if(Notification.permission==="default")Notification.requestPermission().then(p=>{notifOK=p==="granted";}).catch(()=>{});
 }catch(e){}}
-function notifyReady(city){try{if(notifOK&&Notification.permission==="granted")new Notification("Your "+city+" plan is ready ✨",{body:"Open Roads Less Traveled to see it."});}catch(e){}}
+function notifyReady(city){try{if(notifOK&&Notification.permission==="granted")new Notification("Your "+city+" plan is ready ✨",{body:"Open The Road Less Traveled to see it."});}catch(e){}}
 let tT=null;function toast(m){const t=$("#toast");$("#toast-msg").textContent=m;t.classList.add("show");clearTimeout(tT);tT=setTimeout(()=>t.classList.remove("show"),3200);}
 
 /* ---------- build ---------- */
