@@ -23281,6 +23281,8 @@ function assemble(cfg){
 /* ---------- render ---------- */
 function mapLink(it){return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(it.name+" "+(POOL.city||"")+" "+(POOL.state||""));}
 let lastCfg=null;
+function dwell(m){m=Math.round((m||0)/15)*15;if(m<60)return "~"+m+" min";
+  const h=Math.floor(m/60),r=m%60;return "~"+h+(r?"."+(r===30?"5":"25"):"")+" hr";}
 function render(plan,cfg){
   const root=$("#guide-inner");root.innerHTML="";
   const head=el("div","trip-head");
@@ -23314,7 +23316,7 @@ function render(plan,cfg){
       const title=(s._meal?s._meal+" · ":"")+s.name;
       stop.innerHTML='<div class="time">'+(s._travel?('<span class="legmi">'+s._travel.mi+' mi</span><span class="legmode">'+esc(s._travel.mode)+'</span>'):'<span class="legmode">start</span>')+'</div><div class="body">'+
         '<div class="title-row"><span class="emoji">'+emoji+'</span><h4>'+esc(title)+'</h4>'+
-        '<span class="dur">~'+Math.round(s.durMin/15)*15/60+' hr</span></div>'+
+        '<span class="dur">'+dwell(s.durMin)+' here</span></div>'+
         '<p>'+esc(s.note)+'</p>'+
         '<div class="links"><a class="lnk" target="_blank" rel="noopener" href="'+mapLink(s)+'">Map ↗</a>'+
         (s._stop==="sight"?'<button class="swap" data-day="'+di+'" data-idx="'+si+'">↻ Swap</button>':"")+'</div></div>';
