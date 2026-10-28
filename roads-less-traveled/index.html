@@ -23281,8 +23281,10 @@ function assemble(cfg){
 /* ---------- render ---------- */
 function mapLink(it){return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(it.name+" "+(POOL.city||"")+" "+(POOL.state||""));}
 let lastCfg=null;
-function dwell(m){m=Math.round((m||0)/15)*15;if(m<60)return "~"+m+" min";
-  const h=Math.floor(m/60),r=m%60;return "~"+h+(r?"."+(r===30?"5":"25"):"")+" hr";}
+function dwell(m){m=m||0;
+  if(m<60){let lo=Math.floor(m/15)*15;if(lo<15)lo=15;return lo+" - "+(lo+15)+" min";}
+  let lo=Math.floor(m/60),hi=Math.ceil(m/60);if(hi===lo)hi=lo+1;
+  return lo+" - "+hi+" hours";}
 function render(plan,cfg){
   const root=$("#guide-inner");root.innerHTML="";
   const head=el("div","trip-head");
