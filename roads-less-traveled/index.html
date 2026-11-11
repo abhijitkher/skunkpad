@@ -237,7 +237,7 @@
     </div>
 
     <div class="field slider">
-      <div class="legend"><span>Daily pace</span><span class="now" id="pace-now">Steady</span></div>
+      <div class="legend"><span>Pace</span><span class="now" id="pace-now">Steady</span></div>
       <input type="range" id="pace" min="0" max="100" value="45" step="5">
       <div class="ends"><span>&#9664; Relaxed</span><span>Packed &#9654;</span></div>
     </div>
@@ -23249,6 +23249,9 @@ function assemble(cfg){
   const spd=cfg.pace<25?2:cfg.pace<50?3:cfg.pace<75?4:5;
 
   const near=sights.filter(s=>s.distMi<=20);
+  // pace and kids decide how far a day trip may reach: relaxed = one easy hop, packed = long drives
+  const kidMul=cfg.kids>0?0.75:1;
+  const tripCap=(cfg.pace<25?60:cfg.pace<50?90:cfg.pace<75?130:200)*kidMul;
   const far=sights.filter(s=>s.distMi>20);
   // group far by area
   // cluster far sights into drivable day trips: single-link, any two sights within ~20 mi share a day
@@ -23265,10 +23268,14 @@ function assemble(cfg){
   const reach=cfg.maxDist>120?0.5:0;
   const gv=g=>g.slice(0,3).reduce((t,x)=>t+score(x),0)+(g.length>1?0:-1000)+reach*Math.min(110,Math.min.apply(null,g.map(x=>x.distMi)));
   farGroups.sort((a,b)=>gv(b)-gv(a));
+  // drop trips that are too far to enjoy at this pace (a day trip is a round trip: nearest sight sets the drive)
+  for(let i=farGroups.length-1;i>=0;i--){if(Math.min.apply(null,farGroups[i].map(x=>x.distMi))>tripCap)farGroups.splice(i,1);}
 
   let D=cfg.days;
   // wider roam = more days out of town. Parks can pin their own share (the park itself is the main event).
-  const share=(typeof POOL.tripShare==="number")?POOL.tripShare:(cfg.maxDist>150?0.8:cfg.maxDist>120?0.67:cfg.maxDist>60?0.5:0.34);
+  const baseShare=(typeof POOL.tripShare==="number")?POOL.tripShare:(cfg.maxDist>150?0.8:cfg.maxDist>120?0.67:cfg.maxDist>60?0.5:0.34);
+  const paceMul=cfg.pace<25?0.4:cfg.pace<50?0.75:cfg.pace<75?1:1.2;
+  const share=Math.min(0.85,baseShare*paceMul*(cfg.kids>0?0.8:1));
   let dayTrips=far.length?Math.min(Math.round(D*share),farGroups.length):0;
   let townDays=D-dayTrips;
   if(townDays<1&&D>=1){townDays=1;dayTrips=D-1;}
@@ -23301,6 +23308,12 @@ function assemble(cfg){
     days.push({kind:"trip",sights:g});
   }
   if(!days.length) return {days:[],totalMatch,pulled:0};
+  {const town=days.filter(x=>x.kind==="town"),trip=days.filter(x=>x.kind==="trip"),mix=[];
+   while(town.length||trip.length){
+     if(town.length&&(!mix.length||mix[mix.length-1].kind==="trip"||!trip.length))mix.push(town.shift());
+     else if(trip.length)mix.push(trip.shift());
+     else mix.push(town.shift());}
+   days.length=0;days.push(...mix);}
 
   // build timed stops per day
   let pulled=0;
