@@ -227,7 +227,7 @@
     <div class="field slider">
       <div class="legend"><span>How far will you roam</span><span class="now" id="dist-now">Within 120 mi</span></div>
       <input type="range" id="dist" min="10" max="500" value="120" step="10">
-      <div class="ends"><span>In Denver</span><span>Day trips &#9654;</span></div>
+      <div class="ends"><span id="ends-near">In Denver</span><span>Day trips &#9654;</span></div>
     </div>
 
     <div class="field slider">
@@ -23227,7 +23227,7 @@ function readCfg(){
 function hav(a,b){const R=3958.8,r=Math.PI/180;
   const dp=(b.lat-a.lat)*r,dl=(b.lng-a.lng)*r,p1=a.lat*r,p2=b.lat*r;
   const x=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;return 2*R*Math.asin(Math.sqrt(x));}
-function travel(a,b){const d=hav(a,b);let min,mode;
+function travel(a,b){const d=hav(a,b)*((POOL&&POOL.road)||1);let min,mode;
   if(d<0.4){min=d/3*60;mode="walk";}else{const mph=d>15?50:24;min=d/mph*60;mode="drive";}
   min=Math.max(5,Math.round(min/5)*5);return {min,mode,mi:Math.round(d*10)/10,label:min+" min "+mode};}
 function fmtTime(m){let h=Math.floor(m/60),mm=m%60;const ap=h>=12?"PM":"AM";h=h%12;if(h===0)h=12;return h+":"+String(mm).padStart(2,"0")+" "+ap;}
@@ -23397,6 +23397,7 @@ let tT=null;function toast(m){const t=$("#toast");$("#toast-msg").textContent=m;
 /* ---------- build ---------- */
 let firstBuild=true;
 function build(notify){
+  {const e=$("#ends-near");if(e)e.textContent=(POOL.city==="Denver")?"In Denver":"Close by";}
   const cfg=readCfg();
   if(cfg.interests.size){
     const match=POOL.items.filter(it=>it.type!=="food"&&it.cost<=cfg.budget&&(!it.openMonths||it.openMonths.includes(cfg.month))&&it.interests.some(x=>cfg.interests.has(x)));
@@ -23474,6 +23475,14 @@ async function loadCity(slug){
   if(slug==="denver"){POOL=DENVER_POOL;build(false);return;}
   showBuilding(slug); askNotif();
   try{
+    // hand-curated pools ship as static files; fall back to the generator for everything else
+    try{
+      const sr=await fetch("/pools/"+encodeURIComponent(slug)+".json");
+      if(sr.ok&&/json/i.test(sr.headers.get("content-type")||"")){
+        const sj=await sr.json();
+        if(Array.isArray(sj.items)&&sj.items.length){POOL=sj;build(false);return;}
+      }
+    }catch(_){}
     const r=await fetch("/api/pool?city="+encodeURIComponent(slug));
     const j=await r.json().catch(()=>({error:"Bad response from the builder."}));
     if(!r.ok||j.error||!Array.isArray(j.items)){showBuildError(j.error||"Couldn’t build that city. Try another spelling.");return;}
