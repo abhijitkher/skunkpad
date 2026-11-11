@@ -23251,11 +23251,25 @@ function assemble(cfg){
   const near=sights.filter(s=>s.distMi<=20);
   const far=sights.filter(s=>s.distMi>20);
   // group far by area
-  const farAreas={};far.forEach(s=>{(farAreas[s.area]=farAreas[s.area]||[]).push(s);});
-  const farGroups=Object.values(farAreas).sort((a,b)=>score(b[0])-score(a[0]));
+  // cluster far sights into drivable day trips: single-link, any two sights within ~20 mi share a day
+  const farGroups=[];
+  far.forEach(s=>{
+    const hit=farGroups.filter(g=>g.some(m=>hav(m,s)<=20));
+    if(!hit.length){farGroups.push([s]);return;}
+    const base=hit[0];base.push(s);
+    for(let i=1;i<hit.length;i++){base.push(...hit[i]);farGroups.splice(farGroups.indexOf(hit[i]),1);}
+  });
+  farGroups.forEach(g=>g.sort((a,b)=>score(b)-score(a)));
+  // richest, most memorable clusters first (top three sights' scores); one-stop clusters only as a last resort
+  // when the roam slider is wide, the user is asking for a bigger memory: reward clusters that sit farther out
+  const reach=cfg.maxDist>120?0.5:0;
+  const gv=g=>g.slice(0,3).reduce((t,x)=>t+score(x),0)+(g.length>1?0:-1000)+reach*Math.min(110,Math.min.apply(null,g.map(x=>x.distMi)));
+  farGroups.sort((a,b)=>gv(b)-gv(a));
 
   let D=cfg.days;
-  let dayTrips=far.length?Math.min(Math.floor(D/2),farGroups.length):0;
+  // wider roam = more days out of town. Parks can pin their own share (the park itself is the main event).
+  const share=(typeof POOL.tripShare==="number")?POOL.tripShare:(cfg.maxDist>150?0.8:cfg.maxDist>120?0.67:cfg.maxDist>60?0.5:0.34);
+  let dayTrips=far.length?Math.min(Math.round(D*share),farGroups.length):0;
   let townDays=D-dayTrips;
   if(townDays<1&&D>=1){townDays=1;dayTrips=D-1;}
 
@@ -23283,7 +23297,7 @@ function assemble(cfg){
   }
   // day-trip days
   for(let d=0;d<dayTrips&&farGroups.length;d++){
-    const g=farGroups.shift().slice(0,Math.max(2,spd-1));
+    const g=farGroups.shift().slice(0,Math.max(2,spd));
     days.push({kind:"trip",sights:g});
   }
   if(!days.length) return {days:[],totalMatch,pulled:0};
@@ -23305,7 +23319,7 @@ function assemble(cfg){
     stops.forEach((s,i)=>{if(i>0)s._travel=travel(stops[i-1],s);});
     const totalMi=Math.round(stops.reduce((a,s)=>a+(s._travel?s._travel.mi:0),0));
     const areas=[...new Set(ordered.map(s=>s.area))];
-    return {kind:day.kind,theme:day.kind==="trip"?("Day trip • "+areas[0]):areas.slice(0,2).join(" & "),stops,totalMi};
+    return {kind:day.kind,theme:day.kind==="trip"?("Day trip • "+areas.slice(0,2).join(" & ")):areas.slice(0,2).join(" & "),stops,totalMi};
   });
   return {days:built,totalMatch,pulled};
 }

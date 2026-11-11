@@ -37,7 +37,7 @@ def build(prefix, center, city, state, area_base, items, source):
         d.update(ex)
         out.append(d)
     return {"city": city, "state": state, "center": {"lat": center[0], "lng": center[1]},
-            "source": source, "road": ROAD, "count": len(out), "items": out}
+            "source": source, "road": ROAD, "tripShare": 0.34, "count": len(out), "items": out}
 
 # ---------------------------------------------------------------- ZION
 ZC = (37.2000925, -112.9869847)
