@@ -206,6 +206,7 @@
         <div class="field"><label for="start" style="font-size:10px">Arrive</label><input type="date" id="start"></div>
         <div class="field"><label for="end" style="font-size:10px">Depart</label><input type="date" id="end"></div>
       </div>
+      <label style="display:flex;gap:8px;align-items:center;margin-top:8px;font-size:12px;color:var(--muted);cursor:pointer"><input type="checkbox" id="flyday" style="width:auto;margin:0"> Arrive and leave by air: plan only the days in between</label>
     </div>
 
     <div class="field">
@@ -23211,13 +23212,15 @@ $("#dist").oninput=e=>{$("#dist-now").textContent="Within "+e.target.value+" mi"
 
 function setDates(){const a=new Date();a.setDate(a.getDate()+30);const b=new Date(a);b.setDate(b.getDate()+2);
   const f=d=>d.toISOString().slice(0,10);$("#start").value=f(a);$("#end").value=f(b);}
-$("#start").onchange=build;$("#end").onchange=build;
+$("#start").onchange=build;$("#end").onchange=build;$("#flyday").onchange=build;
 
 function readCfg(){
   const s=$("#start").value,e=$("#end").value;
   let days=3;if(s&&e){const d=Math.round((new Date(e)-new Date(s))/864e5)+1;if(d>=1)days=Math.min(6,d);}
+  const fly=!!($("#flyday")&&$("#flyday").checked);
+  if(fly&&days>=3)days=days-2; // first and last calendar days are flights; plan the days in between
   const month=s?(new Date(s+"T00:00:00").getMonth()+1):(new Date().getMonth()+1);
-  return {days,month,adults:state.adults,kids:state.kids,veg:state.veg,nonveg:state.nonveg,
+  return {days,fly,month,adults:state.adults,kids:state.kids,veg:state.veg,nonveg:state.nonveg,
     maxDist:+$("#dist").value,style:+$("#style").value,pace:+$("#pace").value,
     interests:new Set(pressed("#interests").map(b=>b.dataset.int)),
     budget:+((pressed("#budget")[0]||{dataset:{bud:"2"}}).dataset.bud),start:s,end:e};
@@ -23498,12 +23501,12 @@ function b64u(b){let s=btoa(String.fromCharCode.apply(null,b));return s.replace(
 function ub64u(s){s=s.replace(/-/g,"+").replace(/_/g,"/");const bin=atob(s),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return a;}
 function encodeState(){
   const c=readCfg(),b=new Uint8Array(9);
-  b[0]=Math.max(1,Math.min(50,Math.round(c.maxDist/10)));
+  b[0]=Math.max(1,Math.min(50,Math.round(c.maxDist/10)))|(c.fly?128:0);
   b[1]=Math.max(0,Math.min(100,c.style));b[2]=Math.max(0,Math.min(100,c.pace));
   const bud=Math.max(1,Math.min(3,c.budget)),ad=Math.max(1,Math.min(7,c.adults)),kd=Math.max(0,Math.min(7,c.kids));
   b[3]=bud|(ad<<2)|(kd<<5);
   b[4]=Math.min(15,c.veg)|(Math.min(15,c.nonveg)<<4);
-  const nights=Math.max(0,Math.min(15,c.days-1));
+  const nights=Math.max(0,Math.min(15,c.days-1+(c.fly?2:0)));
   b[5]=(c.month&15)|(nights<<4);
   let m=0;INT_LIST.forEach((t,i)=>{if(c.interests.has(t))m|=(1<<i);});
   b[6]=m&255;b[7]=(m>>8)&255;b[8]=(m>>16)&255;
@@ -23511,7 +23514,8 @@ function encodeState(){
 }
 function applyToken(tok){
   let b;try{b=ub64u(tok);}catch(e){return false;}if(b.length<9)return false;
-  $("#dist").value=Math.max(10,Math.min(500,b[0]*10));
+  if($("#flyday"))$("#flyday").checked=!!(b[0]&128);
+  $("#dist").value=Math.max(10,Math.min(500,(b[0]&127)*10));
   $("#style").value=Math.max(0,Math.min(100,b[1]));$("#pace").value=Math.max(0,Math.min(100,b[2]));
   const bud=(b[3]&3)||2,ad=((b[3]>>2)&7)||1,kd=(b[3]>>5)&7;
   document.querySelectorAll("#budget button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.bud==String(bud)?"true":"false"));
