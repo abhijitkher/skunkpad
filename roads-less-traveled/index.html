@@ -23251,7 +23251,7 @@ function assemble(cfg){
   const near=sights.filter(s=>s.distMi<=20);
   // pace and kids decide how far a day trip may reach: relaxed = one easy hop, packed = long drives
   const kidMul=cfg.kids>0?0.75:1;
-  const tripCap=(cfg.pace<25?60:cfg.pace<50?90:cfg.pace<75?130:200)*kidMul;
+  const tripCap=(cfg.pace<25?60:cfg.pace<50?90:cfg.pace<75?110:120)*kidMul;
   const far=sights.filter(s=>s.distMi>20);
   // group far by area
   // cluster far sights into drivable day trips: single-link, any two sights within ~20 mi share a day
@@ -23281,14 +23281,18 @@ function assemble(cfg){
   if(townDays<1&&D>=1){townDays=1;dayTrips=D-1;}
 
   const usedFood=new Set();
-  function pickFood(center){
+  function pickFood(center,maxMi){
     let best=null,bd=1e9;
     food.forEach(f=>{if(usedFood.has(f.id))return;
       if(vegNeed&&cfg.nonveg===0&&(f.veg||0)<1)return;
-      const d=hav(center,f);const pref=(vegNeed&&(f.veg||0)>=2)?-5:0;
+      const d=hav(center,f);if(maxMi&&d>maxMi)return;const pref=(vegNeed&&(f.veg||0)>=2)?-5:0;
       if(d+pref<bd){bd=d+pref;best=f;}});
     if(best)usedFood.add(best.id);return best;
   }
+  function localSpot(cen,area,meal){
+    return {id:"syn-"+meal+"-"+area,name:"A local spot in "+area,type:"food",area:area,lat:cen.lat,lng:cen.lng,distMi:0,local:50,kid:2,
+      interests:["food"],durMin:60,cost:1,veg:0,_q:"restaurants in "+area,
+      note:"Nothing vetted in our pool here yet. Ask a local or check Maps for a spot nearby."};}
   function centroid(arr){const a={lat:0,lng:0};arr.forEach(s=>{a.lat+=s.lat;a.lng+=s.lng;});return {lat:a.lat/arr.length,lng:a.lng/arr.length};}
 
   const avail=near.slice();
@@ -23303,16 +23307,26 @@ function assemble(cfg){
     days.push({kind:"town",sights:chain});
   }
   // day-trip days
+  // relaxed/steady pace: a far, 3+ sight cluster becomes a two-day stay (no same-day round trip, no whiplash back to town)
+  const stayMode=cfg.pace<50;let unitId=0;
   for(let d=0;d<dayTrips&&farGroups.length;d++){
-    const g=farGroups.shift().slice(0,Math.max(2,spd));
-    days.push({kind:"trip",sights:g});
+    const grp=farGroups.shift();
+    const nearest=Math.min.apply(null,grp.map(x=>x.distMi));
+    if(stayMode&&grp.length>=2&&nearest>=45&&d+1<dayTrips){
+      const k=Math.ceil(grp.length/2),u=++unitId;
+      days.push({kind:"trip",unit:u,stay:1,sights:grp.slice(0,k)});
+      days.push({kind:"trip",unit:u,stay:2,sights:grp.slice(k,k+Math.max(2,spd))});
+      d++;continue;}
+    days.push({kind:"trip",sights:grp.slice(0,Math.max(2,spd))});
   }
   if(!days.length) return {days:[],totalMatch,pulled:0};
-  {const town=days.filter(x=>x.kind==="town"),trip=days.filter(x=>x.kind==="trip"),mix=[];
+  {const town=days.filter(x=>x.kind==="town").map(x=>[x]),trip=[];
+   days.filter(x=>x.kind==="trip").forEach(x=>{if(x.unit&&trip.length&&trip[trip.length-1][0].unit===x.unit)trip[trip.length-1].push(x);else trip.push([x]);});
+   const mix=[];let last="";
    while(town.length||trip.length){
-     if(town.length&&(!mix.length||mix[mix.length-1].kind==="trip"||!trip.length))mix.push(town.shift());
-     else if(trip.length)mix.push(trip.shift());
-     else mix.push(town.shift());}
+     if(town.length&&(!mix.length||last==="trip"||!trip.length)){mix.push(...town.shift());last="town";}
+     else if(trip.length){mix.push(...trip.shift());last="trip";}
+     else{mix.push(...town.shift());last="town";}}
    days.length=0;days.push(...mix);}
 
   // build timed stops per day
@@ -23323,22 +23337,26 @@ function assemble(cfg){
     const ordered=[sg.shift()];
     while(sg.length){let bi=0,bd=1e9;for(let i=0;i<sg.length;i++){const dd=hav(ordered[ordered.length-1],sg[i]);if(dd<bd){bd=dd;bi=i;}}ordered.push(sg.splice(bi,1)[0]);}
     const cen=centroid(ordered);
-    const lunch=ordered.length>=2?pickFood(cen):null;
-    const dinner=day.kind==="town"?pickFood(cen):null;
+    const away=day.kind==="trip",area0=ordered[0].area;
+    const lunch=away?(pickFood(cen,15)||localSpot(cen,area0,"L")):(ordered.length>=2?pickFood(cen):null);
+    const dinner=day.kind==="town"?pickFood(cen):(day.stay===1?(pickFood(cen,15)||localSpot(cen,area0,"D")):null);
     // weave: s0,(s1),lunch,(rest),dinner
     const stops=[];
     ordered.forEach((s,i)=>{stops.push({...s,_stop:"sight"});if(i===Math.min(1,ordered.length-1)&&lunch)stops.push({...lunch,_stop:"meal",_meal:"Lunch"});});
     if(dinner)stops.push({...dinner,_stop:"meal",_meal:"Dinner"});
     stops.forEach((s,i)=>{if(i>0)s._travel=travel(stops[i-1],s);});
-    const totalMi=Math.round(stops.reduce((a,s)=>a+(s._travel?s._travel.mi:0),0));
+    let totalMi=Math.round(stops.reduce((a,s)=>a+(s._travel?s._travel.mi:0),0));
+    const eachWay=Math.round(Math.min.apply(null,ordered.map(x=>x.distMi)));
+    if(day.kind==="trip"&&day.stay!==2)totalMi+=eachWay;      // drive out
+    if(day.kind==="trip"&&day.stay!==1)totalMi+=eachWay;      // drive home
     const areas=[...new Set(ordered.map(s=>s.area))];
-    return {kind:day.kind,theme:day.kind==="trip"?("Day trip • "+areas.slice(0,2).join(" & ")):areas.slice(0,2).join(" & "),stops,totalMi};
+    return {kind:day.kind,theme:day.kind==="trip"?((day.stay?"Stay • ":"Day trip • ")+areas.slice(0,2).join(" & ")+(day.stay?" (day "+day.stay+" of 2)":"")+" · ~"+Math.round(Math.min.apply(null,ordered.map(x=>x.distMi)))+" mi from base"):areas.slice(0,2).join(" & "),stops,totalMi};
   });
   return {days:built,totalMatch,pulled};
 }
 
 /* ---------- render ---------- */
-function mapLink(it){return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(it.name+" "+(POOL.city||"")+" "+(POOL.state||""));}
+function mapLink(it){return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(it._q?(it._q+" "+(POOL.state||"")):(it.name+" "+(POOL.city||"")+" "+(POOL.state||"")));}
 let lastCfg=null;
 function dwell(m){m=m||0;
   if(m<60){let lo=Math.floor(m/15)*15;if(lo<15)lo=15;return lo+" - "+(lo+15)+" min";}
