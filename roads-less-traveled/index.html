@@ -36,6 +36,12 @@
   .citysearch input:focus{outline:2px solid var(--gold);border-color:var(--gold)}
   .citysearch button{font:inherit;font-size:13px;font-weight:700;border:0;border-radius:8px;background:var(--ink);color:var(--panel);padding:7px 12px;cursor:pointer}
   .ac{position:relative;margin-top:10px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-items:center}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--ink,inherit);background:var(--panel-2);border:1px solid var(--line-strong);border-radius:999px;padding:4px 6px 4px 10px}
+  .chip button{all:unset;cursor:pointer;color:var(--muted);font-size:14px;line-height:1;padding:0 4px;border-radius:50%}
+  .chip button:hover{color:var(--warn)}
+  #addplace{all:unset;cursor:pointer;font-size:12.5px;font-weight:700;color:var(--gold);padding:4px 2px}
+  #addplace:hover{text-decoration:underline;text-underline-offset:3px}
   .ac>input{width:100%;font:inherit;font-size:14px;color:var(--ink);background:var(--panel-2);border:1px solid var(--line-strong);border-radius:9px;padding:9px 11px}
   .ac>input:focus{outline:2px solid var(--gold);border-color:var(--gold)}
   .ac-list{list-style:none;margin:6px 0 0;padding:4px;position:absolute;left:0;right:0;top:100%;z-index:30;background:var(--panel);border:1px solid var(--line-strong);border-radius:10px;box-shadow:0 10px 28px var(--shadow);max-height:300px;overflow-y:auto}
@@ -198,6 +204,7 @@
         <input type="text" id="cityq" placeholder="Enter a city&hellip;" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="ac-city">
         <ul class="ac-list" id="ac-city" role="listbox" hidden></ul>
       </div>
+      <div class="chips" id="citychips"></div>
     </div>
 
     <div class="field">
@@ -22183,7 +22190,7 @@ function assemble(cfg){
 }
 
 /* ---------- render ---------- */
-function mapLink(it){return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(it._q?(it._q+" "+(POOL.state||"")):(it.name+" "+(POOL.city||"")+" "+(POOL.state||"")));}
+function mapLink(it){return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(it._q?(it._q+" "+(it._state||POOL.state||"")):(it.name+" "+(it._city||POOL.city||"")+" "+(it._state||POOL.state||"")));}
 let lastCfg=null;
 function dwell(m){m=m||0;
   if(m<60){let lo=Math.floor(m/15)*15;if(lo<15)lo=15;return lo+" - "+(lo+15)+" min";}
@@ -22329,13 +22336,13 @@ function applyToken(tok){
 function slugify(s){return String(s||"denver").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");}
 function updateUrl(){
   if(!urlReady)return;
-  const slug=slugify(POOL&&POOL.city?POOL.city:"denver"),tok=encodeState();
+  const slug=CUR.join("+"),tok=encodeState();
   try{history.replaceState({},"","/"+slug+"/"+tok);}catch(e){try{location.hash=slug+"."+tok;}catch(e2){}}
 }
 function parseUrl(){
   let slug="denver",token=null;
   const parts=location.pathname.replace(/^\/+|\/+$/g,"").split("/").filter(Boolean);
-  if(parts.length&&parts[0]!=="index.html"){slug=parts[0].toLowerCase();if(parts[1])token=parts[1];}
+  if(parts.length&&parts[0]!=="index.html"){slug=decodeURIComponent(parts[0]).toLowerCase();if(parts[1])token=parts[1];}
   else if(location.hash){const h=location.hash.replace(/^#/,""),d=h.indexOf(".");if(d>0){slug=h.slice(0,d).toLowerCase();token=h.slice(d+1);}else if(h)slug=h.toLowerCase();}
   return {slug,token};
 }
@@ -22346,32 +22353,89 @@ function showBuilding(slug){
     '<p>Finding the places and tagging them. This runs once per city, then it’s cached and instant. You can leave the tab — it’ll ping you when it’s ready.</p></div></div>';
 }
 function showBuildError(msg){$("#guide-inner").innerHTML='<div class="stage"><div class="stage-box"><h2>Couldn’t build that</h2><p style="color:var(--warn);font-size:13.5px">'+esc(msg)+'</p></div></div>';}
-async function loadCity(slug){
-  slug=(slug||"denver").toLowerCase();
-  if(slug==="denver"){POOL=DENVER_POOL;build(false);return;}
-  showBuilding(slug); askNotif();
+let CUR=["denver"],addMode=false;
+const POOL_CACHE={};
+async function fetchPool(slug){
+  if(slug==="denver")return {pool:DENVER_POOL,gen:false};
+  if(POOL_CACHE[slug])return {pool:POOL_CACHE[slug],gen:false};
+  // hand-curated pools ship as static files; fall back to the generator for everything else
   try{
-    // hand-curated pools ship as static files; fall back to the generator for everything else
-    try{
-      const sr=await fetch("/pools/"+encodeURIComponent(slug)+".json");
-      if(sr.ok&&/json/i.test(sr.headers.get("content-type")||"")){
-        const sj=await sr.json();
-        if(Array.isArray(sj.items)&&sj.items.length){POOL=sj;build(false);return;}
-      }
-    }catch(_){}
-    const r=await fetch("/api/pool?city="+encodeURIComponent(slug));
-    const j=await r.json().catch(()=>({error:"Bad response from the builder."}));
-    if(!r.ok||j.error||!Array.isArray(j.items)){showBuildError(j.error||"Couldn’t build that city. Try another spelling.");return;}
-    POOL=j;
-    build(true);
-  }catch(e){showBuildError("New-city generation runs on the live Vercel site, not inside this preview. Open the deployed URL to build a new city.");}
+    const sr=await fetch("/pools/"+encodeURIComponent(slug)+".json");
+    if(sr.ok&&/json/i.test(sr.headers.get("content-type")||"")){
+      const sj=await sr.json();
+      if(Array.isArray(sj.items)&&sj.items.length){POOL_CACHE[slug]=sj;return {pool:sj,gen:false};}
+    }
+  }catch(_){}
+  const r=await fetch("/api/pool?city="+encodeURIComponent(slug));
+  const j=await r.json().catch(()=>({error:"Bad response from the builder."}));
+  if(!r.ok||j.error||!Array.isArray(j.items)){const er=new Error(j.error||"Couldn’t build that city. Try another spelling.");er.build=true;throw er;}
+  POOL_CACHE[slug]=j;return {pool:j,gen:true};
+}
+const normName=s=>String(s||"").toLowerCase().replace(/\(.*?\)/g,"").replace(/[^a-z0-9]+/g," ").trim().slice(0,26);
+/* merge several place pools into one trip. The first place is the home base (distances are measured from it). */
+function mergePools(pools){
+  if(pools.length===1)return pools[0];
+  const base=pools[0],seen=new Set(),items=[],names=pools.map(p=>p.city);
+  pools.forEach((p,pi)=>{
+    (p.items||[]).forEach(it=>{
+      // a place's own copy of an item wins; skip other pools' stand-ins for a selected place (e.g. Bryce's "Zion" items)
+      if(pi>0||true){if(names.some((n,ni)=>ni!==pi&&it.area===n))return;}
+      const k=normName(it.name);
+      if(seen.has(k))return;seen.add(k);
+      const c=Object.assign({},it);
+      c._city=p.city;c._state=p.state;
+      c.id=p.city.slice(0,2).toLowerCase()+pi+"_"+it.id;
+      if(pi>0){c.distMi=Math.round(hav(base.center,{lat:it.lat,lng:it.lng})*(base.road||1)*10)/10;}
+      items.push(c);
+    });
+  });
+  const sh=pools.map(p=>p.tripShare).filter(x=>typeof x==="number");
+  return {city:names.join(" + "),state:Array.from(new Set(pools.map(p=>p.state).filter(Boolean))).join("/"),
+    center:base.center,road:base.road,tripShare:sh.length===pools.length?Math.min.apply(null,sh):undefined,
+    source:pools.map(p=>p.source).filter(Boolean).join(" | "),count:items.length,items:items,_multi:true};
+}
+function chipLabel(slug){return slug==="denver"?"Denver":titleCase(slug);}
+function renderChips(){
+  const box=$("#citychips");if(!box)return;box.innerHTML="";
+  CUR.forEach((s,i)=>{const c=document.createElement("span");c.className="chip";
+    c.appendChild(document.createTextNode((i===0&&CUR.length>1?"Base: ":"")+chipLabel(s)));
+    if(CUR.length>1){const x=document.createElement("button");x.type="button";x.setAttribute("aria-label","Remove "+chipLabel(s));x.textContent="×";
+      x.onclick=()=>{CUR=CUR.filter(z=>z!==s);navTo(CUR);};c.appendChild(x);}
+    box.appendChild(c);});
+  const add=document.createElement("button");add.type="button";add.id="addplace";add.textContent=addMode?"Pick a place to add…":"+ Add another place";
+  add.onclick=()=>{addMode=true;cityInput.placeholder="Add another place…";cityInput.value="";cityInput.focus();renderChips();};
+  box.appendChild(add);
+}
+function navTo(slugs){
+  const u="/"+slugs.join("+");
+  try{history.pushState({},"",u);}catch(e){location.hash=slugs.join("+");}
+  loadCity(slugs.join("+"));
+}
+async function loadCity(slugStr){
+  let slugs=Array.from(new Set(String(slugStr||"denver").toLowerCase().replace(/%2b|\s/g,"+").split("+").filter(Boolean)));
+  if(!slugs.length)slugs=["denver"];
+  CUR=slugs;addMode=false;if(cityInput)cityInput.placeholder="Enter a city…";renderChips();
+  if(slugs.length===1&&slugs[0]==="denver"){POOL=DENVER_POOL;build(false);return;}
+  showBuilding(slugs.map(chipLabel).join(" + ")); askNotif();
+  try{
+    const rs=await Promise.all(slugs.map(fetchPool));
+    POOL=mergePools(rs.map(r=>r.pool));
+    // widen the roam slider so the other places are reachable from the base
+    if(slugs.length>1){let need=0;for(let i=1;i<rs.length;i++){const c=rs[i].pool.center;need=Math.max(need,hav(rs[0].pool.center,c)*(rs[0].pool.road||1)+40);}
+      const want=Math.min(500,Math.ceil(need/10)*10),d=$("#dist");if(+d.value<want){d.value=want;$("#dist-now").textContent="Within "+want+" mi";}}
+    build(rs.some(r=>r.gen));
+  }catch(e){
+    if(e&&e.build)showBuildError(e.message);
+    else showBuildError("New-city generation runs on the live Vercel site, not inside this preview. Open the deployed URL to build a new city.");
+  }
 }
 function goCity(name){
   const raw=(name||$("#cityq").value||"").split(",")[0].trim(); if(!raw)return;
   const slug=slugify(raw); if(!slug)return;
   acHide();
-  try{history.pushState({},"","/"+slug);}catch(e){location.hash=slug;}
-  loadCity(slug);
+  const next=(addMode&&!CUR.includes(slug))?CUR.concat([slug]):[slug];
+  $("#cityq").value="";
+  navTo(next);
 }
 /* city type-ahead over the GeoNames US cities dataset */
 let CITY_ROWS=null;
