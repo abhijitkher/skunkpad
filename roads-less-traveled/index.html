@@ -22294,7 +22294,7 @@ let urlReady=false;
 function b64u(b){let s=btoa(String.fromCharCode.apply(null,b));return s.replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");}
 function ub64u(s){s=s.replace(/-/g,"+").replace(/_/g,"/");const bin=atob(s),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return a;}
 function encodeState(){
-  const c=readCfg(),b=new Uint8Array(9);
+  const c=readCfg(),b=new Uint8Array(12);
   b[0]=Math.max(1,Math.min(50,Math.round(c.maxDist/10)))|(c.fly?128:0);
   b[1]=Math.max(0,Math.min(100,c.style));b[2]=Math.max(0,Math.min(100,c.pace));
   const bud=Math.max(1,Math.min(3,c.budget)),ad=Math.max(1,Math.min(7,c.adults)),kd=Math.max(0,Math.min(7,c.kids));
@@ -22304,6 +22304,8 @@ function encodeState(){
   b[5]=(c.month&15)|(nights<<4);
   let m=0;INT_LIST.forEach((t,i)=>{if(c.interests.has(t))m|=(1<<i);});
   b[6]=m&255;b[7]=(m>>8)&255;b[8]=(m>>16)&255;
+  if(c.start&&c.end){const s0=Math.round((Date.parse(c.start)-Date.parse("2025-01-01"))/864e5),sp=Math.round((Date.parse(c.end)-Date.parse(c.start))/864e5);
+    if(s0>=0&&s0<65536&&sp>=0&&sp<256){b[9]=s0&255;b[10]=s0>>8;b[11]=sp;}}
   return b64u(b);
 }
 function applyToken(tok){
@@ -22317,6 +22319,7 @@ function applyToken(tok){
   const month=(b[5]&15)||1,nights=(b[5]>>4)&15;
   const arrive=new Date(new Date().getFullYear(),month-1,15),depart=new Date(arrive);depart.setDate(depart.getDate()+nights);
   const f=d=>d.toISOString().slice(0,10);$("#start").value=f(arrive);$("#end").value=f(depart);
+  if(b.length>=12){const s0=b[9]|(b[10]<<8);if(s0>0){const st=new Date(Date.parse("2025-01-01")+s0*864e5),en=new Date(st.getTime()+b[11]*864e5);$("#start").value=f(st);$("#end").value=f(en);}}
   const mask=b[6]|(b[7]<<8)|(b[8]<<16);
   INT_LIST.forEach((t,i)=>{const btn=document.querySelector('#interests button[data-int="'+t+'"]');if(btn)btn.setAttribute("aria-pressed",(mask>>i)&1?"true":"false");});
   $("#style-now").textContent=styleWord(+$("#style").value);$("#pace-now").textContent=paceWord(+$("#pace").value);$("#dist-now").textContent="Within "+$("#dist").value+" mi";
