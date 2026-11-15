@@ -22054,6 +22054,9 @@ function assemble(cfg){
   // pace and kids decide how far a day trip may reach: relaxed = one easy hop, packed = long drives
   const kidMul=cfg.kids>0?0.75:1;
   const tripCap=(cfg.pace<25?60:cfg.pace<50?90:cfg.pace<75?110:120)*kidMul;
+  // multi-night journeys: a long trip (4+ days, wide roam) may stay at a place farther out than a day trip allows; reach grows with days and pace
+  const longReach=(typeof POOL.tripShare!=="number"&&cfg.days>=4&&cfg.maxDist>tripCap)?Math.min(cfg.maxDist,Math.round((cfg.pace<25?0.6:cfg.pace<50?0.8:cfg.pace<75?1:1.1)*110*(cfg.days-1)*kidMul)):0;
+  const nearestOfG=g=>Math.min.apply(null,g.map(x=>x.distMi));
   const far=sights.filter(s=>s.distMi>20);
   // group far by area
   // cluster far sights into drivable day trips: single-link, any two sights within ~20 mi share a day
@@ -22067,11 +22070,13 @@ function assemble(cfg){
   farGroups.forEach(g=>g.sort((a,b)=>score(b)-score(a)));
   // richest, most memorable clusters first (top three sights' scores); one-stop clusters only as a last resort
   // when the roam slider is wide, the user is asking for a bigger memory: reward clusters that sit farther out
-  const reach=cfg.maxDist>120?0.5:0;
-  const gv=g=>g.slice(0,3).reduce((t,x)=>t+score(x),0)+(g.length>1?0:-1000)+reach*Math.min(110,Math.min.apply(null,g.map(x=>x.distMi)));
+  const reach=longReach>tripCap?0.8:(cfg.maxDist>120?0.5:0);
+  // a far stay needs somewhere to eat: reward clusters with real restaurants nearby
+  const foodNear=g=>{const c=centroid(g);return Math.min(3,food.filter(f=>hav(c,f)<=15).length);};
+  const gv=g=>g.slice(0,3).reduce((t,x)=>t+score(x),0)+(g.length>1?0:-1000)+(longReach>tripCap?(foodNear(g)?30*foodNear(g):-150):0)+reach*Math.min(longReach>tripCap?150:110,Math.min.apply(null,g.map(x=>x.distMi)));
   farGroups.sort((a,b)=>gv(b)-gv(a));
   // drop trips that are too far to enjoy at this pace (a day trip is a round trip: nearest sight sets the drive)
-  for(let i=farGroups.length-1;i>=0;i--){if(Math.min.apply(null,farGroups[i].map(x=>x.distMi))>tripCap)farGroups.splice(i,1);}
+  for(let i=farGroups.length-1;i>=0;i--){if(nearestOfG(farGroups[i])>Math.max(tripCap,longReach))farGroups.splice(i,1);}
 
   let D=cfg.days;
   // wider roam = more days out of town. Parks can pin their own share (the park itself is the main event).
@@ -22081,7 +22086,7 @@ function assemble(cfg){
   let dayTrips=far.length?Math.min(Math.round(D*share),farGroups.length):0;
   // LOOP: for cities with a wide-enough trip, go out, stay a while, and come home through a second town (no whiplash back to base)
   let loopList=null;
-  if(typeof POOL.tripShare!=="number"&&D>=3&&farGroups.length){
+  if(typeof POOL.tripShare!=="number"&&D>=3&&farGroups.length&&farGroups[0].length>=2){
     const homeD=D>=6?2:1,loopD=D-homeD;
     const nearestOf=g=>Math.min.apply(null,g.map(x=>x.distMi));
     const A=farGroups[0];
@@ -22090,7 +22095,7 @@ function assemble(cfg){
     while(left>0&&picks.length<3){
       let best=null,bs=-1e9;
       farGroups.forEach(g=>{if(picks.some(p=>p.g===g))return;
-        const dd=hav(centroid(from),centroid(g));if(dd>80)return;
+        const dd=hav(centroid(from),centroid(g)),farFrom=nearestOf(from)>tripCap;if(dd>(farFrom?180:80)||(farFrom&&nearestOf(g)>=nearestOf(from)))return;
         const sc=gv(g)-dd+(nearestOf(g)<nearestOf(from)?30:0);if(sc>bs){bs=sc;best=g;}});
       if(!best)break;
       const k=Math.min(left,2,best.length);picks.push({g:best,k});left-=k;from=best;}
@@ -22103,6 +22108,8 @@ function assemble(cfg){
     });
     if(!loopList.length)loopList=null;
   }
+  // without a loop a far stay can't happen, so only day-trip distances survive
+  if(!loopList){for(let i=farGroups.length-1;i>=0;i--){if(nearestOfG(farGroups[i])>tripCap)farGroups.splice(i,1);}dayTrips=Math.min(dayTrips,farGroups.length);}
   let townDays=loopList?D-loopList.length:D-dayTrips;
   if(!loopList&&townDays<1&&D>=1){townDays=1;dayTrips=D-1;}
 
