@@ -22086,10 +22086,19 @@ function assemble(cfg){
   let dayTrips=far.length?Math.min(Math.round(D*share),farGroups.length):0;
   // LOOP: for cities with a wide-enough trip, go out, stay a while, and come home through a second town (no whiplash back to base)
   let loopList=null;
+  // destination towns keep home days in proportion to the sliders: narrow roam or relaxed pace = mostly home, wide roam = mostly out; never more days than the home sights can fill
+  const homeDaysFor=()=>{
+    if(typeof POOL.homeShare!=="number")return D>=6?2:1;
+    const rf=cfg.maxDist<=60?1.5:cfg.maxDist<=120?1.1:cfg.maxDist<=200?0.85:cfg.maxDist<=300?0.65:0.55;
+    const pf=cfg.pace<25?0.1:cfg.pace>=75?-0.05:0;
+    const want=Math.round(D*Math.min(0.9,POOL.homeShare*rf+pf));
+    const fill=Math.max(1,Math.ceil(near.length/spd));
+    return Math.min(D-1,Math.max(1,Math.min(want,fill)));
+  };
   // a far stay needs 3+ days out to be worth the drive; shorter loops keep to the nearer clusters
-  if(typeof POOL.tripShare!=="number"&&typeof POOL.homeShare==="number"&&D-Math.min(D-1,Math.max(D>=6?2:1,Math.round(D*POOL.homeShare)))<3){for(let i=farGroups.length-1;i>=0;i--)if(nearestOfG(farGroups[i])>tripCap)farGroups.splice(i,1);}
+  if(typeof POOL.tripShare!=="number"&&typeof POOL.homeShare==="number"&&D-homeDaysFor()<3){for(let i=farGroups.length-1;i>=0;i--)if(nearestOfG(farGroups[i])>tripCap)farGroups.splice(i,1);}
   if(typeof POOL.tripShare!=="number"&&D>=3&&farGroups.length&&farGroups[0].length>=2){
-    const homeD=Math.min(D-1,Math.max(D>=6?2:1,typeof POOL.homeShare==="number"?Math.round(D*POOL.homeShare):0)),loopD=D-homeD; // a destination town (homeShare) keeps most of the trip at home
+    const homeD=homeDaysFor(),loopD=D-homeD;
     const nearestOf=g=>Math.min.apply(null,g.map(x=>x.distMi));
     const A=farGroups[0];
     let aReq=Math.max(1,Math.min(3,Math.ceil(loopD/2)));if(cfg.pace>=75)aReq=Math.min(aReq,2);
