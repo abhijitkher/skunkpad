@@ -225,7 +225,7 @@ def build():
         d.update(ex); out.append(d)
     return {"city": "Solvang", "state": "CA", "center": {"lat": C[0], "lng": C[1]},
             "source": "Hand-curated Nov 15 2026 (valley ring plus far ring to about 330 mi). Names and coordinates from Google Places; hours, closures and seasons checked against venue sites, Visit Solvang, county and state park pages. Verify before booking. distMi is approximate road miles from Solvang Village Square.",
-            "road": ROAD, "count": len(out), "items": out}
+            "road": ROAD, "homeShare": 0.55, "count": len(out), "items": out}
 if __name__ == "__main__":
     d = sys.argv[1] if len(sys.argv) > 1 else "pools"
     p = build(); names = [x["name"] for x in p["items"]]; assert len(names) == len(set(names))
